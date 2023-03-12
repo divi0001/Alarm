@@ -14,6 +14,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class MathMethodSetActivity extends AppCompatActivity {
@@ -32,10 +33,11 @@ public class MathMethodSetActivity extends AppCompatActivity {
         rgDifficulty = (RadioGroup) findViewById(R.id.rgDifficulty);
         rgKindOfMath = (RadioGroup) findViewById(R.id.rgMathMethod);
         btnSave = (Button) findViewById(R.id.btnSaveMathMethod);
-        Intent i = getIntent();
 
-        save = i.getStringExtra("btnType").equals("save");
-
+        SharedPreferences pref = getSharedPreferences(getString(R.string.queue_shared_pref_key_adapter),Context.MODE_PRIVATE);
+        if(pref.contains("method")){
+            save = pref.getString("method","").equals("editAlarm");
+            }
 
         if(save){
             btnSave.setText(R.string.save);
@@ -79,7 +81,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 Context context = MathMethodSetActivity.this;
 
-                                SharedPreferences sharedPref = MathMethodSetActivity.this.getSharedPreferences(getString(R.string.preference_file_key),Context.MODE_PRIVATE);
+                                SharedPreferences sharedPref = MathMethodSetActivity.this.getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),Context.MODE_PRIVATE);
                                 SharedPreferences.Editor editor =sharedPref.edit();
 
                                 RadioButton rbMeth = findViewById(rgKindOfMath.getCheckedRadioButtonId());

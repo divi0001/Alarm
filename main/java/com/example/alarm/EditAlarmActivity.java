@@ -40,6 +40,7 @@ public class EditAlarmActivity extends AppCompatActivity {
     private final int REQ_CODE_MATH_METHOD = 1234;
     private ArrayList<Alarm> alarmParameter = new ArrayList<>();
     private final Context context = this;
+    private QueueRecViewAdapter adapter1;
 
 
 
@@ -310,8 +311,6 @@ public class EditAlarmActivity extends AppCompatActivity {
             }
         });
 
-        //TODO: add a textView displaying ... i forgot it ... Q_Q
-
         spMethods.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -352,7 +351,12 @@ public class EditAlarmActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        QueueRecViewAdapter adapter1 = new QueueRecViewAdapter(this);
+        Alarm ala = new Alarm(0);
+        ala.setDifficulty("Easy");
+        ala.setTurnOffMethod("Addition");
+        alarmParameter.add(ala);
+
+        adapter1 = new QueueRecViewAdapter(this);
         adapter1.setAlarmParameter(alarmParameter);
 
         alarmQueue.setAdapter(adapter1);
@@ -392,8 +396,23 @@ public class EditAlarmActivity extends AppCompatActivity {
         }*/
     }
 
-    private void setAlarmParams(ArrayList<Alarm> alarmParameter) {
-        this.alarmParameter = alarmParameter;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences prefs = context.getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),Context.MODE_PRIVATE);
+
+        if(prefs.contains(getString(R.string.current_math_method)) && prefs.contains(getString(R.string.current_math_method_difficulty))) {
+
+            String method = prefs.getString(getString(R.string.current_math_method), "Addition");
+            String difficulty = prefs.getString(getString(R.string.current_math_method_difficulty), "Easy");
+
+            Alarm ala = new Alarm(0);
+            ala.setDifficulty(difficulty);
+            ala.setTurnOffMethod(method);
+
+            alarmParameter.add(ala);
+            adapter1.setAlarmParameter(alarmParameter);
+        }
     }
 
     @Override
@@ -401,17 +420,24 @@ public class EditAlarmActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQ_CODE_MATH_METHOD && resultCode == RESULT_OK) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            JSONArray jArr = new JSONArray();
-            try{
-                JSONHandler j = new JSONHandler();
-                ArrayList<Alarm> alarmList = new ArrayList<>();
-                alarmParameter = j.fromJAlarmArray(jArr);
-                System.out.println(alarmParameter);
 
-            }catch (Exception e){
-                e.printStackTrace();
+            SharedPreferences prefs = context.getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),Context.MODE_PRIVATE);
+
+            if(prefs.contains(getString(R.string.current_math_method)) && prefs.contains(getString(R.string.current_math_method_difficulty))){
+
+                String method = prefs.getString(getString(R.string.current_math_method),"Addition");
+                String difficulty = prefs.getString(getString(R.string.current_math_method_difficulty),"Easy");
+
+                Alarm ala = new Alarm(0);
+                ala.setDifficulty(difficulty);
+                ala.setTurnOffMethod(method);
+
+                alarmParameter.add(ala);
+                adapter1.setAlarmParameter(alarmParameter);
+
+
             }
+
 
 
             //TODO: handle now set math_method, data in strings.xml, wanted to write also handle go back to main screen + add alarm, but that's not due here

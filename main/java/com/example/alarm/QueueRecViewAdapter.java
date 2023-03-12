@@ -4,6 +4,7 @@ import static androidx.core.content.ContextCompat.startActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,12 +18,11 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapter.ViewHolder>{
 
     private ArrayList<Alarm> alarmParameter;
-    Context context;
+    private Context context;
 
     public QueueRecViewAdapter(Context context) {
         this.context = context;
@@ -32,13 +32,14 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
 
     @NonNull
     @Override
-    public QueueRecViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.method_list_item_math, parent, false); //pass null instead of parent,false , if you are not sure to which parent to pass the view/layout
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.method_list_item_math, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull QueueRecViewAdapter.ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+
         holder.txtMethod.setText(alarmParameter.get(position).getTurnOffMethod());
         holder.txtDifficulty.setText(alarmParameter.get(position).getDifficulty());
 
@@ -53,20 +54,22 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
         holder.imgThreeDots.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent iSave = new Intent();
-                iSave.putExtra("btnType","save");
-                Bundle b = new Bundle();
-                b.putString("btnType","save");
-                startActivity(context, iSave, b);
+                Intent iSave = new Intent(context,MathMethodSetActivity.class);
+                String key = holder.itemView.getContext().getString(R.string.queue_shared_pref_key_adapter);
+                SharedPreferences pref = context.getSharedPreferences(key,Context.MODE_PRIVATE);
+                SharedPreferences.Editor edit = pref.edit();
+                edit.putString("method","editAlarm");
+                edit.apply();
+                startActivity(context,iSave,null);
             }
         });
 
-        holder.parent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(context, (alarmParameter.get(position).toString()) + " Selected", Toast.LENGTH_SHORT).show();
-            }
-        });
+        //holder.parent.setOnClickListener(new View.OnClickListener() {
+         //   @Override
+          //  public void onClick(View v) {
+           //     Toast.makeText(context, "It fucking worked", Toast.LENGTH_SHORT).show();
+            //}
+        //});
     }
 
     @Override
@@ -82,9 +85,11 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
+
         private TextView txtMethod,txtDifficulty;
         private ImageView imgThreeDots,imgMinusDelete;
-        private CardView parent;
+        public CardView parent;
+
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

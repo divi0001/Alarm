@@ -176,5 +176,7 @@
     <string name="current_math_method">empty</string>
     <string name="current_math_method_difficulty">exEasy</string>
     <string name="save_set">set</string>
+    <string name="queue_shared_pref_key_adapter">com.example.alarm.QUEUE_SHARED_PREF_KEY_ADAPTER</string>
+    <string name="math_to_edit_alarm_pref_key">com.example.alarm.MATH_TO_EDIT_ALARM_PREF_KEY</string>
 
 </resources>
