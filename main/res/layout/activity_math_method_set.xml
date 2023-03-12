@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MathMethodSetActivity">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="10dp">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/relLayoutMethodMath">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/relLayoutMethodMath1">
+
+                    <!--TODO give the scrollview a gray tint, to make this the focus -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/method_math"
+                        android:textSize="30sp"
+                        android:layout_marginStart="10dp"
+                        android:id="@+id/txtMathMethodSettings"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/difficulty"
+                        android:id="@+id/txtDifficuluty"
+                        android:layout_marginStart="10dp"
+                        android:layout_below="@+id/txtMathMethodSettings"
+                        android:textSize="20sp"/>
+
+                    <RadioGroup
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/rgDifficulty"
+                        android:layout_alignBaseline="@+id/txtDifficuluty"
+                        android:layout_marginTop="10dp">
+
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:text="@string/ex_easy_difficulty"
+                            android:textSize="12sp"
+                            android:id="@+id/rbExEasy"
+                            android:checked="false"/>
+
+
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:text="@string/easy_difficulty"
+                            android:textSize="12sp"
+                            android:id="@+id/rbEasy"
+                            android:checked="false"/>
+
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:text="@string/middle_difficulty"
+                            android:textSize="12sp"
+                            android:id="@+id/rbMiddle"
+                            android:checked="true"/>
+
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:text="@string/hard_difficulty"
+                            android:textSize="12sp"
+                            android:id="@+id/rbHard"
+                            android:checked="false"/>
+
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:text="@string/ex_hard_difficulty"
+                            android:textSize="12sp"
+                            android:id="@+id/rbExHard"
+                            android:checked="false"/>
+
+                    </RadioGroup>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/rgDifficulty"
+                        android:text="@string/example"
+                        android:id="@+id/txtSelectedExample"
+                        android:layout_below="@+id/txtDifficuluty"
+                        android:paddingStart="15dp"
+                        tools:ignore="RtlSymmetry" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtExample"
+                        android:text="@string/to_be_changed"
+                        android:layout_below="@+id/txtSelectedExample"
+                        android:layout_alignStart="@+id/txtSelectedExample"
+                        android:paddingStart="15dp"
+                        android:layout_marginTop="10dp"
+                        tools:ignore="RtlSymmetry" />
+
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/relLayoutMethodMathBelow1"
+                    android:layout_below="@+id/relLayoutMethodMath1"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtTypeOfMath"
+                        android:text="@string/kind_of_math"
+                        android:textSize="15sp"/>
+
+                    <RadioGroup
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/rgMathMethod"
+                        android:layout_marginTop="10dp"
+                        android:layout_below="@+id/txtTypeOfMath">
+
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:text="@string/method_add"
+                            android:textSize="12sp"
+                            android:id="@+id/rbMethodMathAdd"
+                            android:checked="true"/>
+
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:text="@string/method_sub"
+                            android:textSize="12sp"
+                            android:id="@+id/rbMethodMathSub"
+                            android:checked="false"/>
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:text="@string/method_mult"
+                            android:textSize="12sp"
+                            android:id="@+id/rbMethodMathMult"
+                            android:checked="false"/>
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:text="@string/method_divide"
+                            android:textSize="12sp"
+                            android:id="@+id/rbMethodMathDiv"
+                            android:checked="false"/>
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:text="@string/method_faculty"
+                            android:textSize="12sp"
+                            android:id="@+id/rbMethodMathFac"
+                            android:checked="false"/>
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:text="@string/method_root"
+                            android:textSize="12sp"
+                            android:id="@+id/rbMethodMathRoot"
+                            android:checked="false"/>
+
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:text="@string/method_function_value"
+                            android:textSize="12sp"
+                            android:id="@+id/rbMethodMathFuncValue"
+                            android:checked="false"/>
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:text="@string/method_extrema"
+                            android:textSize="12sp"
+                            android:id="@+id/rbMethodMathExtrema"
+                            android:checked="false"/>
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:text="@string/method_multiple_choice"
+                            android:textSize="12sp"
+                            android:id="@+id/rbMethodMathMultipleChoice"
+                            android:checked="false"/>
+
+
+                    </RadioGroup>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/root_x"
+                        android:layout_toEndOf="@+id/rgMathMethod"
+                        android:layout_marginTop="140dp"/>
+
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/rgMathMethod"
+                        android:layout_centerInParent="true"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/save"
+                        android:textAllCaps="false"
+                        android:textStyle="bold"
+                        android:id="@+id/btnSaveMathMethod"
+                        android:visibility="visible" />
+
+
+
+                </RelativeLayout>
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

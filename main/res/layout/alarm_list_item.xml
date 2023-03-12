@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="10dp"
+    android:id="@+id/parent"
+    android:padding="10dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/relParent">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:id="@+id/relLayoutTop"/>
+
+    <TextClock
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:id="@+id/clock"
+        android:textSize="40sp"
+        android:text="@string/to_be_changed"
+        tools:ignore="RelativeOverlap" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/to_be_repeated_on"
+        android:layout_below="@+id/clock"
+        android:layout_marginBottom="10dp"
+        android:paddingStart="10dp"
+        android:id="@id/txtAlarmDates"
+        tools:ignore="RtlSymmetry" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/txtAlarmDates"
+        android:layout_toEndOf="@id/txtAlarmDates"
+        android:paddingStart="5dp"
+        android:text="@string/to_be_changed"
+        android:id="@+id/dates"
+        tools:ignore="RtlSymmetry" />
+
+
+        <ImageView
+            android:id="@+id/btnDown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btnThreeDots"
+            android:layout_alignEnd="@id/btnThreeDots"
+            android:contentDescription="@string/arrow_down"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/ic_arrow_down"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnThreeDots"
+            android:src="@drawable/ic_three_dots"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="20dp"
+            android:padding="2dp"
+            android:layout_marginTop="10dp"
+            android:contentDescription="@string/to_be_changed"/>
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchAlarmOff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="75dp"
+            tools:ignore="RtlSymmetry" />
+
+    </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:layout_below="@+id/relLayoutTop"
+            android:id="@+id/relLayoutExpand">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtMethodTurnOff"
+            android:text="@string/method_turn_off" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtMethod"
+            android:layout_alignBaseline="@+id/txtMethodTurnOff"
+            android:layout_toEndOf="@+id/txtMethodTurnOff"
+            android:layout_marginStart="15dp"
+            android:text="@string/to_be_changed" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtKindOfSound"
+            android:text="@string/alarm_sound"
+            android:layout_below="@+id/txtMethodTurnOff"
+            android:layout_marginTop="7dp" />
+
+        <TextView
+            android:id="@+id/txtSound"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/txtKindOfSound"
+            android:layout_alignStart="@+id/txtMethod"
+            android:layout_alignEnd="@+id/txtMethod"
+            android:text="@string/to_be_changed" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtPrivileges"
+            android:text="@string/extended_privileges"
+            android:layout_below="@+id/txtKindOfSound"
+            android:layout_marginTop="7dp" />
+
+        <TextView
+            android:id="@+id/txtTrueFalse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/txtPrivileges"
+            android:layout_alignStart="@+id/txtSound"
+            android:layout_alignEnd="@+id/txtSound"
+            android:text="@string/to_be_changed" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtPrivileges"
+            android:layout_alignParentEnd="true">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:id="@+id/btnUp"
+                android:contentDescription="@string/arrow_up"
+                android:src="@drawable/ic_arrow_up"
+                tools:ignore="RtlSymmetry"
+                android:paddingEnd="20dp"/>
+
+            <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="@string/delete_alarm"
+            android:id="@+id/txtDelete"
+            android:textColor="@color/magenta"
+            android:layout_toStartOf="@+id/btnUp"
+            android:layout_alignBaseline="@+id/btnUp"
+            android:layout_marginEnd="15dp"/>
+
+        </RelativeLayout>
+        </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

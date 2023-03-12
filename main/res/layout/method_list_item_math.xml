@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="10dp"
+    android:elevation="10dp"
+    android:id="@+id/cvMathItem">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/relLayoutMathod"
+            android:padding="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtMathod"
+            android:text="@string/method"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtMethodType"
+            android:text="@string/to_be_changed"
+            android:layout_toEndOf="@+id/txtMathod"
+            android:layout_marginStart="20dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtDifficult"
+                android:text="@string/difficulty"
+                android:layout_below="@+id/txtMathod"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtDifficultyType"
+                android:text="@string/to_be_changed"
+                android:layout_alignBaseline="@+id/txtDifficult"
+                android:layout_alignStart="@+id/txtMethodType"/>
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/minus_button_small"
+                android:layout_below="@+id/txtDifficultyType"
+                android:layout_toEndOf="@+id/txtDifficultyType"
+                android:contentDescription="@string/to_be_changed"
+                android:layout_marginStart="15dp"
+                android:id="@+id/imgMinusDelete"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:id="@+id/threeDotsEdit"
+                android:src="@drawable/ic_three_dots"
+                android:layout_toEndOf="@+id/txtDifficultyType"
+                android:contentDescription="@string/to_be_changed"
+                android:layout_marginStart="15dp"/>
+
+        </RelativeLayout>
+</androidx.cardview.widget.CardView>

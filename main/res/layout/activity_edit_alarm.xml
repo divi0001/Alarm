@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EditAlarmActivity">
+
+
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/mainScroll">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:layout_marginTop="30dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/wake_me_up"
+                android:textSize="30sp"
+                android:textAlignment="center"
+                android:textStyle="bold"/>
+
+
+            <LinearLayout
+                android:id="@+id/linLayoutTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+                <Spinner
+                    android:id="@+id/spinnerHours"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="50dp"
+                    android:prompt="@string/hh"
+                    android:spinnerMode="dialog"
+                    android:layout_marginTop="10dp"
+                    android:importantForAccessibility="no"/>
+
+
+                <TextView
+                    android:id="@+id/txtColon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/colon"
+                    android:layout_marginTop="10dp"
+                    android:textSize="30sp"
+                    android:textStyle="bold"/>
+
+
+                <Spinner
+                    android:id="@+id/spinnerMins"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:prompt="@string/mm"
+                    android:spinnerMode="dialog"
+                    android:layout_marginTop="10dp"
+                    android:importantForAccessibility="no"/>
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/time"
+                    android:textSize="35sp"
+                    android:layout_marginTop="10dp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/middleRelLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="20dp">
+
+                <LinearLayout
+                    android:id="@+id/linLayAllWeekdays"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:orientation="horizontal">
+
+                    <CheckBox
+                        android:id="@+id/rbMonday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/Monday" />
+
+                    <CheckBox
+                        android:id="@+id/rbTuesday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/Tuesday" />
+
+                    <CheckBox
+                        android:id="@+id/rbWednesday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/Wednesday" />
+
+                    <CheckBox
+                        android:id="@+id/rbThursday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/Thursday" />
+
+                    <CheckBox
+                        android:id="@+id/rbFriday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/Friday" />
+
+                    <CheckBox
+                        android:id="@+id/rbSaturday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/Saturday" />
+
+                    <CheckBox
+                        android:id="@+id/rbSunday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/Sunday" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/linLayWeekendOrWeekDays"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/linLayAllWeekdays"
+                    android:layout_centerHorizontal="true"
+                    android:orientation="horizontal">
+
+                    <CheckBox
+                        android:id="@+id/rbWeekdays"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/Weekdays" />
+
+                    <CheckBox
+                        android:id="@+id/rbWeekend"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/Weekend" />
+
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/belowMiddleRelLay">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
+            android:id="@+id/methodRelLayout">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/method_turn_off"
+            android:textSize="20sp"
+            android:layout_alignStart="@id/spinnerMethods"
+            android:id="@+id/txtMethTurnOff"/>
+
+        <Spinner
+            android:layout_width="250dp"
+            android:layout_height="50dp"
+            android:layout_below="@+id/txtMethTurnOff"
+            android:id="@+id/spinnerMethods"
+            android:layout_centerHorizontal="true"
+            android:prompt="@string/method"
+            android:importantForAccessibility="no"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_toEndOf="@+id/spinnerMethods"
+            android:src="@drawable/plus_button_small"
+            android:layout_alignParentBottom="true"
+            android:contentDescription="@string/to_be_changed"
+            android:id="@+id/btnMethodPlus"/>
+
+        </RelativeLayout>
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/middleDownRelLayout"
+        android:layout_marginTop="20dp"
+        android:paddingStart="30dp"
+        tools:ignore="RtlSymmetry">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:id="@+id/txtMethodQueue"
+        android:text="@string/method_queue"
+        tools:ignore="RtlSymmetry"/>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/cvQueue"
+        android:layout_below="@id/txtMethodQueue"
+        android:orientation="horizontal">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pick_sound"
+            android:layout_below="@id/cvQueue"
+            android:paddingTop="5dp"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:id="@+id/txtPickSound"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pick"
+            android:textAllCaps="false"
+            android:layout_alignBaseline="@+id/txtPickSound"
+            android:layout_toEndOf="@id/txtPickSound"
+            android:layout_marginStart="10dp"
+            android:id="@+id/btnPickSound"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/curr_sound"
+            android:layout_below="@+id/btnPickSound"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:id="@+id/txtCurrSound"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/none"
+            android:layout_below="@+id/btnPickSound"
+            android:textSize="15sp"
+            android:layout_toEndOf="@+id/txtCurrSound"
+            android:textStyle="bold"
+            android:id="@+id/txtSound"
+            android:layout_marginStart="25dp"/>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtCurrSound"
+            android:layout_marginTop="15dp"
+            android:id="@+id/snoozeRelLay">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtSnoozeAllow"
+            android:textStyle="bold"
+            android:text="@string/allow_snooze"
+            android:textSize="15sp"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/checkSnooze"
+                android:layout_alignBaseline="@+id/txtSnoozeAllow"
+                android:layout_toEndOf="@+id/txtSnoozeAllow"
+                android:layout_marginStart="15dp"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnDownSnooze"
+                android:src="@drawable/ic_arrow_down"
+                android:layout_alignParentEnd="true"
+                android:paddingEnd="30dp"
+                android:contentDescription="@string/to_be_changed" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/checkSnooze"
+                android:id="@+id/relLayoutHideable"
+                android:visibility="invisible">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txtHowOftenSnoozable"
+                    android:textSize="15sp"
+                    android:text="@string/ask_amount_snooze"/>
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/txtHowOftenSnoozable"
+                    android:hint="@string/number"
+                    android:layout_toEndOf="@+id/txtHowOftenSnoozable"
+                    android:layout_marginStart="5dp"
+                    android:textSize="12sp"
+                    android:inputType="numberDecimal"
+                    android:autofillHints="-1"
+                    android:id="@+id/editSnoozeNum"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/howLongSnooze"
+                    android:text="@string/snooze_in_min"
+                    android:layout_below="@+id/txtHowOftenSnoozable"
+                    android:textSize="15sp"/>
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/editMinutesSnooze"
+                    android:hint="@string/mmm"
+                    android:textSize="12sp"
+                    android:layout_alignBaseline="@+id/howLongSnooze"
+                    android:layout_toEndOf="@+id/howLongSnooze"
+                    android:autofillHints="5"
+                    android:inputType="numberDecimal" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txtMinutes"
+                    android:textSize="15sp"
+                    android:layout_alignBaseline="@+id/howLongSnooze"
+                    android:layout_toEndOf="@+id/editMinutesSnooze"
+                    android:text="@string/min"/>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_arrow_up"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:contentDescription="@string/to_be_changed"
+                    android:id="@+id/imgBtnUp"
+                    android:paddingEnd="30dp"/>
+
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label"
+                android:layout_below="@+id/txtSnoozeAllow"
+                android:layout_marginTop="25dp"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:id="@+id/txtSetLabel"/>
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:id="@+id/editLabel"
+                android:hint="@string/labelplaceholder"
+                android:textSize="12sp"
+                android:layout_alignBaseline="@id/txtSetLabel"
+                android:layout_toEndOf="@+id/txtSetLabel"
+                android:layout_marginStart="5dp"
+                android:autofillHints="Wake up"
+                android:inputType="text" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtSetLabel"
+                android:layout_marginTop="25dp"
+                android:id="@+id/txtCheckWake"
+                android:text="@string/check_wake"
+                android:textStyle="bold"
+                android:textSize="15sp"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/txtCheckWake"
+                android:layout_toEndOf="@id/txtCheckWake"
+                android:id="@+id/checkAwake"/>
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:hint="@string/minutes_turn_on"
+                android:textSize="10sp"
+                android:layout_alignBaseline="@id/txtCheckWake"
+                android:layout_toEndOf="@id/checkAwake"
+                android:layout_alignStart="@+id/editLabel"
+                android:autofillHints="30"
+                tools:ignore="SmallSp"
+                android:inputType="numberDecimal"
+                android:id="@+id/editTurnBackOn"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:text="@string/inc_intense"
+                android:textStyle="bold"
+                android:layout_below="@+id/checkAwake"
+                android:id="@+id/txtSetAlarmLvls"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/checkAlarmLvls"
+                android:layout_alignBaseline="@id/txtSetAlarmLvls"
+                android:layout_toEndOf="@id/txtSetAlarmLvls"
+                android:layout_marginStart="7dp"/>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/checkAlarmLvls"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/relLayAddLevels">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_as_level"
+                    android:textAllCaps="false"
+                    android:id="@+id/btnAddLvl"/>
+
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/linLayDisplayLevels"
+                    android:orientation="horizontal"
+                    android:layout_below="@+id/btnAddLvl">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtLvls"
+                        android:text="@string/add_as_level"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/cvLevels">
+
+
+                    </androidx.recyclerview.widget.RecyclerView>
+
+                </LinearLayout>
+
+
+
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+
+
+
+    </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/lowRelLay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="25dp">
+
+                <CheckBox
+                    android:id="@+id/checkRevokePrivileges"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/revoke_priv" />
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/btnAdd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="40dp"
+                    android:layout_marginEnd="40dp"
+                    android:layout_marginBottom="40dp"
+                    android:text="@string/add"
+                    android:textAllCaps="false" />
+
+            </RelativeLayout>
+        </LinearLayout>
+
+
+    </ScrollView>
+
+
+</RelativeLayout>
