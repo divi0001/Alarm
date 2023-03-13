@@ -178,5 +178,9 @@
     <string name="save_set">set</string>
     <string name="queue_shared_pref_key_adapter">com.example.alarm.QUEUE_SHARED_PREF_KEY_ADAPTER</string>
     <string name="math_to_edit_alarm_pref_key">com.example.alarm.MATH_TO_EDIT_ALARM_PREF_KEY</string>
+    <string name="math_method_key">com.example.alarm.MATH_METHOD_KEY</string>
+    <string name="pos_in_alarm_list_key">-1</string>
+    <string name="method_to_set">com.example.alarm.METHOD_TO_SET</string>
+    <string name="method_tap_off">Tap off</string>
 
 </resources>

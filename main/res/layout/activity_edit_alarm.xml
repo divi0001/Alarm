@@ -223,7 +223,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/cvQueue"
         android:layout_below="@id/txtMethodQueue"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingBottom="20dp">
 
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -297,7 +298,8 @@
                 android:src="@drawable/ic_arrow_down"
                 android:layout_alignParentEnd="true"
                 android:paddingEnd="30dp"
-                android:contentDescription="@string/to_be_changed" />
+                android:contentDescription="@string/to_be_changed"
+                android:visibility="invisible"/>
 
             <RelativeLayout
                 android:layout_width="wrap_content"
@@ -416,7 +418,8 @@
                 android:autofillHints="30"
                 tools:ignore="SmallSp"
                 android:inputType="numberDecimal"
-                android:id="@+id/editTurnBackOn"/>
+                android:id="@+id/editTurnBackOn"
+                android:visibility="invisible"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -440,7 +443,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/checkAlarmLvls"
                 android:layout_centerHorizontal="true"
-                android:id="@+id/relLayAddLevels">
+                android:id="@+id/relLayAddLevels"
+                android:visibility="invisible">
 
                 <Button
                     android:layout_width="wrap_content"

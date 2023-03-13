@@ -46,8 +46,11 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
         holder.imgMinusDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alarmParameter.remove(position); //TODO: make this not only locally effect alarmParameter
-                notifyDataSetChanged();
+                alarmParameter.remove(position);
+                setAlarmParameter(alarmParameter);
+                //SharedPreferences s = context.getSharedPreferences(holder.itemView.getContext().getString(R.string.queue_shared_pref_key_adapter),Context.MODE_PRIVATE);
+                notifyDataSetChanged();//TODO: Look here, this might be causing trouble, maybe the sharedPreferences are called again, when leaving this activity, so deleting effectively does not work?
+
             }
         });
 
@@ -58,7 +61,8 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
                 String key = holder.itemView.getContext().getString(R.string.queue_shared_pref_key_adapter);
                 SharedPreferences pref = context.getSharedPreferences(key,Context.MODE_PRIVATE);
                 SharedPreferences.Editor edit = pref.edit();
-                edit.putString("method","editAlarm");
+                edit.putString(holder.itemView.getContext().getString(R.string.math_method_key),"editAlarm");
+                edit.putInt(holder.itemView.getContext().getString(R.string.pos_in_alarm_list_key),position);
                 edit.apply();
                 startActivity(context,iSave,null);
             }

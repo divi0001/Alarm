@@ -28,7 +28,7 @@ public class AlarmRecViewAdapter extends RecyclerView.Adapter<AlarmRecViewAdapte
         this.context = context;
     }
 
-
+    //TODO: make the app persistent with data (data should survive a restart of the app or phone)
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -70,7 +70,8 @@ public class AlarmRecViewAdapter extends RecyclerView.Adapter<AlarmRecViewAdapte
                 Alarm curr = alarms.get(position);
                 Intent intent = new Intent(context, EditAlarmActivity.class);
                 intent.putExtra("position", position);
-                context.startActivity(intent); //TODO: understand context
+                context.startActivity(intent);
+                notifyDataSetChanged();
             }
         });
 
@@ -78,7 +79,7 @@ public class AlarmRecViewAdapter extends RecyclerView.Adapter<AlarmRecViewAdapte
             @Override
             public void onClick(View v) {
                 alarms.remove(position);
-                notifyDataSetChanged(); //TODO: test if this actually deletes + updates the view
+                notifyDataSetChanged();
             }
         });
 

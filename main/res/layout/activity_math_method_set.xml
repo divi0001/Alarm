@@ -27,7 +27,7 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/relLayoutMethodMath1">
 
-                    <!--TODO give the scrollview a gray tint, to make this the focus -->
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

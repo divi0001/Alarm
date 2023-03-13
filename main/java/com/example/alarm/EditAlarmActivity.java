@@ -8,9 +8,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.XmlResourceParser;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Layout;
+import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -18,8 +22,12 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 
@@ -30,7 +38,7 @@ public class EditAlarmActivity extends AppCompatActivity {
     private Spinner spHours,spMins,spMethods;
     private CheckBox mo,di,mi,thu,fr,sa,so,checkWeekDays,checkWeekEnds,checkAllowSnooze,checkAwake,checkAlarmLvls,checkRevokePrivilege;
     private ImageView imgAddMethodPlus, imgBtnDownSnooze, imgBtnUpSnooze;
-    private TextView txtCurrSoundName;
+    private TextView txtCurrSoundName,txtSetLabel,txtMinutes,txtAllowSnooze;
     private Button btnPickSound,btnAddLevel,btnAddSaveAlarm;
     private EditText editLabel, editMinutesCheckAwake, editAmountSnoozes, editMinutesSnooze;
     private ValContainer[] c = new ValContainer[2];
@@ -41,7 +49,9 @@ public class EditAlarmActivity extends AppCompatActivity {
     private ArrayList<Alarm> alarmParameter = new ArrayList<>();
     private final Context context = this;
     private QueueRecViewAdapter adapter1;
-
+    private String method,difficulty;
+    private int id;
+    private RelativeLayout relLayoutHideable,relLayAddLvls;
 
 
     @Override
@@ -69,6 +79,9 @@ public class EditAlarmActivity extends AppCompatActivity {
         imgBtnDownSnooze = (ImageView) findViewById(R.id.btnDownSnooze);
         imgBtnUpSnooze = (ImageView) findViewById(R.id.imgBtnUp);
         txtCurrSoundName = (TextView) findViewById(R.id.txtSound);
+        txtSetLabel = (TextView) findViewById(R.id.txtSetLabel);
+        txtAllowSnooze = (TextView) findViewById(R.id.txtSnoozeAllow);
+        txtMinutes = (TextView) findViewById(R.id.txtMinutes);
         btnPickSound = (Button) findViewById(R.id.btnPickSound);
         btnAddLevel = (Button) findViewById(R.id.btnAddLvl);
         btnAddSaveAlarm = (Button) findViewById(R.id.btnAdd);
@@ -78,6 +91,8 @@ public class EditAlarmActivity extends AppCompatActivity {
         editMinutesSnooze = (EditText) findViewById(R.id.editMinutesSnooze);
         alarmQueue = (RecyclerView) findViewById(R.id.cvQueue);
         alarmLevels = (RecyclerView) findViewById(R.id.cvLevels);
+        relLayoutHideable = (RelativeLayout) findViewById(R.id.relLayoutHideable);
+        relLayAddLvls = (RelativeLayout) findViewById(R.id.relLayAddLevels);
 
         ArrayList<String> repeatAlarmDays = new ArrayList<>();
         ArrayList<String> repeatOnWeekends = new ArrayList<>();
@@ -314,20 +329,27 @@ public class EditAlarmActivity extends AppCompatActivity {
         spMethods.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-
+                SharedPreferences sharedPref = EditAlarmActivity.this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                SharedPreferences.Editor ed = sharedPref.edit();
                 switch(position){
                     case 0:
-                        //TODO: add the CardView for queued Methods & check if less or equal then 3 methods set, also handle that this method is actually registered
+
+                        ed.apply();
+
+                        method = "Tap_off";
+                        difficulty = "None";
+
                         break;
+
                     case 1:
-                        SharedPreferences sharedPref = EditAlarmActivity.this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
+                        ed.putString(getString(R.string.method_to_set),"Math");
                         Intent iMath = new Intent(EditAlarmActivity.this, MathMethodSetActivity.class);
                         iMath.putExtra("btnType","set");
                         startActivity(iMath);
-
-                        //TODO: new activity with settings for math method, also handle that this method is actually registered
+                        ed.apply();
                         break;
+
                     case 2:
                         //TODO: add CardView and new window with settings for scan qr code method, also handle that this method is actually registered
                         break;
@@ -351,11 +373,6 @@ public class EditAlarmActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        Alarm ala = new Alarm(0);
-        ala.setDifficulty("Easy");
-        ala.setTurnOffMethod("Addition");
-        alarmParameter.add(ala);
-
         adapter1 = new QueueRecViewAdapter(this);
         adapter1.setAlarmParameter(alarmParameter);
 
@@ -367,66 +384,143 @@ public class EditAlarmActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                try{
-                    JSONArray jArr = new JSONArray(prefs.getString("key","[]"));
-                    JSONHandler j = new JSONHandler();
-                    alarmParameter = j.fromJAlarmArray(jArr);
+                //TODO: this is in onCreate, so only adding Tap off method should be allowed
+                if (adapter1.getItemCount() > 5) {
+                    Toast.makeText(EditAlarmActivity.this, "Do you really need more than 5 methods for this Level?", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if(method.equals("tap_off")){
+                    int aId = alarmParameter.size();
+                    Alarm a1 = new Alarm(aId);
+                    a1.setTurnOffMethod(getString(R.string.method_tap_off));
+                    a1.setDifficulty("None");
+                    alarmParameter.add(a1);
                     adapter1.setAlarmParameter(alarmParameter);
-                }catch (Exception e){
-                    e.printStackTrace();
+                }
+
+
+            }
+        });
+
+
+        checkAllowSnooze.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    RelativeLayout.LayoutParams params= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+                    params.addRule(RelativeLayout.BELOW, R.id.relLayoutHideable);
+                    txtSetLabel.setLayoutParams(params);
+                    if (imgBtnDownSnooze.getVisibility() == View.INVISIBLE && imgBtnUpSnooze.getVisibility() == View.INVISIBLE){
+                        relLayoutHideable.setVisibility(View.VISIBLE);
+                        imgBtnUpSnooze.setVisibility(View.VISIBLE);
+                    }
+                    imgBtnDownSnooze.setVisibility(View.INVISIBLE);
+                    relLayoutHideable.setVisibility(View.VISIBLE);
+                }else{
+
+                    RelativeLayout.LayoutParams params= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+                    params.addRule(RelativeLayout.BELOW, R.id.txtSnoozeAllow);
+                    txtSetLabel.setLayoutParams(params);
+                    imgBtnDownSnooze.setVisibility(View.INVISIBLE);
+                    relLayoutHideable.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+        imgBtnDownSnooze.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                relLayoutHideable.setVisibility(View.VISIBLE);
+                imgBtnUpSnooze.setVisibility(View.VISIBLE);
+                imgBtnDownSnooze.setVisibility(View.INVISIBLE);
+                RelativeLayout.LayoutParams params= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.BELOW, R.id.relLayoutHideable);
+                txtSetLabel.setLayoutParams(params);
+
+                }
+        });
+
+
+        imgBtnUpSnooze.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                relLayoutHideable.setVisibility(View.INVISIBLE);
+                imgBtnUpSnooze.setVisibility(View.INVISIBLE);
+                imgBtnDownSnooze.setVisibility(View.VISIBLE);
+                RelativeLayout.LayoutParams params= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.BELOW, R.id.txtSnoozeAllow);
+                txtSetLabel.setLayoutParams(params);
+            }
+        });
+
+
+        checkAwake.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    editMinutesCheckAwake.setVisibility(View.VISIBLE);
+                }else{
+                    editMinutesCheckAwake.setVisibility(View.INVISIBLE);
                 }
             }
         });
 
 
+        checkAlarmLvls.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    relLayAddLvls.setVisibility(View.VISIBLE);
+                }else{
+                    relLayAddLvls.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
 
 
-        /*try {
-
-            FileOutputStream fo = new FileOutputStream(path);
-
-            ObjectOutputStream objOut = new ObjectOutputStream(fo);
-            objOut.writeObject();
-            objOut.flush();
-            objOut.close();
-            fo.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @Override
     protected void onResume() {
         super.onResume();
+
+
         SharedPreferences prefs = context.getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),Context.MODE_PRIVATE);
 
+        imgAddMethodPlus = (ImageView) findViewById(R.id.btnMethodPlus);
+        //TODO: put this into an if case depending on where the user came from, since this is bugging out the method queue recView
         if(prefs.contains(getString(R.string.current_math_method)) && prefs.contains(getString(R.string.current_math_method_difficulty))) {
+            if(prefs.contains(getString(R.string.math_method_key))){
+                String edit = prefs.getString(getString(R.string.math_method_key), "com.example.alarm.MATH_METHOD_KEY");
+                if(edit.equals("editAlarm")){
+                    int pos = prefs.getInt(getString(R.string.pos_in_alarm_list_key),-1);
+                    Alarm aa = alarmParameter.get(pos);
+                    alarmParameter.remove(pos);
+                    method = prefs.getString(getString(R.string.current_math_method), "Addition");
+                    difficulty = prefs.getString(getString(R.string.current_math_method_difficulty), "Easy");
+                    aa.setDifficulty(difficulty);
+                    aa.setTurnOffMethod(method);
+                    alarmParameter.add(pos,aa);
+                    adapter1.setAlarmParameter(alarmParameter);
+                }
+            }else {
 
-            String method = prefs.getString(getString(R.string.current_math_method), "Addition");
-            String difficulty = prefs.getString(getString(R.string.current_math_method_difficulty), "Easy");
-
-            Alarm ala = new Alarm(0);
-            ala.setDifficulty(difficulty);
-            ala.setTurnOffMethod(method);
-
-            alarmParameter.add(ala);
-            adapter1.setAlarmParameter(alarmParameter);
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == REQ_CODE_MATH_METHOD && resultCode == RESULT_OK) {
-
-            SharedPreferences prefs = context.getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),Context.MODE_PRIVATE);
-
-            if(prefs.contains(getString(R.string.current_math_method)) && prefs.contains(getString(R.string.current_math_method_difficulty))){
-
-                String method = prefs.getString(getString(R.string.current_math_method),"Addition");
-                String difficulty = prefs.getString(getString(R.string.current_math_method_difficulty),"Easy");
+                method = prefs.getString(getString(R.string.current_math_method), "Addition");
+                difficulty = prefs.getString(getString(R.string.current_math_method_difficulty), "Easy");
 
                 Alarm ala = new Alarm(0);
                 ala.setDifficulty(difficulty);
@@ -434,13 +528,28 @@ public class EditAlarmActivity extends AppCompatActivity {
 
                 alarmParameter.add(ala);
                 adapter1.setAlarmParameter(alarmParameter);
-
-
             }
-
-
-
-            //TODO: handle now set math_method, data in strings.xml, wanted to write also handle go back to main screen + add alarm, but that's not due here
         }
+        imgAddMethodPlus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(adapter1.getItemCount() > 4){
+                    Toast.makeText(EditAlarmActivity.this, "Do you really need more than 5 methods for this Level?", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (!alarmParameter.isEmpty()){
+                Alarm alar = alarmParameter.get(alarmParameter.size()-1);
+                alar.setID(alarmParameter.size());
+                alarmParameter.add(alar);
+                adapter1.setAlarmParameter(alarmParameter);}else{ //TODO: understand why mathmethodsetactivity is the dominant setter, so all new cardviews follow the last setting from there, or the first one set
+                    Alarm alar = new Alarm(0); //TODO: try out math_to_edit_shared_pref_key as means of getting the method + difficulty to the method, that registers the cardviews/adds them. This key is used by the dominant class, so i guess that's the whole reason. Anyways, goodnight
+                    alar.setTurnOffMethod(method);
+                    alar.setDifficulty(difficulty);
+                    alarmParameter.add(alar);
+                    adapter1.setAlarmParameter(alarmParameter);
+                }
+            }
+        });
     }
 }

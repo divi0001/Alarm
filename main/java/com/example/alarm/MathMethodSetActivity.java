@@ -29,6 +29,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_math_method_set);
+
         txtExample = (TextView) findViewById(R.id.txtExample);
         rgDifficulty = (RadioGroup) findViewById(R.id.rgDifficulty);
         rgKindOfMath = (RadioGroup) findViewById(R.id.rgMathMethod);
@@ -43,6 +44,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
             btnSave.setText(R.string.save);
         }else{
             btnSave.setText(R.string.add);
+
         }
 
         rgDifficulty.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
