@@ -23,6 +23,7 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
 
     private ArrayList<Alarm> alarmParameter;
     private Context context;
+    private ViewHolder holder;
 
     public QueueRecViewAdapter(Context context) {
         this.context = context;
@@ -40,7 +41,9 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
 
-        holder.txtMethod.setText(alarmParameter.get(position).getTurnOffMethod());
+        this.holder = holder;
+
+        holder.txtMethod.setText(alarmParameter.get(position).getType() + alarmParameter.get(position).getTurnOffMethod());
         holder.txtDifficulty.setText(alarmParameter.get(position).getDifficulty());
 
         holder.imgMinusDelete.setOnClickListener(new View.OnClickListener() {
@@ -57,14 +60,7 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
         holder.imgThreeDots.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent iSave = new Intent(context,MathMethodSetActivity.class);
-                String key = holder.itemView.getContext().getString(R.string.queue_shared_pref_key_adapter);
-                SharedPreferences pref = context.getSharedPreferences(key,Context.MODE_PRIVATE);
-                SharedPreferences.Editor edit = pref.edit();
-                edit.putString(holder.itemView.getContext().getString(R.string.math_method_key),"editAlarm");
-                edit.putInt(holder.itemView.getContext().getString(R.string.pos_in_alarm_list_key),position);
-                edit.apply();
-                startActivity(context,iSave,null);
+                //TODO
             }
         });
 
@@ -74,7 +70,10 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
            //     Toast.makeText(context, "It fucking worked", Toast.LENGTH_SHORT).show();
             //}
         //});
+
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -86,6 +85,8 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
         this.alarmParameter = alarmParameter;
         notifyDataSetChanged();
     }
+
+
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 

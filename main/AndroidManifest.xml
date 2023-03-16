@@ -12,6 +12,9 @@
         android:theme="@style/Theme.Alarm"
         tools:targetApi="31">
         <activity
+            android:name=".QRMethodSetActivity"
+            android:exported="false" />
+        <activity
             android:name=".MathMethodSetActivity"
             android:exported="false" />
         <activity

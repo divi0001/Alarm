@@ -12,9 +12,10 @@ public class Alarm implements java.io.Serializable {
     private String imgBtnUpSrc;
     private String imgBtnThreeDotsSrc;
     private String difficulty;
+    private String type;
 
 
-    public Alarm(CharSequence t, String turnOffMethod, int id, String soundPath, boolean extendedPrivileges, boolean isActive, String imgBtnDownSrc, String imgBtnUpSrc, String imgBtnThreeDots, String difficulty) {
+    public Alarm(CharSequence t, String turnOffMethod, int id, String soundPath, boolean extendedPrivileges, boolean isActive, String imgBtnDownSrc, String imgBtnUpSrc, String imgBtnThreeDots, String difficulty, String type) {
         this.t = t;
         this.turnOffMethod = turnOffMethod;
         this.ID = id;
@@ -25,6 +26,15 @@ public class Alarm implements java.io.Serializable {
         this.imgBtnUpSrc = imgBtnUpSrc;
         this.imgBtnThreeDotsSrc = imgBtnThreeDotsSrc;
         this.difficulty = difficulty;
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public Alarm(int id){
@@ -122,6 +132,7 @@ public class Alarm implements java.io.Serializable {
         return "Alarm{" +
                 "t=" + t +
                 ", turnOffMethod='" + turnOffMethod + '\'' +
+                ", ID=" + ID +
                 ", soundPath='" + soundPath + '\'' +
                 ", extendedPrivileges=" + extendedPrivileges +
                 ", isActive=" + isActive +
@@ -129,6 +140,7 @@ public class Alarm implements java.io.Serializable {
                 ", imgBtnUpSrc='" + imgBtnUpSrc + '\'' +
                 ", imgBtnThreeDotsSrc='" + imgBtnThreeDotsSrc + '\'' +
                 ", difficulty='" + difficulty + '\'' +
+                ", type='" + type + '\'' +
                 '}';
     }
 }

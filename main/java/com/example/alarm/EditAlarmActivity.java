@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Layout;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -52,6 +53,7 @@ public class EditAlarmActivity extends AppCompatActivity {
     private String method,difficulty;
     private int id;
     private RelativeLayout relLayoutHideable,relLayAddLvls;
+    private String methodToSet;
 
 
     @Override
@@ -329,41 +331,30 @@ public class EditAlarmActivity extends AppCompatActivity {
         spMethods.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                SharedPreferences sharedPref = EditAlarmActivity.this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-                SharedPreferences.Editor ed = sharedPref.edit();
+
                 switch(position){
                     case 0:
-
-                        ed.apply();
-
-                        method = "Tap_off";
-                        difficulty = "None";
-
+                        methodToSet = "tap_off";
                         break;
 
                     case 1:
-
-                        ed.putString(getString(R.string.method_to_set),"Math");
-                        Intent iMath = new Intent(EditAlarmActivity.this, MathMethodSetActivity.class);
-                        iMath.putExtra("btnType","set");
-                        startActivity(iMath);
-                        ed.apply();
+                        methodToSet = "math";
                         break;
 
                     case 2:
-                        //TODO: add CardView and new window with settings for scan qr code method, also handle that this method is actually registered
+                        methodToSet = "scan_qr_barcode";
                         break;
                     case 3:
-                        //TODO: add CardView and new window with settings for location based method, also handle that this method is actually registered
+                        methodToSet = "location_based";
                         break;
                     case 4:
-                        //TODO: add CardView and new window with settings for sudoku method, also handle that this method is actually registered
+                        methodToSet = "sudoku";
                         break;
                     case 5:
-                        //TODO: add CardView and new window with settings for memory method, also handle that this method is actually registered
+                        methodToSet = "memory";
                         break;
                     case 6:
-                        //TODO: add CardView and new window with settings for passphrase method, also handle that this method is actually registered
+                        methodToSet = "type_passphrase";
                         break;
                 }
 
@@ -373,11 +364,11 @@ public class EditAlarmActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        adapter1 = new QueueRecViewAdapter(this);
+        adapter1 = new QueueRecViewAdapter(context);
         adapter1.setAlarmParameter(alarmParameter);
 
         alarmQueue.setAdapter(adapter1);
-        alarmQueue.setLayoutManager(new LinearLayoutManager(this));
+        alarmQueue.setLayoutManager(new LinearLayoutManager(context));
 
 
         imgAddMethodPlus.setOnClickListener(new View.OnClickListener() {
@@ -389,15 +380,25 @@ public class EditAlarmActivity extends AppCompatActivity {
                     Toast.makeText(EditAlarmActivity.this, "Do you really need more than 5 methods for this Level?", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                SharedPreferences pref = getSharedPreferences(getString(R.string.queue_shared_pref_key_adapter),Context.MODE_PRIVATE);
+                SharedPreferences.Editor edi = pref.edit();
+                edi.putString("method", "set_alarm");
+                edi.apply();
+                if(methodToSet.equals("tap_off")) {
 
-                if(method.equals("tap_off")){
-                    int aId = alarmParameter.size();
-                    Alarm a1 = new Alarm(aId);
-                    a1.setTurnOffMethod(getString(R.string.method_tap_off));
-                    a1.setDifficulty("None");
-                    alarmParameter.add(a1);
+                    alarmParameter.add(new Alarm(alarmParameter.size()));
+                    alarmParameter.get(alarmParameter.size() - 1).setTurnOffMethod(getString(R.string.method_tap_off));
+                    alarmParameter.get(alarmParameter.size() - 1).setDifficulty("None");
+                    alarmParameter.get(alarmParameter.size() - 1).setType("Tap off");
+
                     adapter1.setAlarmParameter(alarmParameter);
+
+                }else{
+                        Toast.makeText(context, "The selected spMethod did not register", Toast.LENGTH_SHORT).show();
+
+
                 }
+
 
 
             }
@@ -488,10 +489,27 @@ public class EditAlarmActivity extends AppCompatActivity {
 
 
 
+        //if(prefs.contains(getString(R.string.math_method_key))){
+
+        //  String edit = prefs.getString(getString(R.string.math_method_key), "com.example.alarm.MATH_METHOD_KEY");
+        //if(edit.equals("editAlarm")){
+
+        //  int pos = prefs.getInt(getString(R.string.pos_in_alarm_list_key),-1);
+        //      alarmParameter.add(pos, new Alarm(alarmParameter.size()));
+        //      Log.d("debug", "In standard prefs onActivityResult");
+
+        //      method = prefs.getString(getString(R.string.current_math_method), "Addition");
+        //      difficulty = prefs.getString(getString(R.string.current_math_method_difficulty), "Easy");
+
+        //      alarmParameter.get(pos).setDifficulty(difficulty);
+        //      alarmParameter.get(pos).setTurnOffMethod(method);
+
+        //      adapter1.setAlarmParameter(alarmParameter);
+        //}
 
 
 
-
+        //}
 
 
     @Override
@@ -500,56 +518,75 @@ public class EditAlarmActivity extends AppCompatActivity {
 
 
         SharedPreferences prefs = context.getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),Context.MODE_PRIVATE);
+        if(prefs.getString(getString(R.string.current_math_method),"empty").equals("empty") && prefs.getString(getString(R.string.current_math_method_difficulty),"exEasy").equals("exEasy")) {
+
+
+            Log.d("debug", "Standard Shared Preferences, useless if case, onResume");
+        }else {
+
+            Log.d("debug", "In set prefs onResume"); //TODO: mux the different methods to set according cardviews
+            method = prefs.getString(getString(R.string.current_math_method), "Addition");
+            difficulty = prefs.getString(getString(R.string.current_math_method_difficulty), "Easy");
+
+            alarmParameter.add(new Alarm(alarmParameter.size()));
+
+            alarmParameter.get(alarmParameter.size()-1).setDifficulty(difficulty);
+            alarmParameter.get(alarmParameter.size()-1).setTurnOffMethod(method);
+            alarmParameter.get(alarmParameter.size()-1).setType("Math: ");
+
+            adapter1.setAlarmParameter(alarmParameter);
+        }
+
+
+        adapter1 = new QueueRecViewAdapter(context);
+        adapter1.setAlarmParameter(alarmParameter);
+
+        alarmQueue.setAdapter(adapter1);
+        alarmQueue.setLayoutManager(new LinearLayoutManager(context));
 
         imgAddMethodPlus = (ImageView) findViewById(R.id.btnMethodPlus);
-        //TODO: put this into an if case depending on where the user came from, since this is bugging out the method queue recView
-        if(prefs.contains(getString(R.string.current_math_method)) && prefs.contains(getString(R.string.current_math_method_difficulty))) {
-            if(prefs.contains(getString(R.string.math_method_key))){
-                String edit = prefs.getString(getString(R.string.math_method_key), "com.example.alarm.MATH_METHOD_KEY");
-                if(edit.equals("editAlarm")){
-                    int pos = prefs.getInt(getString(R.string.pos_in_alarm_list_key),-1);
-                    Alarm aa = alarmParameter.get(pos);
-                    alarmParameter.remove(pos);
-                    method = prefs.getString(getString(R.string.current_math_method), "Addition");
-                    difficulty = prefs.getString(getString(R.string.current_math_method_difficulty), "Easy");
-                    aa.setDifficulty(difficulty);
-                    aa.setTurnOffMethod(method);
-                    alarmParameter.add(pos,aa);
-                    adapter1.setAlarmParameter(alarmParameter);
-                }
-            }else {
-
-                method = prefs.getString(getString(R.string.current_math_method), "Addition");
-                difficulty = prefs.getString(getString(R.string.current_math_method_difficulty), "Easy");
-
-                Alarm ala = new Alarm(0);
-                ala.setDifficulty(difficulty);
-                ala.setTurnOffMethod(method);
-
-                alarmParameter.add(ala);
-                adapter1.setAlarmParameter(alarmParameter);
-            }
-        }
         imgAddMethodPlus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if(adapter1.getItemCount() > 4){
-                    Toast.makeText(EditAlarmActivity.this, "Do you really need more than 5 methods for this Level?", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (!alarmParameter.isEmpty()){
-                Alarm alar = alarmParameter.get(alarmParameter.size()-1);
-                alar.setID(alarmParameter.size());
-                alarmParameter.add(alar);
-                adapter1.setAlarmParameter(alarmParameter);}else{ //TODO: understand why mathmethodsetactivity is the dominant setter, so all new cardviews follow the last setting from there, or the first one set
-                    Alarm alar = new Alarm(0); //TODO: try out math_to_edit_shared_pref_key as means of getting the method + difficulty to the method, that registers the cardviews/adds them. This key is used by the dominant class, so i guess that's the whole reason. Anyways, goodnight
-                    alar.setTurnOffMethod(method);
-                    alar.setDifficulty(difficulty);
-                    alarmParameter.add(alar);
+                if(methodToSet.equals("math")) {
+
+                    SharedPreferences pref = context.getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), Context.MODE_PRIVATE);
+                    String m = pref.getString(getString(R.string.current_math_method), "empty");
+                    String d = pref.getString(getString(R.string.current_math_method_difficulty), "exEasy");
+                    if (!pref.getString(getString(R.string.current_math_method), "empty").equals("empty") && !pref.getString(getString(R.string.current_math_method_difficulty), "exEasy").equals("exEasy")) {
+                        method = m;
+                        difficulty = d;
+                    }
+
+                    System.out.println("Difficulty: " + difficulty + " \n Method: " + method);
+
+                    if (adapter1.getItemCount() > 4) {
+                        Toast.makeText(EditAlarmActivity.this, "Do you really need more than 5 methods for this Level?", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                        Intent iMath = new Intent(context, MathMethodSetActivity.class);
+                        startActivity(iMath);
+
+
+
+                } else if (methodToSet.equals("tap_off")) {
+
+                    alarmParameter.add(new Alarm(alarmParameter.size()));
+                    alarmParameter.get(alarmParameter.size()-1).setType("tap_off");
+                    alarmParameter.get(alarmParameter.size()-1).setDifficulty("None");
                     adapter1.setAlarmParameter(alarmParameter);
+
+                } else if (methodToSet.equals("scan_qr_barcode")) {
+                    Intent iScan = new Intent(context, QRMethodSetActivity.class);
+                    startActivity(iScan);
                 }
+
+
             }
+
         });
+
     }
 }

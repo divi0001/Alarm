@@ -35,6 +35,11 @@ public class MathMethodSetActivity extends AppCompatActivity {
         rgKindOfMath = (RadioGroup) findViewById(R.id.rgMathMethod);
         btnSave = (Button) findViewById(R.id.btnSaveMathMethod);
 
+        RadioButton rbSelectedDiff = findViewById(rgDifficulty.getCheckedRadioButtonId());
+        int methId = rgKindOfMath.getCheckedRadioButtonId();
+
+        txtExample.setText(generateExample(rbSelectedDiff.getText().toString(),methId));
+
         SharedPreferences pref = getSharedPreferences(getString(R.string.queue_shared_pref_key_adapter),Context.MODE_PRIVATE);
         if(pref.contains("method")){
             save = pref.getString("method","").equals("editAlarm");
@@ -91,6 +96,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
 
                                 editor.putString(getString(R.string.current_math_method),rbMeth.getText().toString());
                                 editor.putString(getString(R.string.current_math_method_difficulty),rbDiff.getText().toString());
+                                editor.putString(getString(R.string.method_to_set),"math");
 
                                 if(save){
                                     editor.putString(getString(R.string.save_set),"save");
@@ -99,10 +105,6 @@ public class MathMethodSetActivity extends AppCompatActivity {
                                 }
 
                                 editor.apply();
-
-                                Intent retI = new Intent();
-                                retI.putExtra("result",0);
-                                setResult(RESULT_OK,retI);
 
                                 finish();
 
