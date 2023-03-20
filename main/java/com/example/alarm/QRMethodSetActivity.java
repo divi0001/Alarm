@@ -63,8 +63,10 @@ public class QRMethodSetActivity extends AppCompatActivity {
         if(requestCode == REQUEST_FROM_CAMERA && resultCode == RESULT_OK){
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             DetectQRCode det = new DetectQRCode();
-            if (det.detect(photo)){
+            int[] dataAboutQR = det.detect(photo);
+            if (dataAboutQR.length > 1){
                 editLabel.setHint((CharSequence) photo.toString()); //TODO: read qr from foto
+
             }
         }
 

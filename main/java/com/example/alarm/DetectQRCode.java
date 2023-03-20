@@ -2,7 +2,6 @@ package com.example.alarm;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.ColorSpace;
 
 import java.util.Arrays;
 
@@ -11,7 +10,15 @@ public class DetectQRCode {
 
     boolean diag = false;
     private int[][] blackWhiteMapPicture;
-    private int count, border, firstBorderBlack, secondBorderWhite, thirdBorderBlack, fourthBorderWhite, fifthBorderBlack, currLine, startX, startY, qrSize, tileSize;
+    private int border;
+    private int firstBorderBlack;
+    private int secondBorderWhite;
+    private int thirdBorderBlack;
+    private int fourthBorderWhite;
+    private int startX;
+    private int startY;
+    private int qrSize;
+    private int tileSize;
 
     //(example qr code)
     //squares are 7*151x7*151pixels big (plus 3 outlines so 154), + 1 pixel black outline (1pixel border (grey)outtermost only horizontal has other gray tone than vertical (or might even be different on all sides)
@@ -78,9 +85,9 @@ public class DetectQRCode {
 
 
     public boolean detect_horizontal(int[][] bitMap, int startstart, int start, int stopstop, int stop){ //startstart & start are starting indexes to search at for finding a qr code
-        this.blackWhiteMapPicture = bitMap; //TODO: stopping functionality, aborting at (stopstop, stop) coord reached
+        this.blackWhiteMapPicture = bitMap;
         border = 0;
-        count = 0;
+        int count = 0;
         int lastChance = bitMap[bitMap.length/2].length/1000;
 
         for (int v = startstart; v < bitMap.length; v++) {
@@ -89,7 +96,6 @@ public class DetectQRCode {
                 return false;
             }
 
-            this.currLine = v;
             int[] bitM = bitMap[v];
             boolean endOfLine = false;
             boolean isThisTileSizeSet = false;
@@ -189,7 +195,6 @@ public class DetectQRCode {
                     } else if (ith == 3) {
                         this.fourthBorderWhite = g;
                     }else{
-                        this.fifthBorderBlack = g;
                     }
                     return true;
                 }
@@ -203,14 +208,14 @@ public class DetectQRCode {
         return false;
     }
 
-    public boolean detect_vertical(int[][] bitMap, int startstart, int start){ //TODO make sure every call of this function gets the right coords, so this is also never called before horizontal
+    public boolean detect_vertical(int[][] bitMap, int startstart, int start, int stopstop, int stop){
         int[][] newBitMap = new int[bitMap.length][bitMap[0].length];
         for(int i = 0; i < bitMap.length; i++){
             for (int ii = 0; ii < bitMap[i].length; ii++){
                 newBitMap[ii][i] = bitMap[i][ii]; //this should flip the bitMap by 90 degree right?
             }
         }
-        return detect_horizontal(newBitMap, startstart, start, newBitMap.length, newBitMap[0].length);
+        return detect_horizontal(newBitMap, startstart, start, stopstop, stop);
     }
 
 
@@ -268,50 +273,81 @@ public class DetectQRCode {
                         new_arr[i][j] = bitMap[j][i];
                     }
                 }
+
                 bitMap = new_arr;
             }
 
             int maxDiag = bitMap[0].length;
             diag_arr = mk_uneven_diag_arr(maxDiag, bitMap.length);
 
-            int c = 0;
-            for(int i = bitMap.length-1; i > bitMap.length-maxDiag; i--){
-                int z = 0;
-                for(int h = i; h < bitMap.length; h++){
-                    diag_arr[c][z] = bitMap[h][z];
-                    z++;
+            int[] aio = new int[bitMap.length*bitMap[bitMap.length/2].length];
+            int x = 0;
+            for(int[] bitM: bitMap){
+
+                for(int bit: bitM){
+
+                    aio[x] = bit;
+                    x++;
                 }
-                c++;
+            }
+            x = 0;
+
+            boolean findOut = true;
+            int t = 0;
+            while(findOut) {
+                if(binlog(t) >= maxDiag) {
+                    findOut = false;
+                }
+                t++;
             }
 
-            for(int i = bitMap.length-maxDiag-1; i > 0; i++){ //TODO i think there is a bug here, this is not setting the diag_arr correctly i think
+            while(x < aio.length) {
 
-                for(int g = 0; g < maxDiag; g++){
-                    diag_arr[c][g] = bitMap[i][g];
-                }
-                c++;
+                int[] coord = getXY(x,maxDiag, aio.length,t);
+                diag_arr[coord[0]][coord[1]] = aio[x];
+                x++;
             }
 
-            for(int i = 0; i < bitMap[0].length; i++){
-
-                for(int h = 0; h < bitMap[0].length-i; h++){
-                    diag_arr[c][h] = bitMap[h][i];
-                }
-                c++;
-
-            }
 
         }
 
 
         if (detect_horizontal( diag_arr, startstart, start, diag_arr.length, diag_arr[diag_arr.length/2].length)){
-            if(detect_vertical(diag_arr, startstart, start)){
+            if(detect_vertical(diag_arr, startstart, start, diag_arr.length, diag_arr[diag_arr.length/2].length)){
                 this.diag = true;
                 return true;
             }
 
         }
         return false;
+    }
+
+    private int[] getXY(int num, int maxDiag, int maxX, int x) {
+
+
+        if(binlog(num) < maxDiag){
+            return new int[]{binlog(num), indexY(num)};
+        }
+        else if (num < maxX - x) {
+            return new int[]{((num-x) /maxDiag) + maxDiag, ((num-x) %maxDiag)}; //this should be correct...right?
+        }else {
+           return new int[]{binlog(maxX - num), indexY(maxX-num)};
+        }
+
+
+        /*
+        0 [0,0]
+        1 [1,0]
+        2 [1,1]
+        3 [2,0]
+        4 [2,1]
+        5 [2,2]
+        6 [3,0]
+        ... until x, where x is the num, where coord[0] == maxDiag, or binlog(x) == maxDiag
+        x+0 [(x+0)-x/maxDiag][(x+0)-x%maxDiag]
+        ... until x+y, where y is the number, where the last maxDiag long line is.
+        basically reverse the stuff from before maxDiag len was reached, but add maxDiag + y-x/maxDiag that is X, Y is complicated
+         */
     }
 
     private int[][] mk_uneven_diag_arr(int maxDiag, int len) {
@@ -396,9 +432,10 @@ public class DetectQRCode {
             middleX = this.thirdBorderBlack + (this.fourthBorderWhite - this.thirdBorderBlack)/2;
             dist = this.secondBorderWhite - this.firstBorderBlack;
             startstart = firstBorderBlack-dist;
-            start = middleX -3*dist - (dist*3)/2;
-
-            if(detect_vertical(bitMap,startstart,start)){
+            start = middleX -3*dist+1 - (dist*3)/2; //middleX is actually middleY lol
+            int stopstop = bitMap[bitMap.length/2].length; //X and Y coords are confusing lmao
+            int stop = middleX + 3*dist+1 - (dist*3)/2; //dist+1 to account for diagonal view of camera (perspective)
+            if(detect_vertical(bitMap,startstart,start,stopstop,stop)){
 
                 for(int i = 5; i < 161; i+=4) {
 
@@ -409,7 +446,7 @@ public class DetectQRCode {
                     down = detect_horizontal(bitMap, startstart - dist * i, start,start - dist*(i+1), bitMap[bitMap.length/2].length);
                     left = detect_horizontal(bitMap, startstart, start - dist * i, bitMap.length, startstart - dist*(i+1));
                     right = detect_horizontal(bitMap, startstart, start + dist * i, bitMap.length, startstart + dist*(i+1));
-                    //TODO: detect_horizontal edit, so it can stop at specific coords, so it doesnt find the same marker twice
+
 
                     if (up && left) { //for efficiency reasons, i will only scan horizontally after the first marker was verified
 
@@ -417,10 +454,10 @@ public class DetectQRCode {
                         detect_horizontal(bitMap, startstart + dist * i, start, start + dist*(i+1), bitMap[bitMap.length/2].length); //this sets the borders again
                         middleX = this.thirdBorderBlack + (this.fourthBorderWhite - this.thirdBorderBlack) / 2;
                         start = middleX - 3 * dist - (dist * 3) / 2;   //X
-                        this.startX = start + dist * (i + 7);
+                        this.startX = start + dist * i;
                         detect_horizontal(bitMap, startstart, start - dist * i, bitMap.length, startstart - dist*(i+1));
                         startstart = firstBorderBlack - dist;     //Y
-                        this.startY = startstart - dist * (i + 7);    //TODO: check if this actually holds true for the correct coords
+                        this.startY = startstart - dist * i;
                         return true;
 
                     } else if (up & right) {
@@ -429,10 +466,10 @@ public class DetectQRCode {
                         detect_horizontal(bitMap, startstart + dist * i, start, start + dist*(i+1), bitMap[bitMap.length/2].length); //this sets the borders again
                         middleX = this.thirdBorderBlack + (this.fourthBorderWhite - this.thirdBorderBlack) / 2;
                         start = middleX - 3 * dist - (dist * 3) / 2;   //X
-                        this.startX = start + dist * (i + 7);
+                        this.startX = start + dist * i;
                         detect_horizontal(bitMap, startstart, start + dist * i, bitMap.length, startstart + dist*(i+1));
                         startstart = firstBorderBlack - dist;     //Y
-                        this.startY = startstart + dist * (i + 7);
+                        this.startY = startstart + dist * i;
                         return true;
 
                     } else if (left & down) {
@@ -441,10 +478,10 @@ public class DetectQRCode {
                         detect_horizontal(bitMap, startstart - dist * i, start,start - dist*(i+1), bitMap[bitMap.length/2].length); //this sets the borders again
                         middleX = this.thirdBorderBlack + (this.fourthBorderWhite - this.thirdBorderBlack) / 2;
                         start = middleX - 3 * dist - (dist * 3) / 2;   //X
-                        this.startX = start - dist * (i + 7);
+                        this.startX = start - dist * i;
                         detect_horizontal(bitMap, startstart, start - dist * i, bitMap.length, startstart - dist*(i+1));
                         startstart = firstBorderBlack - dist;     //Y
-                        this.startY = startstart - dist * (i + 7);
+                        this.startY = startstart - dist *i;
                         return true;
 
                     } else if (right & down) {
@@ -452,10 +489,10 @@ public class DetectQRCode {
                         detect_horizontal(bitMap, startstart - dist * i, start,start - dist*(i+1), bitMap[bitMap.length/2].length); //this sets the borders again
                         middleX = this.thirdBorderBlack + (this.fourthBorderWhite - this.thirdBorderBlack) / 2;
                         start = middleX - 3 * dist - (dist * 3) / 2;   //X
-                        this.startX = start - dist * (i + 7);
+                        this.startX = start - dist * i;
                         detect_horizontal(bitMap, startstart, start + dist * i, bitMap.length, startstart + dist*(i+1));
                         startstart = firstBorderBlack - dist;     //Y
-                        this.startY = startstart + dist * (i + 7);
+                        this.startY = startstart + dist * i;
                         return true;
                         //this should match any case, in that a qr code is findable and set the coords according
                     }
@@ -475,61 +512,62 @@ public class DetectQRCode {
                 start = middleX -3*dist - (dist*3)/2;
 
                 if(detect_diags(flipBitMap(bitMap), startstart, start)){
-                    for(int i = 2; i < 80; i+=2) {
+                    for(int i = 5; i < 161; i+=4) {
 
                         this.qrSize = i;
                         //first marker found yay :D
                         boolean up, down, left, right;
-                        up = detect_horizontal(bitMap, startstart + dist * i, start); //TODO: make detect_horizontal instantly return false, if any of the position int args are smaller or greater than bitMap size
-                        down = detect_horizontal(bitMap, startstart - dist * i, start);
-                        left = detect_horizontal(bitMap, startstart, start - dist * i);
-                        right = detect_horizontal(bitMap, startstart, start + dist * i); //TODO: detect_horizontal edit, so it can stop at specific coords, so it doesnt find the same marker twice
+                        up = detect_horizontal(bitMap, startstart + dist * i, start, start + dist*(i+1), bitMap[bitMap.length/2].length);
+                        down = detect_horizontal(bitMap, startstart - dist * i, start,start - dist*(i+1), bitMap[bitMap.length/2].length);
+                        left = detect_horizontal(bitMap, startstart, start - dist * i, bitMap.length, startstart - dist*(i+1));
+                        right = detect_horizontal(bitMap, startstart, start + dist * i, bitMap.length, startstart + dist*(i+1));
+
 
                         if (up && left) { //for efficiency reasons, i will only scan horizontally after the first marker was verified
 
                             //qr code verified, set read-starting coords and return true
-                            detect_horizontal(bitMap, startstart + dist * i, start); //this sets the borders again
+                            detect_horizontal(bitMap, startstart + dist * i, start, start + dist*(i+1), bitMap[bitMap.length/2].length); //this sets the borders again
                             middleX = this.thirdBorderBlack + (this.fourthBorderWhite - this.thirdBorderBlack) / 2;
                             start = middleX - 3 * dist - (dist * 3) / 2;   //X
-                            this.startX = start + dist * (i + 7);
-                            detect_horizontal(bitMap, startstart, start - dist * i);
+                            this.startX = start + dist * i;
+                            detect_horizontal(bitMap, startstart, start - dist * i, bitMap.length, startstart - dist*(i+1));
                             startstart = firstBorderBlack - dist;     //Y
-                            this.startY = startstart - dist * (i + 7);    //TODO: check if this actually holds true for the correct coords
+                            this.startY = startstart - dist * i;
                             return true;
 
                         } else if (up & right) {
 
                             //qr code verified, set read-starting coords and return true
-                            detect_horizontal(bitMap, startstart + dist * i, start); //this sets the borders again
+                            detect_horizontal(bitMap, startstart + dist * i, start, start + dist*(i+1), bitMap[bitMap.length/2].length); //this sets the borders again
                             middleX = this.thirdBorderBlack + (this.fourthBorderWhite - this.thirdBorderBlack) / 2;
                             start = middleX - 3 * dist - (dist * 3) / 2;   //X
-                            this.startX = start + dist * (i + 7);
-                            detect_horizontal(bitMap, startstart, start + dist * i);
+                            this.startX = start + dist * i;
+                            detect_horizontal(bitMap, startstart, start + dist * i, bitMap.length, startstart + dist*(i+1));
                             startstart = firstBorderBlack - dist;     //Y
-                            this.startY = startstart + dist * (i + 7);
+                            this.startY = startstart + dist *i;
                             return true;
 
                         } else if (left & down) {
 
                             //qr code verified, set read-starting coords and return true
-                            detect_horizontal(bitMap, startstart - dist * i, start); //this sets the borders again
+                            detect_horizontal(bitMap, startstart - dist * i, start,start - dist*(i+1), bitMap[bitMap.length/2].length); //this sets the borders again
                             middleX = this.thirdBorderBlack + (this.fourthBorderWhite - this.thirdBorderBlack) / 2;
                             start = middleX - 3 * dist - (dist * 3) / 2;   //X
-                            this.startX = start - dist * (i + 7);
-                            detect_horizontal(bitMap, startstart, start - dist * i);
+                            this.startX = start - dist * i;
+                            detect_horizontal(bitMap, startstart, start - dist * i, bitMap.length, startstart - dist*(i+1));
                             startstart = firstBorderBlack - dist;     //Y
-                            this.startY = startstart - dist * (i + 7);
+                            this.startY = startstart - dist *i;
                             return true;
 
                         } else if (right & down) {
                             //qr code verified, set read-starting coords and return true
-                            detect_horizontal(bitMap, startstart - dist * i, start); //this sets the borders again
+                            detect_horizontal(bitMap, startstart - dist * i, start,start - dist*(i+1), bitMap[bitMap.length/2].length); //this sets the borders again
                             middleX = this.thirdBorderBlack + (this.fourthBorderWhite - this.thirdBorderBlack) / 2;
                             start = middleX - 3 * dist - (dist * 3) / 2;   //X
-                            this.startX = start - dist * (i + 7);
-                            detect_horizontal(bitMap, startstart, start + dist * i);
+                            this.startX = start - dist * i;
+                            detect_horizontal(bitMap, startstart, start + dist * i, bitMap.length, startstart + dist*(i+1));
                             startstart = firstBorderBlack - dist;     //Y
-                            this.startY = startstart + dist * (i + 7);
+                            this.startY = startstart + dist *i;
                             return true;
                             //this should match any case, in that a qr code is findable and set the coords according
                         }
