@@ -1,36 +1,35 @@
 package com.example.alarm;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import java.io.File;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+
 import java.util.ArrayList;
 
 
+//TODO: Apache License include
 public class QRMethodSetActivity extends AppCompatActivity {
-
     private static final int REQUEST_FROM_CAMERA = 20;
     private RadioGroup rgQRBarMethod;
     private RadioButton rbQR, rbBar;
     private Button btnAddNewQRBar, btnAddSelectedQRBar;
     private EditText editLabel;
     private Spinner spSavedQRBars;
-    private Bitmap bitmap;
-    private String path;
+    private TextView txtDecode,txtFormat;
 
     private ArrayList<Bitmap> qrCodes,barCodes;
 
@@ -40,17 +39,23 @@ public class QRMethodSetActivity extends AppCompatActivity {
         setContentView(R.layout.activity_qrmethod_set);
 
         btnAddNewQRBar = (Button) findViewById(R.id.btnAddQRBarCode);
+        rgQRBarMethod = (RadioGroup) findViewById(R.id.rgQrBarMethod);
+        txtDecode = (TextView) findViewById(R.id.txtDecode);
+        txtFormat = (TextView) findViewById(R.id.txtFormat);
+
 
         btnAddNewQRBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                intent.putExtra("foto",android.provider.MediaStore.EXTRA_OUTPUT);
+                IntentIntegrator intentIntegrator = new IntentIntegrator(QRMethodSetActivity.this);
+                intentIntegrator.setPrompt("Scan a QR/Bar Code");
+                intentIntegrator.setOrientationLocked(true);
+                intentIntegrator.initiateScan();
 
-                startActivityForResult(intent,REQUEST_FROM_CAMERA);
             }
         });
+
 
 
 
@@ -60,17 +65,32 @@ public class QRMethodSetActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if(requestCode == REQUEST_FROM_CAMERA && resultCode == RESULT_OK){
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
-            DetectQRCode det = new DetectQRCode();
-            int[] dataAboutQR = det.detect(photo);
-            if (dataAboutQR.length > 1){
-                editLabel.setHint((CharSequence) photo.toString()); //TODO: read qr from foto
+        super.onActivityResult(requestCode, resultCode, data);
 
+        IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        // if the intentResult is null then
+        // toast a message as "cancelled"
+        if (intentResult != null) {
+            if (intentResult.getContents() == null) {
+                Toast.makeText(getBaseContext(), "Cancelled", Toast.LENGTH_SHORT).show();
+            } else {
+                // if the intentResult is not null we'll set
+                // the content and format of scan message
+                txtDecode.setText(intentResult.getContents());
+                txtFormat.setText(intentResult.getFormatName());
             }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
 
 
-        super.onActivityResult(requestCode, resultCode, data);
+
     }
+
+
+
+
+
+
+
 }
