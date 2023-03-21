@@ -8,23 +8,17 @@ public class Alarm implements java.io.Serializable {
     private String soundPath;
     private boolean extendedPrivileges;
     private boolean isActive;
-    private String imgBtnDownSrc;
-    private String imgBtnUpSrc;
-    private String imgBtnThreeDotsSrc;
     private String difficulty;
     private String type;
 
 
-    public Alarm(CharSequence t, String turnOffMethod, int id, String soundPath, boolean extendedPrivileges, boolean isActive, String imgBtnDownSrc, String imgBtnUpSrc, String imgBtnThreeDots, String difficulty, String type) {
+    public Alarm(CharSequence t, String turnOffMethod, int id, String soundPath, boolean extendedPrivileges, boolean isActive, String difficulty, String type) {
         this.t = t;
         this.turnOffMethod = turnOffMethod;
         this.ID = id;
         this.soundPath = soundPath;
         this.extendedPrivileges = extendedPrivileges;
         this.isActive = isActive;
-        this.imgBtnDownSrc = imgBtnDownSrc;
-        this.imgBtnUpSrc = imgBtnUpSrc;
-        this.imgBtnThreeDotsSrc = imgBtnThreeDotsSrc;
         this.difficulty = difficulty;
         this.type = type;
     }
@@ -61,30 +55,6 @@ public class Alarm implements java.io.Serializable {
 
     public void setDifficulty(String difficulty) {
         this.difficulty = difficulty;
-    }
-
-    public String getImgBtnDownSrc() {
-        return imgBtnDownSrc;
-    }
-
-    public void setImgBtnDownSrc(String imgBtnDownSrc) {
-        this.imgBtnDownSrc = imgBtnDownSrc;
-    }
-
-    public String getImgBtnUpSrc() {
-        return imgBtnUpSrc;
-    }
-
-    public void setImgBtnUpSrc(String imgBtnUpSrc) {
-        this.imgBtnUpSrc = imgBtnUpSrc;
-    }
-
-    public String getImgBtnThreeDotsSrc() {
-        return imgBtnThreeDotsSrc;
-    }
-
-    public void setImgBtnThreeDotsSrc(String imgBtnThreeDots) {
-        this.imgBtnThreeDotsSrc = imgBtnThreeDots;
     }
 
     public CharSequence getT() {
@@ -136,9 +106,6 @@ public class Alarm implements java.io.Serializable {
                 ", soundPath='" + soundPath + '\'' +
                 ", extendedPrivileges=" + extendedPrivileges +
                 ", isActive=" + isActive +
-                ", imgBtnDownSrc='" + imgBtnDownSrc + '\'' +
-                ", imgBtnUpSrc='" + imgBtnUpSrc + '\'' +
-                ", imgBtnThreeDotsSrc='" + imgBtnThreeDotsSrc + '\'' +
                 ", difficulty='" + difficulty + '\'' +
                 ", type='" + type + '\'' +
                 '}';

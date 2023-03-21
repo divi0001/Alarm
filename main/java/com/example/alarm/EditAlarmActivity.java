@@ -487,41 +487,16 @@ public class EditAlarmActivity extends AppCompatActivity {
 
 
 
-
-
-        //if(prefs.contains(getString(R.string.math_method_key))){
-
-        //  String edit = prefs.getString(getString(R.string.math_method_key), "com.example.alarm.MATH_METHOD_KEY");
-        //if(edit.equals("editAlarm")){
-
-        //  int pos = prefs.getInt(getString(R.string.pos_in_alarm_list_key),-1);
-        //      alarmParameter.add(pos, new Alarm(alarmParameter.size()));
-        //      Log.d("debug", "In standard prefs onActivityResult");
-
-        //      method = prefs.getString(getString(R.string.current_math_method), "Addition");
-        //      difficulty = prefs.getString(getString(R.string.current_math_method_difficulty), "Easy");
-
-        //      alarmParameter.get(pos).setDifficulty(difficulty);
-        //      alarmParameter.get(pos).setTurnOffMethod(method);
-
-        //      adapter1.setAlarmParameter(alarmParameter);
-        //}
-
-
-
-        //}
-
-
     @Override
     protected void onResume() {
         super.onResume();
 
 
         SharedPreferences prefs = context.getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),Context.MODE_PRIVATE);
-        if(prefs.getString(getString(R.string.current_math_method),"empty").equals("empty") && prefs.getString(getString(R.string.current_math_method_difficulty),"exEasy").equals("exEasy")) {
-
+        if(prefs.getString(getString(R.string.current_math_method),"empty").equals("empty")) {
 
             Log.d("debug", "Standard Shared Preferences, useless if case, onResume");
+
         }else {
 
             Log.d("debug", "In set prefs onResume"); //TODO: mux the different methods to set according cardviews

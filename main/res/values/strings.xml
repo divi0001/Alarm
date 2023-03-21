@@ -185,14 +185,15 @@
     <string name="qr_or_bar">Chose qr- or barcode method: </string>
     <string name="qr">QR-Code</string>
     <string name="bar">Barcode</string>
-    <string name="add_qr_or_bar">Add a qr/barcode</string>
+    <string name="add_qr_or_bar">New QR/BarCode</string>
     <string name="or">or</string>
-    <string name="add_selected">Add selected qr/barcode</string>
+    <string name="add_selected">Add selected</string>
     <string name="label_me">Label me: </string>
     <string name="qr_code">qr_code</string>
     <string name="enter_your_info">Enter your info</string>
     <string name="generate_qr_code">Generate QR Code</string>
     <string name="resultQR">Result of scan</string>
     <string name="dataTypeQR">Datatype of scan</string>
+    <string name="addNew">Add from above</string>
 
 </resources>

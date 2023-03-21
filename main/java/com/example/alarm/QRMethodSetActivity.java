@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,24 +22,31 @@ import java.util.ArrayList;
 //TODO: Apache License include
 public class QRMethodSetActivity extends AppCompatActivity {
     private static final int REQUEST_FROM_CAMERA = 20;
-    private RadioGroup rgQRBarMethod;
-    private RadioButton rbQR, rbBar;
-    private Button btnAddNewQRBar, btnAddSelectedQRBar;
+    private Button btnAddNewQRBar, btnAddSelectedQRBar, btnAddFromAbove;
     private EditText editLabel;
     private Spinner spSavedQRBars;
     private TextView txtDecode,txtFormat;
 
     private ArrayList<Bitmap> qrCodes,barCodes;
+    private DBHelper db;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qrmethod_set);
 
-        btnAddNewQRBar = (Button) findViewById(R.id.btnAddQRBarCode);
-        rgQRBarMethod = (RadioGroup) findViewById(R.id.rgQrBarMethod);
+        btnAddNewQRBar = (Button) findViewById(R.id.btnReadQRBarCode);
         txtDecode = (TextView) findViewById(R.id.txtDecode);
         txtFormat = (TextView) findViewById(R.id.txtFormat);
+        btnAddSelectedQRBar = (Button) findViewById(R.id.btnAddSelected);
+        btnAddFromAbove = (Button) findViewById(R.id.btnAddNewQRCode);
+
+        db = new DBHelper(this);
+
+
+        //spSavedQRBars.setAdapter();
+
 
 
         btnAddNewQRBar.setOnClickListener(new View.OnClickListener() {
@@ -56,7 +61,12 @@ public class QRMethodSetActivity extends AppCompatActivity {
             }
         });
 
+        btnAddSelectedQRBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+            }
+        });
 
 
 
@@ -65,19 +75,30 @@ public class QRMethodSetActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
         super.onActivityResult(requestCode, resultCode, data);
 
         IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        // if the intentResult is null then
-        // toast a message as "cancelled"
+
         if (intentResult != null) {
             if (intentResult.getContents() == null) {
                 Toast.makeText(getBaseContext(), "Cancelled", Toast.LENGTH_SHORT).show();
             } else {
-                // if the intentResult is not null we'll set
-                // the content and format of scan message
+
                 txtDecode.setText(intentResult.getContents());
                 txtFormat.setText(intentResult.getFormatName());
+
+                btnAddFromAbove.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+
+
+                    }
+                });
+
+
+
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
