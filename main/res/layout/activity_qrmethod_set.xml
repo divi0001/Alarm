@@ -21,7 +21,7 @@
         tools:layout_editor_absoluteX="125dp" />
 
     <TextView
-        android:id="@+id/txtDecode"
+        android:id="@+id/txtFormat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/dataTypeQR"
@@ -30,14 +30,14 @@
         app:layout_constraintTop_toBottomOf="@+id/btnReadQRBarCode" />
 
     <TextView
-        android:id="@+id/txtFormat"
+        android:id="@+id/txtDecode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:text="@string/resultQR"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtDecode" />
+        app:layout_constraintTop_toBottomOf="@+id/txtFormat" />
 
 
     <TextView

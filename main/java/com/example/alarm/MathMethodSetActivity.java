@@ -3,10 +3,13 @@ package com.example.alarm;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -88,24 +91,29 @@ public class MathMethodSetActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 Context context = MathMethodSetActivity.this;
 
-                                SharedPreferences sharedPref = MathMethodSetActivity.this.getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),Context.MODE_PRIVATE);
-                                SharedPreferences.Editor editor =sharedPref.edit();
+                                DBHelper db = new DBHelper(context, "Mathdatabase");
 
                                 RadioButton rbMeth = findViewById(rgKindOfMath.getCheckedRadioButtonId());
                                 RadioButton rbDiff = findViewById(rgDifficulty.getCheckedRadioButtonId());
 
-                                editor.putString(getString(R.string.current_math_method),rbMeth.getText().toString());
-                                editor.putString(getString(R.string.current_math_method_difficulty),rbDiff.getText().toString());
-                                editor.putString(getString(R.string.method_to_set),"math");
 
-                                if(save){
-                                    editor.putString(getString(R.string.save_set),"save");
+
+                                Cursor c = db.execQuery("SELECT * FROM Mathdatabase WHERE ?",new String[]{"MAX(id)"});
+
+/*                                if(c.getCount() > 0){
+                                    c.moveToFirst();
+                                    System.out.println(c.getInt(0)+c.getString(1)+c.getString(2));
+                                    while(c.moveToNext()){
+                                        System.out.println(c.getInt(0)+c.getString(1)+c.getString(2));
+                                    }
                                 }else{
-                                    editor.putString(getString(R.string.save_set), "set");
+                                    System.out.println("Mathdatabase is empty");
                                 }
+  */                            c.moveToFirst();
+                                db.insertAlarmData(new String[]{"id", "method", "difficulty"}, new String[]{Integer.toString(Integer.parseInt(c.getString(0)) + 1), rbMeth.getText().toString(), rbDiff.getText().toString()}, "Mathdatabase");
 
-                                editor.apply();
-
+                                //TODO: FIND THE GODDAMN BUG, THAT IS NOT ALLOWING TO FIND THE LAST INDEX OF MATHDATABASE FOR GODS SAKE!
+                                //TODO: let EditAlarmActivity know, if alarm is set or save, or even better, if not save, edit here lol
                                 finish();
 
                             }

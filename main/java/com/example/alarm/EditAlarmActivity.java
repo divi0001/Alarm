@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.XmlResourceParser;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Layout;
@@ -489,27 +491,20 @@ public class EditAlarmActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+
         super.onResume();
+        DBHelper db = new DBHelper(EditAlarmActivity.this, "Alarmdatabase");
 
+        Cursor c = db.getData("Alarmdatabase");
+        ArrayList<String> arrMeth = new ArrayList<>();
 
-        SharedPreferences prefs = context.getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),Context.MODE_PRIVATE);
-        if(prefs.getString(getString(R.string.current_math_method),"empty").equals("empty")) {
-
-            Log.d("debug", "Standard Shared Preferences, useless if case, onResume");
-
-        }else {
-
-            Log.d("debug", "In set prefs onResume"); //TODO: mux the different methods to set according cardviews
-            method = prefs.getString(getString(R.string.current_math_method), "Addition");
-            difficulty = prefs.getString(getString(R.string.current_math_method_difficulty), "Easy");
-
-            alarmParameter.add(new Alarm(alarmParameter.size()));
-
-            alarmParameter.get(alarmParameter.size()-1).setDifficulty(difficulty);
-            alarmParameter.get(alarmParameter.size()-1).setTurnOffMethod(method);
-            alarmParameter.get(alarmParameter.size()-1).setType("Math: ");
-
-            adapter1.setAlarmParameter(alarmParameter);
+        if(c.getCount()>0){
+            while(c.moveToNext()){
+                arrMeth.add(c.getString(2));
+            }
+        }
+        for (String st : arrMeth) {
+            mkNewAlarmParam(st);
         }
 
 
@@ -524,33 +519,27 @@ public class EditAlarmActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                if (adapter1.getItemCount() > 4) {
+                    Toast.makeText(EditAlarmActivity.this, "Do you really need more than 5 methods for this Level?", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+
+
+
+
                 if(methodToSet.equals("math")) {
 
-                    SharedPreferences pref = context.getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), Context.MODE_PRIVATE);
-                    String m = pref.getString(getString(R.string.current_math_method), "empty");
-                    String d = pref.getString(getString(R.string.current_math_method_difficulty), "exEasy");
-                    if (!pref.getString(getString(R.string.current_math_method), "empty").equals("empty") && !pref.getString(getString(R.string.current_math_method_difficulty), "exEasy").equals("exEasy")) {
-                        method = m;
-                        difficulty = d;
-                    }
 
-                    System.out.println("Difficulty: " + difficulty + " \n Method: " + method);
-
-                    if (adapter1.getItemCount() > 4) {
-                        Toast.makeText(EditAlarmActivity.this, "Do you really need more than 5 methods for this Level?", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                        Intent iMath = new Intent(context, MathMethodSetActivity.class);
-                        startActivity(iMath);
+                    Intent iMath = new Intent(context, MathMethodSetActivity.class);
+                    startActivity(iMath);
 
 
 
                 } else if (methodToSet.equals("tap_off")) {
 
-                    alarmParameter.add(new Alarm(alarmParameter.size()));
-                    alarmParameter.get(alarmParameter.size()-1).setType("tap_off");
-                    alarmParameter.get(alarmParameter.size()-1).setDifficulty("None");
+                    mkNewAlarmParam("TapOff");
+
                     adapter1.setAlarmParameter(alarmParameter);
 
                 } else if (methodToSet.equals("scan_qr_barcode")) {
@@ -564,4 +553,49 @@ public class EditAlarmActivity extends AppCompatActivity {
         });
 
     }
-}
+
+    private void mkNewAlarmParam(String st) {
+
+        DBHelper db;
+
+
+
+        if(st.contains("TapOff")){
+
+            alarmParameter.add(new Alarm(alarmParameter.size()));
+            alarmParameter.get(alarmParameter.size()-1).setType("Tap off");
+            alarmParameter.get(alarmParameter.size()-1).setDifficulty("None");
+
+        }else if (st.contains("Mathdatabase")){
+
+            db = new DBHelper(EditAlarmActivity.this, "Mathdatabase"); //TODO: exception handling (try with ressources)
+            String firstNumber = st.replaceFirst(".*?(\\d+).*", "$1"); //TODO: does this actually give back the right id?
+            int id = Integer.parseInt(firstNumber);
+
+            Cursor c = db.execQuery("SELECT * FROM Mathdatabase WHERE ?", new String[]{"id = " + id}); //TODO: this database shall be cleared, when creating the alarm, pulling out everything first. Also it shall be recreated in oncreate of this class
+
+            alarmParameter.add(new Alarm(alarmParameter.size()));
+            alarmParameter.get(alarmParameter.size()-1).setType("Math: ");
+            alarmParameter.get(alarmParameter.size()-1).setTurnOffMethod(c.getString(1));
+            alarmParameter.get(alarmParameter.size()-1).setDifficulty(c.getString(2));
+
+            } else if (st.contains("qr/bar")) {
+
+            db = new DBHelper(EditAlarmActivity.this, "QRBarcodedatabase");
+            String firstNumber = st.replaceFirst(".*?(\\d+).*", "$1"); //TODO: does this actually give back the right id?
+            int id = Integer.parseInt(firstNumber);
+
+            Cursor c = db.execQuery("SELECT * FROM QRBarcodedatabase WHERE ?", new String[]{"id = " + id});
+
+            alarmParameter.add(new Alarm(alarmParameter.size()));
+            alarmParameter.get(alarmParameter.size()-1).setType("QR/Barcode: ");
+            alarmParameter.get(alarmParameter.size()-1).setTurnOffMethod(c.getString(0));
+            alarmParameter.get(alarmParameter.size()-1).setDifficulty("None");
+
+        }
+
+
+    }
+
+
+    }

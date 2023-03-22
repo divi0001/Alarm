@@ -1,6 +1,8 @@
 package com.example.alarm;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
@@ -41,8 +43,9 @@ public class QRMethodSetActivity extends AppCompatActivity {
         txtFormat = (TextView) findViewById(R.id.txtFormat);
         btnAddSelectedQRBar = (Button) findViewById(R.id.btnAddSelected);
         btnAddFromAbove = (Button) findViewById(R.id.btnAddNewQRCode);
+        editLabel = (EditText) findViewById(R.id.editLabelMe);
 
-        db = new DBHelper(this);
+        db = new DBHelper(this, "QRBarcodedatabase");
 
 
         //spSavedQRBars.setAdapter();
@@ -61,13 +64,35 @@ public class QRMethodSetActivity extends AppCompatActivity {
             }
         });
 
-        btnAddSelectedQRBar.setOnClickListener(new View.OnClickListener() {
+        btnAddFromAbove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                Cursor c = db.getData("QRBarcodedatabase");
+                ArrayList<String> values = new ArrayList<>();
+
+                if(c.getCount()>0){
+                    while(c.moveToNext()){
+                        values.add(c.getString(0));
+                    }
+                    System.out.println(values);
+                }
+                if(values.contains(editLabel.getText().toString())){
+                    Toast.makeText(QRMethodSetActivity.this, "Label already used. Please use a unique label", Toast.LENGTH_SHORT).show();
+                }else {
+
+                    boolean isInsertedData = db.insertAlarmData(new String[]{"label", "decoded"}, new String[]{editLabel.getText().toString(), txtDecode.getText().toString()}, "QRBarcodedatabase");
+                    if (isInsertedData) {
+                        Toast.makeText(QRMethodSetActivity.this, "Added " + editLabel.getText().toString() + " as a new qr/barcode", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        Toast.makeText(QRMethodSetActivity.this, "Some error occurred, couldn't add the qr/barcode", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+
             }
         });
-
 
 
 
@@ -88,14 +113,7 @@ public class QRMethodSetActivity extends AppCompatActivity {
                 txtDecode.setText(intentResult.getContents());
                 txtFormat.setText(intentResult.getFormatName());
 
-                btnAddFromAbove.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
 
-
-
-                    }
-                });
 
 
 
