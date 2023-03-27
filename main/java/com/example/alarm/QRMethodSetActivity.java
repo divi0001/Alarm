@@ -81,13 +81,8 @@ public class QRMethodSetActivity extends AppCompatActivity {
                     Toast.makeText(QRMethodSetActivity.this, "Label already used. Please use a unique label", Toast.LENGTH_SHORT).show();
                 }else {
 
-                    boolean isInsertedData = db.insertAlarmData(new String[]{"label", "decoded"}, new String[]{editLabel.getText().toString(), txtDecode.getText().toString()}, "QRBarcodedatabase");
-                    if (isInsertedData) {
-                        Toast.makeText(QRMethodSetActivity.this, "Added " + editLabel.getText().toString() + " as a new qr/barcode", Toast.LENGTH_SHORT).show();
-                        finish();
-                    } else {
-                        Toast.makeText(QRMethodSetActivity.this, "Some error occurred, couldn't add the qr/barcode", Toast.LENGTH_SHORT).show();
-                    }
+                    db.insertAlarmData(new String[]{"label", "decoded"}, new String[]{editLabel.getText().toString(), txtDecode.getText().toString()}, "QRBarcodedatabase");
+                    finish();
                 }
 
 

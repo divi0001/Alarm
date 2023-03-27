@@ -1,13 +1,17 @@
 package com.example.alarm;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.XmlResourceParser;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -525,9 +529,6 @@ public class EditAlarmActivity extends AppCompatActivity {
                 }
 
 
-
-
-
                 if(methodToSet.equals("math")) {
 
 
@@ -545,6 +546,17 @@ public class EditAlarmActivity extends AppCompatActivity {
                 } else if (methodToSet.equals("scan_qr_barcode")) {
                     Intent iScan = new Intent(context, QRMethodSetActivity.class);
                     startActivity(iScan);
+                } else if (methodToSet.equals("location_based")) {
+
+                    if(ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                        Intent iLoc = new Intent(context, LocationMethodSetActivity.class);
+                        startActivity(iLoc);
+                    }else{
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+                    }
+
+
+
                 }
 
 
@@ -579,11 +591,12 @@ public class EditAlarmActivity extends AppCompatActivity {
             alarmParameter.get(alarmParameter.size()-1).setTurnOffMethod(c.getString(1));
             alarmParameter.get(alarmParameter.size()-1).setDifficulty(c.getString(2));
 
-            } else if (st.contains("qr/bar")) {
+            } else if (st.contains("QRBardatabase")) {
 
             db = new DBHelper(EditAlarmActivity.this, "QRBarcodedatabase");
             String firstNumber = st.replaceFirst(".*?(\\d+).*", "$1"); //TODO: does this actually give back the right id?
             int id = Integer.parseInt(firstNumber);
+            System.out.println(id);
 
             Cursor c = db.execQuery("SELECT * FROM QRBarcodedatabase WHERE ?", new String[]{"id = " + id});
 
@@ -598,4 +611,12 @@ public class EditAlarmActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            Intent iLoc = new Intent(context, LocationMethodSetActivity.class);
+            startActivity(iLoc);
+        }
     }
+}
