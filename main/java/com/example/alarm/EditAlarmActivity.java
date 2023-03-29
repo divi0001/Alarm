@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.mapbox.mapboxsdk.Mapbox;
 
 import org.json.JSONArray;
 
@@ -549,6 +550,7 @@ public class EditAlarmActivity extends AppCompatActivity {
                 } else if (methodToSet.equals("location_based")) {
 
                     if(ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                        Mapbox.getInstance(EditAlarmActivity.this, getResources().getString(R.string.mapbox_access_token));
                         Intent iLoc = new Intent(context, LocationMethodSetActivity.class);
                         startActivity(iLoc);
                     }else{
@@ -603,6 +605,20 @@ public class EditAlarmActivity extends AppCompatActivity {
             alarmParameter.add(new Alarm(alarmParameter.size()));
             alarmParameter.get(alarmParameter.size()-1).setType("QR/Barcode: ");
             alarmParameter.get(alarmParameter.size()-1).setTurnOffMethod(c.getString(0));
+            alarmParameter.get(alarmParameter.size()-1).setDifficulty("None");
+
+        } else if (st.contains("Locationdatabase")) {
+
+            db = new DBHelper(EditAlarmActivity.this, "Locationdatabase");
+            String firstNumber = st.replaceFirst(".*?(\\d+).*", "$1"); //TODO: does this actually give back the right id?
+            int id = Integer.parseInt(firstNumber);
+            System.out.println(id);
+
+            Cursor c = db.execQuery("SELECT * FROM Locationdatabase WHERE ?", new String[]{"id = " + id});
+
+            alarmParameter.add(new Alarm(alarmParameter.size()));
+            alarmParameter.get(alarmParameter.size()-1).setType("Location: " + c.getString(3)); //3rd row is streetname
+            alarmParameter.get(alarmParameter.size()-1).setTurnOffMethod(c.getString(2));  //2nd row is radius
             alarmParameter.get(alarmParameter.size()-1).setDifficulty("None");
 
         }

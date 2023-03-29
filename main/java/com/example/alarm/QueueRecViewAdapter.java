@@ -1,17 +1,12 @@
 package com.example.alarm;
 
-import static androidx.core.content.ContextCompat.startActivity;
-
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -38,8 +33,9 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
         return new ViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
 
         this.holder = holder;
 
@@ -47,12 +43,12 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
         holder.txtDifficulty.setText(alarmParameter.get(position).getDifficulty());
 
         holder.imgMinusDelete.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onClick(View v) {
                 alarmParameter.remove(position);
                 setAlarmParameter(alarmParameter);
-                //SharedPreferences s = context.getSharedPreferences(holder.itemView.getContext().getString(R.string.queue_shared_pref_key_adapter),Context.MODE_PRIVATE);
-                notifyDataSetChanged();//TODO: Look here, this might be causing trouble, maybe the sharedPreferences are called again, when leaving this activity, so deleting effectively does not work?
+                notifyDataSetChanged();
 
             }
         });
@@ -80,6 +76,7 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
         return alarmParameter.size();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setAlarmParameter(ArrayList<Alarm> alarmParameter) {
 
         this.alarmParameter = alarmParameter;

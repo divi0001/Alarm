@@ -1,5 +1,6 @@
 package com.example.alarm;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -69,6 +70,7 @@ public class QRMethodSetActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Cursor c = db.getData("QRBarcodedatabase");
+
                 ArrayList<String> values = new ArrayList<>();
 
                 if(c.getCount()>0){

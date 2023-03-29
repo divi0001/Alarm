@@ -27,6 +27,7 @@ public class DBHelper extends SQLiteOpenHelper{
         //every int representing a bool is -1 for false                         this is the id of the table and the item in it, for the corresponding method
         db.execSQL("create Table QRBarcodedatabase (label TEXT primary key, decoded TEXT)");
         db.execSQL("create Table Mathdatabase (id INTEGER primary key autoincrement, method TEXT, difficulty TEXT)");
+        db.execSQL("create Table Locationdatabase (id INTEGER primary key autoincrement, latitude TEXT, longitude TEXT, radius TEXT, street TEXT)");
     }
 
     @Override
@@ -34,6 +35,7 @@ public class DBHelper extends SQLiteOpenHelper{
         db.execSQL("drop Table if exists Alarmdatabase");
         db.execSQL("drop Table if exists QRBarcodedatabase");
         db.execSQL("drop Table if exists Mathdatabase");
+        db.execSQL("drop Table if exists Locationdatabase");
         onCreate(db);
     }
 
