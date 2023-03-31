@@ -347,7 +347,9 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                     try {
                         addr = g.getFromLocation(latitude, longitude, 1).get(0);
                         DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Locationdatabase");
-                        db.insertAlarmData(new String[]{"latitude", "longitude", "radius", "street"}, new String[]{String.valueOf(latitude), String.valueOf(longitude), String.valueOf(radius), addr.getThoroughfare()}, "Locationdatabase");
+                        db.addLocation((int)latitude, Integer.parseInt(String.valueOf(latitude).substring(String.valueOf(latitude).indexOf("."))),
+                                (int) longitude, Integer.parseInt(String.valueOf(longitude).substring(String.valueOf(longitude).indexOf("."))),
+                                (int) radius, Integer.parseInt(String.valueOf(radius).substring(String.valueOf(radius).indexOf("."))), addr.getThoroughfare());
                         //TODO: make sure radius is consistently updated
                         finish();
                     } catch (IOException e) {
@@ -355,7 +357,9 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                     }
                 }else{
                     DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Locationdatabase");
-                    db.insertAlarmData(new String[]{"latitude", "longitude", "radius", "street"}, new String[]{String.valueOf(latitude), String.valueOf(longitude), String.valueOf(radius), addr.getThoroughfare()}, "Locationdatabase");
+                    db.addLocation((int)latitude, Integer.parseInt(String.valueOf(latitude).substring(String.valueOf(latitude).indexOf("."))),
+                            (int) longitude, Integer.parseInt(String.valueOf(longitude).substring(String.valueOf(longitude).indexOf("."))),
+                            (int) radius, Integer.parseInt(String.valueOf(radius).substring(String.valueOf(radius).indexOf("."))), addr.getThoroughfare());
                     finish();
                 }
             }

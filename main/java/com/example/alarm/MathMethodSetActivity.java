@@ -96,21 +96,11 @@ public class MathMethodSetActivity extends AppCompatActivity {
                                 RadioButton rbMeth = findViewById(rgKindOfMath.getCheckedRadioButtonId());
                                 RadioButton rbDiff = findViewById(rgDifficulty.getCheckedRadioButtonId());
 
+                                db.addMath(rbMeth.getText().toString(), rbDiff.getText().toString());
 
 
-                                Cursor c = db.execQuery("SELECT * FROM Mathdatabase WHERE ?",new String[]{"MAX(id)"});
 
-/*                                if(c.getCount() > 0){
-                                    c.moveToFirst();
-                                    System.out.println(c.getInt(0)+c.getString(1)+c.getString(2));
-                                    while(c.moveToNext()){
-                                        System.out.println(c.getInt(0)+c.getString(1)+c.getString(2));
-                                    }
-                                }else{
-                                    System.out.println("Mathdatabase is empty");
-                                }
-  */                            c.moveToFirst();
-                                db.insertAlarmData(new String[]{"id", "method", "difficulty"}, new String[]{Integer.toString(Integer.parseInt(c.getString(0)) + 1), rbMeth.getText().toString(), rbDiff.getText().toString()}, "Mathdatabase");
+
 
                                 //TODO: FIND THE GODDAMN BUG, THAT IS NOT ALLOWING TO FIND THE LAST INDEX OF MATHDATABASE FOR GODS SAKE!
                                 //TODO: let EditAlarmActivity know, if alarm is set or save, or even better, if not save, edit here lol

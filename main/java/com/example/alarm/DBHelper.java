@@ -23,46 +23,177 @@ public class DBHelper extends SQLiteOpenHelper{
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create Table Alarmdatabase (id INTEGER primary key autoincrement, label TEXT, method_queue_list TEXT, sound_path TEXT, privilege_rights TEXT, snoozable_list TEXT, time_wake_up TEXT, days_schedule TEXT, weeks_schedule TEXT, check_awake TEXT, alarm_level_table TEXT)");
+        db.execSQL("create Table Alarmdatabase (id INTEGER primary key autoincrement, label TEXT, method_queue_id INTEGER, sound_path_id INTEGER, privilege_rights INTEGER, snoozable INTEGER, time_wake_up_hours INTEGER, time_wake_up_minutes INTEGER, days_schedule_id INTEGER, weeks_schedule_id INTEGER, check_awake INTEGER, alarm_level_table_id INTEGER)");
         //every int representing a bool is -1 for false                         this is the id of the table and the item in it, for the corresponding method
+
+        db.execSQL("create Table Methoddatabase (id INTEGER primary key autoincrement, queue_id INTEGER, method_type_id INTEGER, method_id INTEGER, difficulty_id INTEGER, label TEXT, method_database_specific_id INTEGER)"); //multiple rows with same queue_id are part of the same queue
+        db.execSQL("create Table Methodtype (id INTEGER primary key autoincrement, method_type TEXT)");
+        db.execSQL("create Table Method (id INTEGER primary key autoincrement, method TEXT)");
+        db.execSQL("create Table Difficulty (id INTEGER primary key autoincrement, difficulty TEXT)");
+
+        db.execSQL("create Table Alarmlevel (id INTEGER primary key autoincrement, level_id INTEGER, method_databse_queue_id INTEGER)"); //multiple rows with the same level_id make up the different Alarmlevels, might add more attribs later
+
         db.execSQL("create Table QRBarcodedatabase (label TEXT primary key, decoded TEXT)");
         db.execSQL("create Table Mathdatabase (id INTEGER primary key autoincrement, method TEXT, difficulty TEXT)");
-        db.execSQL("create Table Locationdatabase (id INTEGER primary key autoincrement, latitude TEXT, longitude TEXT, radius TEXT, street TEXT)");
+        db.execSQL("create Table Locationdatabase (id INTEGER primary key autoincrement, latitude_int INTEGER, zero_point_latitude INTEGER, longitude_int INTEGER, zero_point_longitude INTEGER, radius_int INTEGER, zero_point_radius INTEGER, street TEXT)");
+        setupTablesForPreset();
+    }
+
+    private void setupTablesForPreset() {
+
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+
+        for(String type : new String[]{"tap_off","math","qr_barcode","location","sudoku","memory","passphrase"}) {
+            cv.put("method_type", type);
+        }
+        if(db.insert("Methodtype", null, cv) == -1){
+            Toast.makeText(context, "Error setting up static Database \"Methodtype\"", Toast.LENGTH_SHORT).show();
+        }
+
+        cv = new ContentValues();
+        for(String type : new String[]{"null","add","sub","mult","div","fac","root","value_fx","extrema_fx","multiple_choice","reach_radius","leave_radius"}) {
+            cv.put("method", type);
+        }
+        if(db.insert("Method", null, cv) == -1){
+            Toast.makeText(context, "Error setting up static Database \"Method\"", Toast.LENGTH_SHORT).show();
+        }
+
+        cv = new ContentValues();
+        for(String type : new String[]{"ex_easy","easy","middle","hard","ex_hard"}) {
+            cv.put("difficulty", type);
+        }
+        if(db.insert("Difficulty", null, cv) == -1){
+            Toast.makeText(context, "Error setting up static Database \"Difficulty\"", Toast.LENGTH_SHORT).show();
+        }
+
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int verOld, int verNew) {
         db.execSQL("drop Table if exists Alarmdatabase");
+
+        db.execSQL("drop Table if exists Methoddatabase");
+        db.execSQL("drop Table if exists Methodtype");
+        db.execSQL("drop Table if exists Method");
+        db.execSQL("drop Table if exists Difficulty");
+
+        db.execSQL("drop Table if exists Alarmlevel");
+
         db.execSQL("drop Table if exists QRBarcodedatabase");
         db.execSQL("drop Table if exists Mathdatabase");
         db.execSQL("drop Table if exists Locationdatabase");
         onCreate(db);
     }
 
-    public void insertAlarmData(String[] key, String[] value, String tableName){
+    //TODO: I don't need to handle SQLInjection, atleast for now, because sharing of settings is not supported as of now, so this would only harm the person itself, or be a nice niche feature lol
+    //(this might change in the future, so i will keep this todo in until publishing, so if i add that feature at any point, i'll know, that i have to take care of that.)
 
+    public void addAlarm(String label, int methodQueueId, int soundPathId, boolean privilegeRights, boolean snoozable, int wakeUpTimeHours, int wakeUpTimeMinutes, int daysScheduleId, int weeksScheduleId, boolean checkAwake, int alarmLevelTableId){
 
         SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
 
-        ContentValues contentValues = new ContentValues();
-        for (int i = 0; i < key.length; i++) {
-            if (value[i] == null) {
-                continue;
-            }
-            //TODO: handle, when to put ints, also don't forget where to put them from where ever this is called
-            //TODO: i don't think i need to handle sqlinjection, because users doing this would only affect their own data right?
-            contentValues.put(key[i], value[i]);
-        }
-        long res = db.insert(tableName, null, contentValues);
-        if (res == -1){
-            
-            Toast.makeText(context, "Failed to insert data", Toast.LENGTH_SHORT).show();
+        cv.put("label", label);
+        cv.put("method_queue_id",methodQueueId);
+        cv.put("sound_path_id",soundPathId);
+        if(privilegeRights){
+        cv.put("privilege_rights",1);}
+        else{
+            cv.put("privilege_rights", 0);}
+        if(snoozable){
+        cv.put("snoozable",1);}
+        else{
+            cv.put("snoozable",0);}
+        cv.put("time_wake_up_hours", wakeUpTimeHours);
+        cv.put("time_wake_up_minutes", wakeUpTimeMinutes);
+        cv.put("days_schedule_id",daysScheduleId);
+        cv.put("weeks_schedule_id",weeksScheduleId);
+        if(checkAwake){
+        cv.put("check_awake", 1);}else{
+            cv.put("check_awake", 0);}
+        cv.put("alarm_level_table_id",alarmLevelTableId);
+        long res = db.insert("Alarmdatabase", null, cv);
+        if(res == -1){
+            Toast.makeText(context, "Inserting into Alarmdatabase failed", Toast.LENGTH_SHORT).show();
         }else{
-            Toast.makeText(context, "Added successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Successfully added into Alarmdatabase", Toast.LENGTH_SHORT).show();
         }
-
 
     }
+
+
+    //queue_id INTEGER, method_type_id INTEGER, method_id INTEGER, difficulty_id INTEGER, label TEXT)"); //multiple rows with same queue_id are part of the same queue
+    public void addMethod(int queueID, int methodTypeId, int methodId, int difficultyId, String label, int methodDatabaseSpecificID){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put("queue_id",queueID);
+        cv.put("method_type_id",methodTypeId);
+        cv.put("method_id",methodId);
+        cv.put("difficulty_id",difficultyId);
+        cv.put("label",label);
+        cv.put("method_database_specific_id", methodDatabaseSpecificID);    //This is the id, that (if necessary) points to the specific data of the method database defined by method_type_id
+                                                                            //In easy words: if you need to look up the decoded string from qrcode method, this points to the id in the specific database, that has this info
+        long res = db.insert("Methoddatabase", null, cv);
+        if(res == -1){
+            Toast.makeText(context, "Inserting into Methoddatabase failed", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(context, "Successfully added into Methoddatabase", Toast.LENGTH_SHORT).show();
+        }
+    }
+    public void addMath(String method, String difficulty){
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put("method",method);
+        cv.put("difficulty",difficulty);
+        long res = db.insert("Mathdatabase", null, cv);
+        if(res == -1){
+            Toast.makeText(context, "Inserting into Mathdatabase failed", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(context, "Successfully added into Mathdatabase", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void addQRBar(String label, String decoded){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put("label", label);
+        cv.put("decoded", decoded);
+        long res = db.insert("QRBarcodedatabase", null, cv);
+        if(res == -1){
+            Toast.makeText(context, "Inserting into QRBarcodedatabase failed", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(context, "Successfully added into QRBarcodedatabase", Toast.LENGTH_SHORT).show();
+        }
+    }
+    //        Locationdatabase latitude_int INTEGER, zero_point_latitude INTEGER, longitude_int INTEGER, zero_point_longitude INTEGER, radius_int INTEGER, zero_point_radius INTEGER, street TEXT)");
+
+    public void addLocation(int latitudeInt, int zeroPointLatitude, int longitudeInt, int zeroPointLongitude, int radiusInt, int zeroPointRadius, String street){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put("latitude_int",latitudeInt);
+        cv.put("zero_point_latitude",zeroPointLatitude);
+        cv.put("longitude_int",longitudeInt);
+        cv.put("zero_point_longitude",zeroPointLongitude);
+        cv.put("radius_int",radiusInt);
+        cv.put("zero_point_radius",zeroPointRadius);
+        cv.put("street",street);
+        long res = db.insert("Locationdatabase", null, cv);
+        if(res == -1){
+            Toast.makeText(context, "Inserting into Locationdatabase failed", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(context, "Successfully added into Locationdatabase", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
 
     public Cursor getData(String database ){
         SQLiteDatabase db = this.getReadableDatabase();

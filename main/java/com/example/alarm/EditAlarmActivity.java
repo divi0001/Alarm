@@ -379,8 +379,12 @@ public class EditAlarmActivity extends AppCompatActivity {
 
 
         imgAddMethodPlus.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
+
+
+
 
                 //TODO: this is in onCreate, so only adding Tap off method should be allowed
                 if (adapter1.getItemCount() > 5) {
@@ -398,13 +402,14 @@ public class EditAlarmActivity extends AppCompatActivity {
                     alarmParameter.get(alarmParameter.size() - 1).setDifficulty("None");
                     alarmParameter.get(alarmParameter.size() - 1).setType("Tap off");
 
-                    adapter1.setAlarmParameter(alarmParameter);
 
                 }else{
                         Toast.makeText(context, "The selected spMethod did not register", Toast.LENGTH_SHORT).show();
 
 
                 }
+
+                adapter1.setAlarmParameter(alarmParameter);
 
 
 
@@ -509,6 +514,7 @@ public class EditAlarmActivity extends AppCompatActivity {
             }
         }
         for (String st : arrMeth) {
+
             mkNewAlarmParam(st);
         }
 
@@ -537,10 +543,11 @@ public class EditAlarmActivity extends AppCompatActivity {
                     startActivity(iMath);
 
 
-
                 } else if (methodToSet.equals("tap_off")) {
 
-                    mkNewAlarmParam("TapOff");
+                    mkNewAlarmParam("TapOff"); //TODO: make sure, this sets the new dbs in a valid way, also just get everything from every database, when calling
+                    //todo                                  mkNewAlarmParam, then the recView can update much more easily, and since it is not that much data, it will not
+                    //todo                                  worsen the performance too much yay :)
 
                     adapter1.setAlarmParameter(alarmParameter);
 

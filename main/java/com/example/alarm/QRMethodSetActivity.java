@@ -83,7 +83,7 @@ public class QRMethodSetActivity extends AppCompatActivity {
                     Toast.makeText(QRMethodSetActivity.this, "Label already used. Please use a unique label", Toast.LENGTH_SHORT).show();
                 }else {
 
-                    db.insertAlarmData(new String[]{"label", "decoded"}, new String[]{editLabel.getText().toString(), txtDecode.getText().toString()}, "QRBarcodedatabase");
+                    db.addQRBar(editLabel.getText().toString(), txtDecode.getText().toString());
                     finish();
                 }
 
