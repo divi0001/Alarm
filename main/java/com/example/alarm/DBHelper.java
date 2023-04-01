@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -35,38 +36,44 @@ public class DBHelper extends SQLiteOpenHelper{
 
         db.execSQL("create Table QRBarcodedatabase (label TEXT primary key, decoded TEXT)");
         db.execSQL("create Table Mathdatabase (id INTEGER primary key autoincrement, method TEXT, difficulty TEXT)");
-        db.execSQL("create Table Locationdatabase (id INTEGER primary key autoincrement, latitude_int INTEGER, zero_point_latitude INTEGER, longitude_int INTEGER, zero_point_longitude INTEGER, radius_int INTEGER, zero_point_radius INTEGER, street TEXT)");
-        setupTablesForPreset();
+        db.execSQL("create Table Locationdatabase (id INTEGER primary key autoincrement, latitude_int INTEGER, zero_point_latitude INTEGER, longitude_int INTEGER, zero_point_longitude INTEGER, radius_int INTEGER, zero_point_radius INTEGER, street TEXT, radius_mode TEXT)");
+        setupTablesForPreset(db);
     }
 
-    private void setupTablesForPreset() {
+    private void setupTablesForPreset(SQLiteDatabase db) {
 
-        SQLiteDatabase db = getWritableDatabase();
+
         ContentValues cv = new ContentValues();
 
-
+        long res;
         for(String type : new String[]{"tap_off","math","qr_barcode","location","sudoku","memory","passphrase"}) {
             cv.put("method_type", type);
+            res = db.insert("Methodtype", null, cv);
+            if(res == -1){
+                Toast.makeText(context, "Error setting up static Database \"Methodtype\"", Toast.LENGTH_SHORT).show();
+            }
         }
-        if(db.insert("Methodtype", null, cv) == -1){
-            Toast.makeText(context, "Error setting up static Database \"Methodtype\"", Toast.LENGTH_SHORT).show();
-        }
+
 
         cv = new ContentValues();
         for(String type : new String[]{"null","add","sub","mult","div","fac","root","value_fx","extrema_fx","multiple_choice","reach_radius","leave_radius"}) {
             cv.put("method", type);
+            res = db.insert("Method", null, cv);
+            if(res == -1){
+                Toast.makeText(context, "Error setting up static Database \"Method\"", Toast.LENGTH_SHORT).show();
+            }
         }
-        if(db.insert("Method", null, cv) == -1){
-            Toast.makeText(context, "Error setting up static Database \"Method\"", Toast.LENGTH_SHORT).show();
-        }
+
 
         cv = new ContentValues();
         for(String type : new String[]{"ex_easy","easy","middle","hard","ex_hard"}) {
             cv.put("difficulty", type);
+            res = db.insert("Difficulty", null, cv);
+            if(res == -1){
+                Toast.makeText(context, "Error setting up static Database \"Difficulty\"", Toast.LENGTH_SHORT).show();
+            }
         }
-        if(db.insert("Difficulty", null, cv) == -1){
-            Toast.makeText(context, "Error setting up static Database \"Difficulty\"", Toast.LENGTH_SHORT).show();
-        }
+
 
 
     }
@@ -125,7 +132,6 @@ public class DBHelper extends SQLiteOpenHelper{
     }
 
 
-    //queue_id INTEGER, method_type_id INTEGER, method_id INTEGER, difficulty_id INTEGER, label TEXT)"); //multiple rows with same queue_id are part of the same queue
     public void addMethod(int queueID, int methodTypeId, int methodId, int difficultyId, String label, int methodDatabaseSpecificID){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -144,6 +150,95 @@ public class DBHelper extends SQLiteOpenHelper{
             Toast.makeText(context, "Successfully added into Methoddatabase", Toast.LENGTH_SHORT).show();
         }
     }
+
+
+
+    public String getMethodById(int id){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM Method WHERE ?", new String[]{"id =" + id});
+
+        if(c.getCount() == 0){
+
+            return "non existent";
+        }else{
+            c.moveToNext();
+            return c.getString(1);
+            }
+        }
+
+
+    public String getMethodTypeById(int id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM MethodType WHERE ?", new String[]{"id =" + id});
+
+        if(c.getCount() > 0){
+
+            c.moveToFirst();
+            return c.getString(1);
+
+        }else{
+            return "non existent";
+
+
+        }
+    }
+
+    public String getDifficulty(int id){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM Difficulty WHERE ?", new String[]{"id =" + id});
+
+        if(c.getCount() == 0){
+
+            return "non existent";
+        }else{
+            c.moveToNext();
+            return c.getString(1);
+        }
+    }
+
+
+
+
+    public int findIdByMethodType(String methodType){
+
+        String[] methArr = new String[]{"tap_off","math","qr_barcode","location","sudoku","memory","passphrase"};
+        for(int i = 0; i < methArr.length; i++) {
+            if(methArr[i].equals(methodType)){
+                return i+1;
+            }
+        }
+        return -1;
+    }
+
+    public int findIdByMethod(String method){
+        String[] meArr = new String[]{"null","Addition","Subtraction","Multiplication","Division","Faculty (x!)","Root","Value for f(x)","Determine extrema of f(x)","Multiple choice questions","reach_radius","leave_radius"};
+        for(int i = 0; i < meArr.length; i++){
+            if(meArr[i].equals(method)){
+                return i+1;
+            }
+        }
+        return -1;
+    }
+
+    public int findIdByDifficulty(String difficulty){
+        switch (difficulty) {
+            case "Extremely easy":
+                return 1;
+            case "Easy":
+                return 2;
+            case "Middle":
+                return 3;
+            case "Hard":
+                return 4;
+            case "Extremely hard":
+                return 5;
+            default:
+                return -1;
+        }
+    }
+
+
     public void addMath(String method, String difficulty){
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -174,7 +269,7 @@ public class DBHelper extends SQLiteOpenHelper{
     }
     //        Locationdatabase latitude_int INTEGER, zero_point_latitude INTEGER, longitude_int INTEGER, zero_point_longitude INTEGER, radius_int INTEGER, zero_point_radius INTEGER, street TEXT)");
 
-    public void addLocation(int latitudeInt, int zeroPointLatitude, int longitudeInt, int zeroPointLongitude, int radiusInt, int zeroPointRadius, String street){
+    public void addLocation(int latitudeInt, int zeroPointLatitude, int longitudeInt, int zeroPointLongitude, int radiusInt, int zeroPointRadius, String street, String radiusMode){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -185,6 +280,7 @@ public class DBHelper extends SQLiteOpenHelper{
         cv.put("radius_int",radiusInt);
         cv.put("zero_point_radius",zeroPointRadius);
         cv.put("street",street);
+        cv.put("radius_mode", radiusMode);
         long res = db.insert("Locationdatabase", null, cv);
         if(res == -1){
             Toast.makeText(context, "Inserting into Locationdatabase failed", Toast.LENGTH_SHORT).show();

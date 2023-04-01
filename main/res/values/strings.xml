@@ -198,9 +198,12 @@
     <string name="go">Go!</string>
     <string name="km_radius_txt">Radius from location: </string>
     <string name="standard_km">600 M</string>
-    <string name="change_adress_here">Change adress here</string>
+    <string name="change_adress_here">Change address here</string>
     <string name="example_location">Example-street 42 \n12345 Example city \nExampleCountry</string>
     <string name="tutorial">Press the arrow key twice to use \n the location from the autocompletion</string>
+    <string name="rbEnter">Enter radius</string>
+    <string name="rbLeave">Leave radius</string>
+    <string name="queue_key">com.example.alarm.QUEUE_KEY</string>
 
 
 </resources>

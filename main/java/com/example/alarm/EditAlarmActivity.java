@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -67,6 +68,8 @@ public class EditAlarmActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_alarm);
+
+
 
         spHours = (Spinner) findViewById(R.id.spinnerHours);
         spMins = (Spinner) findViewById(R.id.spinnerMins);
@@ -503,7 +506,7 @@ public class EditAlarmActivity extends AppCompatActivity {
     protected void onResume() {
 
         super.onResume();
-        DBHelper db = new DBHelper(EditAlarmActivity.this, "Alarmdatabase");
+        DBHelper db = new DBHelper(EditAlarmActivity.this, "Database.db");
 
         Cursor c = db.getData("Alarmdatabase");
         ArrayList<String> arrMeth = new ArrayList<>();
@@ -513,17 +516,15 @@ public class EditAlarmActivity extends AppCompatActivity {
                 arrMeth.add(c.getString(2));
             }
         }
-        for (String st : arrMeth) {
-
-            mkNewAlarmParam(st);
-        }
 
 
         adapter1 = new QueueRecViewAdapter(context);
-        adapter1.setAlarmParameter(alarmParameter);
+        mkNewAlarmParam();
 
         alarmQueue.setAdapter(adapter1);
         alarmQueue.setLayoutManager(new LinearLayoutManager(context));
+
+
 
         imgAddMethodPlus = (ImageView) findViewById(R.id.btnMethodPlus);
         imgAddMethodPlus.setOnClickListener(new View.OnClickListener() {
@@ -536,36 +537,46 @@ public class EditAlarmActivity extends AppCompatActivity {
                 }
 
 
-                if(methodToSet.equals("math")) {
+                switch (methodToSet) {
+                    case "math":
+
+                        SharedPreferences sP = EditAlarmActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
+                        SharedPreferences.Editor sE = sP.edit();
+                        sE.putString("queue_id", "1"); //TODO: this will change. In future, you will get the id from alarm levels database, to display the current set queue, for now (before implementing this), it is fine to just take "0" as the id
+
+                        sE.apply();                     //actually, this was dumb, sql starts counting ids at 1..
+
+                        Intent iMath = new Intent(context, MathMethodSetActivity.class);
+                        startActivity(iMath);
 
 
-                    Intent iMath = new Intent(context, MathMethodSetActivity.class);
-                    startActivity(iMath);
+                        break;
+                    case "tap_off":
+
+                        mkNewAlarmParam(); //TODO: make sure, this sets the new dbs in a valid way, also just get everything from every database, when calling
+
+                        //todo                                  mkNewAlarmParam, then the recView can update much more easily, and since it is not that much data, it will not
+                        //todo                                  worsen the performance too much yay :)
+
+                        adapter1.setAlarmParameter(alarmParameter);
+
+                        break;
+                    case "scan_qr_barcode":
+                        Intent iScan = new Intent(context, QRMethodSetActivity.class);
+                        startActivity(iScan);
+                        break;
+                    case "location_based":
+
+                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                            Mapbox.getInstance(EditAlarmActivity.this, getResources().getString(R.string.mapbox_access_token));
+                            Intent iLoc = new Intent(context, LocationMethodSetActivity.class);
+                            startActivity(iLoc);
+                        } else {
+                            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+                        }
 
 
-                } else if (methodToSet.equals("tap_off")) {
-
-                    mkNewAlarmParam("TapOff"); //TODO: make sure, this sets the new dbs in a valid way, also just get everything from every database, when calling
-                    //todo                                  mkNewAlarmParam, then the recView can update much more easily, and since it is not that much data, it will not
-                    //todo                                  worsen the performance too much yay :)
-
-                    adapter1.setAlarmParameter(alarmParameter);
-
-                } else if (methodToSet.equals("scan_qr_barcode")) {
-                    Intent iScan = new Intent(context, QRMethodSetActivity.class);
-                    startActivity(iScan);
-                } else if (methodToSet.equals("location_based")) {
-
-                    if(ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-                        Mapbox.getInstance(EditAlarmActivity.this, getResources().getString(R.string.mapbox_access_token));
-                        Intent iLoc = new Intent(context, LocationMethodSetActivity.class);
-                        startActivity(iLoc);
-                    }else{
-                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
-                    }
-
-
-
+                        break;
                 }
 
 
@@ -575,61 +586,127 @@ public class EditAlarmActivity extends AppCompatActivity {
 
     }
 
-    private void mkNewAlarmParam(String st) {
+
+    public String translateIdToMethodType(int id){
+        String[] tra =  new String[]{"Tap off","Math: ","QR/Barcode","Location: ","Sudoku","Memory","Passphrase"};
+        return tra[id];
+    }
+
+    public String translateIdToMethod(int id){
+        String[] tra = new String[]{"null","Addition","Subtraction","Multiplication","Division","Faculty","Root","Value of f(x)","Extrema of f(x)","Multiple Choice","Enter radius","Leave radius"};
+        return tra[id-1];
+    }
+
+    public String translateIdToDifficulty(int id){
+        String[] tra = new String[]{"extremely easy","easy","middle","hard","extremely hard"};
+        return tra[id-1];
+    }
+
+    private void mkNewAlarmParam() {
 
         DBHelper db;
+        ArrayList<Integer> queueIds = new ArrayList<>();
+        ArrayList<Integer> methodTypeIds = new ArrayList<>();
+        ArrayList<Integer> methodIds = new ArrayList<>();
+        ArrayList<String> labels = new ArrayList<>();
+        ArrayList<Integer> methodDatabaseSpecificIds = new ArrayList<>();
+        ArrayList<String> difficulties = new ArrayList<>();
 
 
 
-        if(st.contains("TapOff")){
 
-            alarmParameter.add(new Alarm(alarmParameter.size()));
-            alarmParameter.get(alarmParameter.size()-1).setType("Tap off");
-            alarmParameter.get(alarmParameter.size()-1).setDifficulty("None");
+        db = new DBHelper(EditAlarmActivity.this, "Database.db"); //TODO: exception handling (try with ressources)
+        Cursor c = db.getData("Methoddatabase");
 
-        }else if (st.contains("Mathdatabase")){
+        int maxQueueId = -1;
 
-            db = new DBHelper(EditAlarmActivity.this, "Mathdatabase"); //TODO: exception handling (try with ressources)
-            String firstNumber = st.replaceFirst(".*?(\\d+).*", "$1"); //TODO: does this actually give back the right id?
-            int id = Integer.parseInt(firstNumber);
+        if (c.getCount() > 0){
+            while(c.moveToNext()){
+                queueIds.add(c.getInt(0));
 
-            Cursor c = db.execQuery("SELECT * FROM Mathdatabase WHERE ?", new String[]{"id = " + id}); //TODO: this database shall be cleared, when creating the alarm, pulling out everything first. Also it shall be recreated in oncreate of this class
+                if(queueIds.get(queueIds.size()-1) > maxQueueId )
+                    maxQueueId = queueIds.get(queueIds.size()-1);
 
-            alarmParameter.add(new Alarm(alarmParameter.size()));
-            alarmParameter.get(alarmParameter.size()-1).setType("Math: ");
-            alarmParameter.get(alarmParameter.size()-1).setTurnOffMethod(c.getString(1));
-            alarmParameter.get(alarmParameter.size()-1).setDifficulty(c.getString(2));
-
-            } else if (st.contains("QRBardatabase")) {
-
-            db = new DBHelper(EditAlarmActivity.this, "QRBarcodedatabase");
-            String firstNumber = st.replaceFirst(".*?(\\d+).*", "$1"); //TODO: does this actually give back the right id?
-            int id = Integer.parseInt(firstNumber);
-            System.out.println(id);
-
-            Cursor c = db.execQuery("SELECT * FROM QRBarcodedatabase WHERE ?", new String[]{"id = " + id});
-
-            alarmParameter.add(new Alarm(alarmParameter.size()));
-            alarmParameter.get(alarmParameter.size()-1).setType("QR/Barcode: ");
-            alarmParameter.get(alarmParameter.size()-1).setTurnOffMethod(c.getString(0));
-            alarmParameter.get(alarmParameter.size()-1).setDifficulty("None");
-
-        } else if (st.contains("Locationdatabase")) {
-
-            db = new DBHelper(EditAlarmActivity.this, "Locationdatabase");
-            String firstNumber = st.replaceFirst(".*?(\\d+).*", "$1"); //TODO: does this actually give back the right id?
-            int id = Integer.parseInt(firstNumber);
-            System.out.println(id);
-
-            Cursor c = db.execQuery("SELECT * FROM Locationdatabase WHERE ?", new String[]{"id = " + id});
-
-            alarmParameter.add(new Alarm(alarmParameter.size()));
-            alarmParameter.get(alarmParameter.size()-1).setType("Location: " + c.getString(3)); //3rd row is streetname
-            alarmParameter.get(alarmParameter.size()-1).setTurnOffMethod(c.getString(2));  //2nd row is radius
-            alarmParameter.get(alarmParameter.size()-1).setDifficulty("None");
-
+                methodTypeIds.add(c.getInt(1));
+                methodIds.add(c.getInt(2));
+                labels.add(c.getString(3)); // --> if null, wont throw any exception yay :D
+                difficulties.add(translateIdToDifficulty(c.getInt(4)));
+                methodDatabaseSpecificIds.add(c.getInt(5));
+            }
+        }else{
+            Toast.makeText(this, "No Methods are inside of the queue yet", Toast.LENGTH_SHORT).show();
+            return;
         }
+        String TAG = "TAGAlarmParameter";
+        Log.d(TAG, "mkNewAlarmParam: id-yfied:"+ " \nMethodTypeid "+ methodTypeIds+ " \nMethodid "+methodIds+ " \nLabel "+labels+ " \nspecific to db "+methodDatabaseSpecificIds);
 
+        alarmParameter = new ArrayList<>();
+
+
+        for(int i = 0; i < queueIds.size(); i++) {
+
+            String metho = translateIdToMethod(methodIds.get(i));
+            String methodType = translateIdToMethodType(methodTypeIds.get(i));
+            String difficult = difficulties.get(i);
+
+            Log.d(TAG, "mkNewAlarmParam: methodType = "+methodType);
+
+            int queueId = queueIds.get(i);
+
+            alarmParameter.add(new Alarm(alarmParameter.size()));
+            alarmParameter.get(alarmParameter.size() - 1).setType(methodType);
+
+            if (methodType.equals("Tap Off") && queueId == maxQueueId) {
+
+                alarmParameter.get(alarmParameter.size() - 1).setDifficulty("None");
+                Log.d(TAG, "mkNewAlarmParam: " + "in tap off");
+            } else if (methodType.equals("Math: ") && queueId == maxQueueId) {
+                Log.d(TAG, "mkNewAlarmParam: in math");
+
+                //todo missing difficulty
+                System.out.println(difficulties.get(i));
+                alarmParameter.get(alarmParameter.size() - 1).setDifficulty(difficult);
+                alarmParameter.get(alarmParameter.size() - 1).setTurnOffMethod(metho);
+                alarmParameter.get(alarmParameter.size() - 1).setDifficulty(difficult);
+
+
+            } else if (methodType.equals("QR/Barcode")) {
+                Log.d(TAG, "mkNewAlarmParam: in qrbar");
+
+                Cursor resQR = db.getData("QRBarcodedatabase");
+                if(resQR.getCount()>0){
+                    while (resQR.moveToNext()){
+                        if(resQR.getInt(0) == methodDatabaseSpecificIds.get(i)) {
+                            metho = resQR.getString(1);
+                            difficult = labels.get(i);
+                        }
+                    }
+
+                }
+
+                alarmParameter.get(alarmParameter.size() - 1).setTurnOffMethod(metho);
+                alarmParameter.get(alarmParameter.size() - 1).setDifficulty(difficult);
+
+            } else if (methodType.equals("Location: ")) {
+                Log.d(TAG, "mkNewAlarmParam: in location");
+                db = new DBHelper(EditAlarmActivity.this, "Database.db");
+
+
+                Cursor resLoc = db.getData("Locationdatabase");
+                if(resLoc.getCount()>0){
+                    while(resLoc.moveToNext()){
+                        if(resLoc.getInt(0) == methodDatabaseSpecificIds.get(i)){
+                            alarmParameter.get(alarmParameter.size() - 1).setType("Location: " + resLoc.getString(7));
+                            alarmParameter.get(alarmParameter.size()-1).setTurnOffMethod(resLoc.getString(5));
+                        }
+                    }
+                }
+
+
+            }
+        }
+        Log.d("TAGAlarmParameter", "mkNewAlarmParam: "+alarmParameter);
+        adapter1.setAlarmParameter(alarmParameter);
 
     }
 

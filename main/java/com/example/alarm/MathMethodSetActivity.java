@@ -91,19 +91,29 @@ public class MathMethodSetActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 Context context = MathMethodSetActivity.this;
 
-                                DBHelper db = new DBHelper(context, "Mathdatabase");
+                                DBHelper db = new DBHelper(context, "Database.db");
 
                                 RadioButton rbMeth = findViewById(rgKindOfMath.getCheckedRadioButtonId());
                                 RadioButton rbDiff = findViewById(rgDifficulty.getCheckedRadioButtonId());
 
                                 db.addMath(rbMeth.getText().toString(), rbDiff.getText().toString());
 
+                                Cursor c = db.getData("Mathdatabase");
+                                int lastId = 0;
+                                if(c.getCount()>0){
+                                    while(c.moveToNext()){
+                                        lastId = c.getInt(0);
+                                    }
+                                }
 
+                                db = new DBHelper(context,"Database.db");
 
+                                SharedPreferences sp = MathMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
+                                int queueId = Integer.parseInt(sp.getString("queue_id","1"));
+                                db.addMethod(queueId, db.findIdByMethodType("math"), db.findIdByMethod(rbMeth.getText().toString()), db.findIdByDifficulty(rbDiff.getText().toString()), null, lastId);
 
+                                //TODO: functionality for editing existing alarms
 
-                                //TODO: FIND THE GODDAMN BUG, THAT IS NOT ALLOWING TO FIND THE LAST INDEX OF MATHDATABASE FOR GODS SAKE!
-                                //TODO: let EditAlarmActivity know, if alarm is set or save, or even better, if not save, edit here lol
                                 finish();
 
                             }

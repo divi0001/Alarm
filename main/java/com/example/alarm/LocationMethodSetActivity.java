@@ -22,6 +22,8 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -74,9 +76,12 @@ public class LocationMethodSetActivity extends AppCompatActivity {
     private int km;
     private PolygonOptions currPoly;
     private RecyclerView recViewAutoComplete;
-    private String text;
+    private String text, radiusMode;
     private List<Address> lAddr;
     private Address addr;
+    private RadioGroup rgRadiusMode;
+    private RadioButton rbEnter, rbLeave;
+    private boolean isLeaveMode = true;
 
 
     @Override
@@ -101,7 +106,9 @@ public class LocationMethodSetActivity extends AppCompatActivity {
         txtKm = (TextView) findViewById(R.id.txtRadius);
         imgSatelliteMap = (ImageView) findViewById(R.id.imgSatelliteMap);
         recViewAutoComplete = (RecyclerView) findViewById(R.id.recViewAutoComplete);
-
+        rgRadiusMode = (RadioGroup) findViewById(R.id.rgRadiusMode);
+        rbEnter = (RadioButton) findViewById(R.id.rbEnterRadius);
+        rbLeave = (RadioButton) findViewById(R.id.rbLeaveRadius);
 
 
         currentImg = imgSatelliteExpanded;
@@ -342,24 +349,30 @@ public class LocationMethodSetActivity extends AppCompatActivity {
         btnGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if(isLeaveMode) {
+                    radiusMode = "leave";
+                }else{
+                    radiusMode = "enter";
+                }
+
                 if(addr == null){
                     Geocoder g = new Geocoder(LocationMethodSetActivity.this);
                     try {
                         addr = g.getFromLocation(latitude, longitude, 1).get(0);
-                        DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Locationdatabase");
-                        db.addLocation((int)latitude, Integer.parseInt(String.valueOf(latitude).substring(String.valueOf(latitude).indexOf("."))),
-                                (int) longitude, Integer.parseInt(String.valueOf(longitude).substring(String.valueOf(longitude).indexOf("."))),
-                                (int) radius, Integer.parseInt(String.valueOf(radius).substring(String.valueOf(radius).indexOf("."))), addr.getThoroughfare());
+                        DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Database.db");
+
+                        db.addLocation((int)latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, getDecFromDouble(radius),
+                                addr.getThoroughfare(), radiusMode);
                         //TODO: make sure radius is consistently updated
                         finish();
                     } catch (IOException e) {
                         Toast.makeText(LocationMethodSetActivity.this, "Couldn't find a valid location at your click", Toast.LENGTH_SHORT).show();
                     }
                 }else{
-                    DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Locationdatabase");
-                    db.addLocation((int)latitude, Integer.parseInt(String.valueOf(latitude).substring(String.valueOf(latitude).indexOf("."))),
-                            (int) longitude, Integer.parseInt(String.valueOf(longitude).substring(String.valueOf(longitude).indexOf("."))),
-                            (int) radius, Integer.parseInt(String.valueOf(radius).substring(String.valueOf(radius).indexOf("."))), addr.getThoroughfare());
+                    DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Database.db");
+                    db.addLocation((int)latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, getDecFromDouble(radius),
+                            addr.getThoroughfare(), radiusMode);
                     finish();
                 }
             }
@@ -368,6 +381,18 @@ public class LocationMethodSetActivity extends AppCompatActivity {
 
 
 
+    }
+
+
+    public int getDecFromDouble(double d){
+        String dStr = Double.toString(d);
+        for(int i = 0; i < dStr.length(); i++){
+            if (dStr.charAt(i) == '.'){
+                dStr = dStr.substring(i+1); //substring is inclusive of beginIndex, so +1 is used
+                break;
+            }
+        }
+        return Integer.parseInt(dStr);
     }
 
 

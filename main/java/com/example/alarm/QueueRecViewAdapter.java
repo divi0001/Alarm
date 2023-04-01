@@ -73,6 +73,9 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
 
     @Override
     public int getItemCount() {
+        if(alarmParameter == null){
+            return 0;
+        }
         return alarmParameter.size();
     }
 

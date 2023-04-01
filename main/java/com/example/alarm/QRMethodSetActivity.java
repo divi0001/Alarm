@@ -46,7 +46,7 @@ public class QRMethodSetActivity extends AppCompatActivity {
         btnAddFromAbove = (Button) findViewById(R.id.btnAddNewQRCode);
         editLabel = (EditText) findViewById(R.id.editLabelMe);
 
-        db = new DBHelper(this, "QRBarcodedatabase");
+        db = new DBHelper(this, "Database.db");
 
 
         //spSavedQRBars.setAdapter();

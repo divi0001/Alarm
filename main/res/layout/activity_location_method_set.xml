@@ -25,6 +25,37 @@
             android:layout_marginStart="10dp"/>
 
 
+        <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/rgRadiusMode"
+            app:layout_constraintTop_toBottomOf="@+id/btnGoAddLocation"
+            app:layout_constraintStart_toStartOf="@+id/btnGoAddLocation"
+            android:layout_marginTop="8dp"
+            android:background="@color/white">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rbLeaveRadius"
+                android:text="@string/rbLeave"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                tools:ignore="SmallSp"
+                android:checked="true"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rbEnterRadius"
+                android:text="@string/rbEnter"
+                android:textStyle="bold"
+                android:textSize="10sp"
+                tools:ignore="SmallSp"
+                android:checked="false"/>
+
+        </RadioGroup>
+
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -58,8 +89,6 @@
             app:layout_constraintStart_toStartOf="@+id/autoCompleteEditTextLocation"
             app:layout_constraintEnd_toEndOf="@id/autoCompleteEditTextLocation"/>
 
-        <!--TODO: delete the itemCount, so it can show more than 1 elem,
-        rn it would be taking up all the space of the screen-->
 
 
 
