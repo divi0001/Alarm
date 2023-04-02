@@ -5,12 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
-
-import java.util.ArrayList;
+import java.util.Objects;
 
 public class DBHelper extends SQLiteOpenHelper{
     
@@ -138,9 +135,9 @@ public class DBHelper extends SQLiteOpenHelper{
 
         cv.put("queue_id",queueID);
         cv.put("method_type_id",methodTypeId);
-        cv.put("method_id",methodId);
-        cv.put("difficulty_id",difficultyId);
-        cv.put("label",label);
+        if(methodId != -1) cv.put("method_id",methodId);
+        if(difficultyId != -1) cv.put("difficulty_id",difficultyId);
+        if(!Objects.equals(label, "-1")) cv.put("label",label);
         cv.put("method_database_specific_id", methodDatabaseSpecificID);    //This is the id, that (if necessary) points to the specific data of the method database defined by method_type_id
                                                                             //In easy words: if you need to look up the decoded string from qrcode method, this points to the id in the specific database, that has this info
         long res = db.insert("Methoddatabase", null, cv);
@@ -269,7 +266,7 @@ public class DBHelper extends SQLiteOpenHelper{
     }
     //        Locationdatabase latitude_int INTEGER, zero_point_latitude INTEGER, longitude_int INTEGER, zero_point_longitude INTEGER, radius_int INTEGER, zero_point_radius INTEGER, street TEXT)");
 
-    public void addLocation(int latitudeInt, int zeroPointLatitude, int longitudeInt, int zeroPointLongitude, int radiusInt, int zeroPointRadius, String street, String radiusMode){
+    public long addLocation(int latitudeInt, int zeroPointLatitude, int longitudeInt, int zeroPointLongitude, int radiusInt, int zeroPointRadius, String street, String radiusMode){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -287,6 +284,7 @@ public class DBHelper extends SQLiteOpenHelper{
         }else{
             Toast.makeText(context, "Successfully added into Locationdatabase", Toast.LENGTH_SHORT).show();
         }
+        return res;
     }
 
 

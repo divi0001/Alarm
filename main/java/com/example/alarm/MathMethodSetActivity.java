@@ -111,7 +111,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
                                 SharedPreferences sp = MathMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
                                 int queueId = Integer.parseInt(sp.getString("queue_id","1"));
                                 db.addMethod(queueId, db.findIdByMethodType("math"), db.findIdByMethod(rbMeth.getText().toString()), db.findIdByDifficulty(rbDiff.getText().toString()), null, lastId);
-
+                                System.out.println(db.findIdByMethod(rbMeth.getText().toString()));
                                 //TODO: functionality for editing existing alarms
 
                                 finish();

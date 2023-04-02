@@ -1,12 +1,12 @@
 package com.example.alarm;
 
-import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -45,11 +45,12 @@ public class QRMethodSetActivity extends AppCompatActivity {
         btnAddSelectedQRBar = (Button) findViewById(R.id.btnAddSelected);
         btnAddFromAbove = (Button) findViewById(R.id.btnAddNewQRCode);
         editLabel = (EditText) findViewById(R.id.editLabelMe);
+        spSavedQRBars = (Spinner) findViewById(R.id.spinnerQRBar);
 
         db = new DBHelper(this, "Database.db");
 
 
-        //spSavedQRBars.setAdapter();
+
 
 
 
@@ -64,26 +65,32 @@ public class QRMethodSetActivity extends AppCompatActivity {
 
             }
         });
+        Cursor c = db.getData("QRBarcodedatabase");
 
+        ArrayList<String> values = new ArrayList<>();
+        ArrayList<String> labels = new ArrayList<>();
+
+
+        if(c.getCount()>0){
+            c.moveToFirst();
+            while(c.moveToNext()){
+                labels.add(c.getString(0));
+                values.add(c.getString(1));
+            }
+        }
+
+        SharedPreferences sp = QRMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
+        int queueId = Integer.parseInt(sp.getString("queue_id","1"));
         btnAddFromAbove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Cursor c = db.getData("QRBarcodedatabase");
-
-                ArrayList<String> values = new ArrayList<>();
-
-                if(c.getCount()>0){
-                    while(c.moveToNext()){
-                        values.add(c.getString(0));
-                    }
-                    System.out.println(values);
-                }
-                if(values.contains(editLabel.getText().toString())){
+                if(labels.contains(editLabel.getText().toString())){
                     Toast.makeText(QRMethodSetActivity.this, "Label already used. Please use a unique label", Toast.LENGTH_SHORT).show();
                 }else {
 
                     db.addQRBar(editLabel.getText().toString(), txtDecode.getText().toString());
+                    db.addMethod(queueId, 2, -1, -1, editLabel.getText().toString(), -1);
                     finish();
                 }
 
@@ -91,6 +98,18 @@ public class QRMethodSetActivity extends AppCompatActivity {
             }
         });
 
+        spSavedQRBars.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, labels));
+
+        btnAddSelectedQRBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                db.addMethod(queueId, 2, -1, -1, spSavedQRBars.getSelectedItem().toString(), -1);
+                finish();
+
+
+            }
+        });
 
 
     }
@@ -109,10 +128,6 @@ public class QRMethodSetActivity extends AppCompatActivity {
 
                 txtDecode.setText(intentResult.getContents());
                 txtFormat.setText(intentResult.getFormatName());
-
-
-
-
 
             }
         } else {

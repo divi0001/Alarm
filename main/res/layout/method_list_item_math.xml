@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+<androidx.cardview.widget.CardView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardCornerRadius="20dp"
     android:elevation="20dp"
     android:id="@+id/cvMathItem"
-    android:backgroundTint="@color/btnColor">
+    android:backgroundTint="@color/btnColor"
+    android:paddingTop="4dp"
+    android:layout_marginStart="32dp"
+    android:layout_marginEnd="32dp">
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/relLayoutMathod"
-            android:padding="10dp">
+            android:padding="12dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -26,7 +37,8 @@
             android:id="@+id/txtMethodType"
             android:text="@string/to_be_changed"
             android:layout_toEndOf="@+id/txtMathod"
-            android:layout_marginStart="20dp"/>
+            android:layout_marginStart="20dp"
+            tools:ignore="RelativeOverlap" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -48,7 +60,7 @@
                 android:layout_height="20dp"
                 android:src="@drawable/minus_button_small"
                 android:layout_below="@+id/txtDifficultyType"
-                android:layout_toEndOf="@+id/txtDifficultyType"
+                android:layout_alignParentEnd="true"
                 android:contentDescription="@string/to_be_changed"
                 android:layout_marginStart="15dp"
                 android:id="@+id/imgMinusDelete"/>
@@ -58,9 +70,10 @@
                 android:layout_height="20dp"
                 android:id="@+id/threeDotsEdit"
                 android:src="@drawable/ic_three_dots"
-                android:layout_toEndOf="@+id/txtDifficultyType"
+                android:layout_alignParentEnd="true"
                 android:contentDescription="@string/to_be_changed"
                 android:layout_marginStart="15dp"/>
 
         </RelativeLayout>
 </androidx.cardview.widget.CardView>
+</LinearLayout>

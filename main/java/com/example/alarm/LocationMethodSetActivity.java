@@ -6,6 +6,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.inputmethodservice.Keyboard;
 import android.location.Address;
@@ -356,14 +357,22 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                     radiusMode = "enter";
                 }
 
+                SharedPreferences sp = LocationMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
+                int queueId = Integer.parseInt(sp.getString("queue_id","1"));
+
                 if(addr == null){
                     Geocoder g = new Geocoder(LocationMethodSetActivity.this);
                     try {
                         addr = g.getFromLocation(latitude, longitude, 1).get(0);
                         DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Database.db");
 
-                        db.addLocation((int)latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, getDecFromDouble(radius),
-                                addr.getThoroughfare(), radiusMode);
+
+                        long specificId = db.addLocation((int)latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius,
+                                getDecFromDouble(radius), addr.getThoroughfare(), radiusMode);
+
+
+
+                        db.addMethod(queueId, 3, -1, -1, "-1", (int) specificId);
                         //TODO: make sure radius is consistently updated
                         finish();
                     } catch (IOException e) {
@@ -371,8 +380,9 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                     }
                 }else{
                     DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Database.db");
-                    db.addLocation((int)latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, getDecFromDouble(radius),
+                    long specificId = db.addLocation((int)latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, getDecFromDouble(radius),
                             addr.getThoroughfare(), radiusMode);
+                    db.addMethod(queueId, 3, -1, -1, "-1", (int) specificId);
                     finish();
                 }
             }
