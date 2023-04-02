@@ -554,10 +554,7 @@ public class EditAlarmActivity extends AppCompatActivity {
                         dbHelper.addMethod(1,1,-1,-1,"-1",-1);
 
 
-                        mkNewAlarmParam(); //TODO: make sure, this sets the new dbs in a valid way, also just get everything from every database, when calling
-
-                        //todo                                  mkNewAlarmParam, then the recView can update much more easily, and since it is not that much data, it will not
-                        //todo                                  worsen the performance too much yay :)
+                        mkNewAlarmParam();
 
                         adapter1.setAlarmParameter(alarmParameter);
 
@@ -576,7 +573,6 @@ public class EditAlarmActivity extends AppCompatActivity {
                         } else {
                             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
                         }
-
 
                         break;
                 }

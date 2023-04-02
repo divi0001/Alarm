@@ -2,11 +2,15 @@ package com.example.alarm;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -49,14 +53,77 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
                 alarmParameter.remove(position);
                 setAlarmParameter(alarmParameter);
                 notifyDataSetChanged();
-
+                //TODO: update in db as well
             }
         });
 
         holder.imgThreeDots.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO
+
+                String type = alarmParameter.get(position).getType();
+                Class classType = EditAlarmActivity.class;
+
+                switch (type){
+                    case "Tap Off":
+                        Toast.makeText(context, "What exactly do you want to edit here? :D", Toast.LENGTH_SHORT).show();
+                        break;
+                    case "Math: ":
+                        classType = MathMethodSetActivity.class;
+                        break;
+                    case "QR/Barcode":
+                        classType = QRMethodSetActivity.class;
+                        break;
+                    default:
+                        classType = EditAlarmActivity.class; //TODO: make sure, the names of the string that is switch cased is actually correctly muxed
+                        break;
+                }
+
+                if(type.contains("Location: ")){
+                    classType = LocationMethodSetActivity.class;
+                }
+
+                Intent iUpdate = new Intent(context, classType);
+
+                switch (type) {
+                    case "Math: ":
+                        iUpdate.putExtra("method", alarmParameter.get(position).getTurnOffMethod());
+                        iUpdate.putExtra("difficulty", alarmParameter.get(position).getDifficulty());
+                        iUpdate.putExtra("alarmParamId", position);
+                        break;
+                    case "QR/Barcode":
+                        iUpdate.putExtra("label", alarmParameter.get(position).getDifficulty());
+                }
+                if(type.contains("Location: ")) {
+                    double radius = Double.parseDouble(alarmParameter.get(position).getDifficulty().substring(0, alarmParameter.get(position).getDifficulty().indexOf(" "))); //last arg in .substring is exclusive, so no -1 needed
+                    String enter_leave = alarmParameter.get(position).getDifficulty().substring(alarmParameter.get(position).getDifficulty().indexOf("To ")+3);
+                    String ent_lea = enter_leave.substring(0,enter_leave.indexOf(" "));
+
+                    iUpdate.putExtra("street", type.substring(type.indexOf(" ")+1));
+                    iUpdate.putExtra("radius",radius);
+                    iUpdate.putExtra("enter_leave", ent_lea);
+
+
+                    DBHelper db = new DBHelper(context,"Database.db");
+                    int pos = -1;
+
+                    Cursor c1 = db.getData("Locationdatabase");
+
+                    if(c1.getCount()>0){
+                        while (c1.moveToNext()){
+                            if(c1.getString(7).equals(type.substring(type.indexOf(" ")+1)) && c1.getInt(5) == (int)radius && c1.getString(8).equals(ent_lea)) pos = c1.getInt(0);
+                        }
+                    }
+
+                    iUpdate.putExtra("pos",pos);
+
+                    System.out.println(type.substring(type.indexOf(" ")+1) + "\n"+ radius+"\n" +ent_lea );
+                }
+
+
+                iUpdate.putExtra("edit_add","edit");
+
+                context.startActivity(iUpdate);
             }
         });
 

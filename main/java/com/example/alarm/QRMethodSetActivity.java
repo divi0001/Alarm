@@ -20,6 +20,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 //TODO: Apache License include
@@ -74,7 +75,7 @@ public class QRMethodSetActivity extends AppCompatActivity {
         if(c.getCount()>0){
             c.moveToFirst();
             while(c.moveToNext()){
-                labels.add(c.getString(0));
+                labels.add(c.getString(0)); //TODO: find out, why only 1 item is shown in the qr/barcode spinner when updating
                 values.add(c.getString(1));
             }
         }
@@ -85,16 +86,33 @@ public class QRMethodSetActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(labels.contains(editLabel.getText().toString())){
-                    Toast.makeText(QRMethodSetActivity.this, "Label already used. Please use a unique label", Toast.LENGTH_SHORT).show();
+                if(getIntent().hasExtra("label") && getIntent().hasExtra("edit_add")){
+                    int row_id = 1;
+                    Cursor c = db.getData("Methoddatabase");
+                    if(c.getCount()>0){
+
+                        while(c.moveToNext()){
+
+                            if(Objects.equals(c.getString(5), getIntent().getStringExtra("label"))) break;
+                            row_id++;
+                        }
+                    }
+
+                    db.editMethoddatabase(queueId, 2, -1, -1, editLabel.getText().toString(), -1, row_id);
+                    finish();
                 }else {
 
-                    db.addQRBar(editLabel.getText().toString(), txtDecode.getText().toString());
-                    db.addMethod(queueId, 2, -1, -1, editLabel.getText().toString(), -1);
-                    finish();
+
+                    if (labels.contains(editLabel.getText().toString())) {
+                        Toast.makeText(QRMethodSetActivity.this, "Label already used. Please use a unique label", Toast.LENGTH_SHORT).show();
+                    } else {
+
+                        db.addQRBar(editLabel.getText().toString(), txtDecode.getText().toString());
+                        db.addMethod(queueId, 2, -1, -1, editLabel.getText().toString(), -1);
+                        finish();
+                    }
+
                 }
-
-
             }
         });
 
@@ -104,14 +122,53 @@ public class QRMethodSetActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                db.addMethod(queueId, 2, -1, -1, spSavedQRBars.getSelectedItem().toString(), -1);
-                finish();
+                if(getIntent().hasExtra("label") && getIntent().hasExtra("edit_add")) {
+                    int row_id = 1;
+                    Cursor c = db.getData("Methoddatabase");
+                    if (c.getCount() > 0) {
 
+                        while (c.moveToNext()) {
+
+                            if (Objects.equals(c.getString(5), getIntent().getStringExtra("label")))
+                                break;
+                            row_id++;
+                        }
+                    }
+
+                    db.editMethoddatabase(queueId, 2, -1, -1, spSavedQRBars.getSelectedItem().toString(), -1, row_id);
+                    finish();
+
+                }else {
+
+                    db.addMethod(queueId, 2, -1, -1, spSavedQRBars.getSelectedItem().toString(), -1);
+                    finish();
+
+                }
 
             }
         });
 
 
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Cursor c = db.getData("QRBarcodedatabase");
+
+        ArrayList<String> values = new ArrayList<>();
+        ArrayList<String> labels = new ArrayList<>();
+
+
+        if(c.getCount()>0){
+            c.moveToFirst();
+            while(c.moveToNext()){
+                labels.add(c.getString(0));
+                values.add(c.getString(1));
+            }
+        }
+        spSavedQRBars.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, labels));
     }
 
     @Override

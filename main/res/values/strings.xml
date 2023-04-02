@@ -204,7 +204,6 @@
     <string name="rbEnter">Enter radius</string>
     <string name="rbLeave">Leave radius</string>
     <string name="queue_key">com.example.alarm.QUEUE_KEY</string>
-    <string-array name="qr_arr"></string-array>
 
 
 </resources>

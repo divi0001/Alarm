@@ -3,6 +3,7 @@ package com.example.alarm;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -16,6 +17,7 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -25,9 +27,12 @@ public class MathMethodSetActivity extends AppCompatActivity {
     private TextView txtExample;
     private RadioGroup rgDifficulty,rgKindOfMath;
     private Button btnSave;
-    private boolean save;
+    private boolean edit;
+    private int posAlarmParam, row_id, spec_id;
+    private Cursor alarm;
 
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,14 +46,12 @@ public class MathMethodSetActivity extends AppCompatActivity {
         RadioButton rbSelectedDiff = findViewById(rgDifficulty.getCheckedRadioButtonId());
         int methId = rgKindOfMath.getCheckedRadioButtonId();
 
-        txtExample.setText(generateExample(rbSelectedDiff.getText().toString(),methId));
 
-        SharedPreferences pref = getSharedPreferences(getString(R.string.queue_shared_pref_key_adapter),Context.MODE_PRIVATE);
-        if(pref.contains("method")){
-            save = pref.getString("method","").equals("editAlarm");
-            }
 
-        if(save){
+        getIntentData(); //gets the bool for edit which is used below here
+        txtExample.setText("generating example, as soon \nas you select a different math task");
+
+        if(edit){
             btnSave.setText(R.string.save);
         }else{
             btnSave.setText(R.string.add);
@@ -89,6 +92,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+
                                 Context context = MathMethodSetActivity.this;
 
                                 DBHelper db = new DBHelper(context, "Database.db");
@@ -96,25 +100,38 @@ public class MathMethodSetActivity extends AppCompatActivity {
                                 RadioButton rbMeth = findViewById(rgKindOfMath.getCheckedRadioButtonId());
                                 RadioButton rbDiff = findViewById(rgDifficulty.getCheckedRadioButtonId());
 
-                                db.addMath(rbMeth.getText().toString(), rbDiff.getText().toString());
 
-                                Cursor c = db.getData("Mathdatabase");
-                                int lastId = 0;
-                                if(c.getCount()>0){
-                                    while(c.moveToNext()){
-                                        lastId = c.getInt(0);
+                                if(edit){
+
+                                    //TODO: edit data in sql
+                                    db.editMethoddatabase(1,1,
+                                            db.findIdByMethod(rbMeth.getText().toString()), db.findIdByDifficulty(rbDiff.getText().toString()), "-1", spec_id, row_id);
+                                    finish();
+
+                                }else {
+
+
+
+                                    db.addMath(rbMeth.getText().toString(), rbDiff.getText().toString());
+
+                                    Cursor c = db.getData("Mathdatabase");
+                                    int lastId = 0;
+                                    if (c.getCount() > 0) {
+                                        while (c.moveToNext()) {
+                                            lastId = c.getInt(0);
+                                        }
                                     }
+
+                                    db = new DBHelper(context, "Database.db");
+
+                                    SharedPreferences sp = MathMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
+                                    int queueId = Integer.parseInt(sp.getString("queue_id", "1"));
+                                    db.addMethod(queueId, db.findIdByMethodType("math")-1, db.findIdByMethod(rbMeth.getText().toString()), db.findIdByDifficulty(rbDiff.getText().toString()), null, lastId);
+
+                                    //TODO: functionality for editing existing alarms
+
+                                    finish();
                                 }
-
-                                db = new DBHelper(context,"Database.db");
-
-                                SharedPreferences sp = MathMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
-                                int queueId = Integer.parseInt(sp.getString("queue_id","1"));
-                                db.addMethod(queueId, db.findIdByMethodType("math"), db.findIdByMethod(rbMeth.getText().toString()), db.findIdByDifficulty(rbDiff.getText().toString()), null, lastId);
-                                System.out.println(db.findIdByMethod(rbMeth.getText().toString()));
-                                //TODO: functionality for editing existing alarms
-
-                                finish();
 
                             }
                         });
@@ -130,6 +147,100 @@ public class MathMethodSetActivity extends AppCompatActivity {
 
 
     }
+
+
+    private void getIntentData(){
+
+        if(getIntent().hasExtra("edit_add") && getIntent().hasExtra("difficulty") && getIntent().hasExtra("method")){
+
+
+            String edit_add = getIntent().getStringExtra("edit_add");
+            edit = edit_add.equals("edit");
+
+            String diff = getIntent().getStringExtra("difficulty");
+            String meth = getIntent().getStringExtra("method");
+
+            posAlarmParam = getIntent().getIntExtra("alarmParamId", -1);
+            DBHelper db = new DBHelper(MathMethodSetActivity.this, "Database.db");
+            alarm = db.getData("Methoddatabase");
+
+            row_id = 1;
+
+            if(alarm.getCount() >0){
+                while(alarm.moveToNext()){
+                    if(alarm.getInt(2) == 1) row_id++;
+
+                    if(posAlarmParam == alarm.getInt(0)){
+                        spec_id = alarm.getInt(6);
+                        break;
+                    }
+
+                }
+            }
+
+
+
+            RadioButton rbCurrDiff, rbCurrMeth;
+
+            switch (diff){
+                case "extremely easy":
+                    rbCurrDiff = (RadioButton) findViewById(R.id.rbExEasy);
+                    break;
+                case "easy":
+                    rbCurrDiff = (RadioButton) findViewById(R.id.rbEasy);
+                    break;
+                case "hard":
+                    rbCurrDiff = (RadioButton) findViewById(R.id.rbHard);
+                    break;
+                case "extremely hard":
+                    rbCurrDiff = (RadioButton) findViewById(R.id.rbExHard);
+                    break;
+                default:
+                    rbCurrDiff = (RadioButton) findViewById(R.id.rbMiddle);
+                    break;
+            }
+
+
+            switch (meth){
+                case "Subtraction":
+                    rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathSub);
+                    break;
+                case "Division":
+                    rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathDiv);
+                    break;
+                case "Multiplication":
+                    rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathMult);
+                    break;
+                case "Root":
+                    rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathRoot);
+                    break;
+                case "Faculty (x!)":
+                    rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathFac);
+                    break;
+                case "Value for f(x)":
+                    rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathFuncValue);
+                    break;
+                case "Determine extrema of f(x)":
+                    rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathExtrema);
+                    break;
+                case "Multiple choice":
+                    rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathMultipleChoice);
+                    break;
+                default:
+                    rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathAdd);
+                    break;
+            }
+
+            rbCurrDiff.setChecked(true);
+            rbCurrMeth.setChecked(true);
+
+
+        }else{
+            edit = false;
+        }
+
+    }
+
 
     private String generateExample(String difficulty, int kindOfMath) {
         Random rd = new Random();

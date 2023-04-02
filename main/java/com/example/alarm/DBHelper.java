@@ -289,6 +289,97 @@ public class DBHelper extends SQLiteOpenHelper{
 
 
 
+    public void editMethoddatabase(int queue_id, int method_type_id, int method_id, int difficulty_id, String label, int method_database_spec_id, int row_id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        if(queue_id != -1) cv.put("queue_id", queue_id);
+        if(method_type_id != -1) cv.put("method_type_id", method_type_id);
+        if(method_id != -1) cv.put("method_id", method_id);
+        if(difficulty_id != -1) cv.put("difficulty_id", difficulty_id);
+        if(!Objects.equals(label,"-1")) cv.put("label", label);
+        if(method_database_spec_id != -1) cv.put("method_database_specific_id", method_database_spec_id);
+
+        if (method_id == 1){
+            editMathdatabase(getMethodById(method_id), getDifficulty(difficulty_id), method_database_spec_id);
+        }
+
+        long result = db.update("Methoddatabase", cv, "id=?", new String[]{String.valueOf(row_id)});
+        if(result == -1){
+            Toast.makeText(context, "Failed to update Methoddatabase", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(context, "Success updating Methoddatabase", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+
+    public void editMathdatabase(String method, String difficulty, int row_id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues c = new ContentValues();
+        if (!Objects.equals(method, "")) c.put("method", method);
+        if (!Objects.equals(difficulty, "")) c.put("difficulty", difficulty);
+
+        long r = db.update("Mathdatabase",c, "id=?", new String[]{String.valueOf(row_id)});
+        if(r == -1){
+            Toast.makeText(context, "Failed to update Mathdatabase", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(context, "Success updating Mathdatabase", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+
+    public void editLocation(int lat, int zerolat, int lon, int zerolon, int radius, int zeroradius, String street, String enter_leave, int row_id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        int currlat, currzerolat, currlon, currzerolon, currradius, currzeroradius;
+        String currstreet, currenterleave;
+
+        Cursor c = getData("Locationdatabase");
+        if(c.getCount() > 0) {
+            while(c.moveToNext()){
+                if(c.getInt(0) == row_id){
+
+                    currlat = c.getInt(1);
+                    currzerolat = c.getInt(2);
+                    currlon = c.getInt(3);
+                    currzerolon = c.getInt(4);
+                    currradius = c.getInt(5);
+                    currzeroradius = c.getInt(6);
+                    currstreet = c.getString(7);
+                    currenterleave = c.getString(8);
+
+                    if (lat != currlat) cv.put("latitude_int", lat);
+                    if (zerolat != currzerolat) cv.put("zero_point_latitude", zerolat);
+                    if (lon != currlon) cv.put("longitude_int", lon);
+                    if (zerolon != currzerolon) cv.put("zero_point_longitude", zerolon);
+                    if (radius != currradius) cv.put("radius_int", radius);
+                    if (zeroradius != currzeroradius) cv.put("zero_point_radius", zeroradius);
+                    if (!Objects.equals(street, currstreet)) cv.put("street", street);
+                    if (!Objects.equals(enter_leave,currenterleave)) cv.put("radius_mode", enter_leave);
+                }
+            }
+
+
+
+            long res = db.update("Locationdatabase", cv, "id=?", new String[]{String.valueOf(row_id)});
+            if (res == -1) {
+                Toast.makeText(context, "Failed to update Locationdatabase", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "Success updating Locationdatabase", Toast.LENGTH_SHORT).show();
+            }
+        }else{
+            Toast.makeText(context, "how did you manage to even get here wtf", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+
+
+
+
     public Cursor getData(String database ){
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = null;

@@ -7,6 +7,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.inputmethodservice.Keyboard;
 import android.location.Address;
@@ -83,6 +84,7 @@ public class LocationMethodSetActivity extends AppCompatActivity {
     private RadioGroup rgRadiusMode;
     private RadioButton rbEnter, rbLeave;
     private boolean isLeaveMode = true;
+    private boolean edit;
 
 
     @Override
@@ -113,6 +115,21 @@ public class LocationMethodSetActivity extends AppCompatActivity {
 
 
         currentImg = imgSatelliteExpanded;
+
+        if(getIntent().hasExtra("edit_add")) {
+            edit = getIntent().getStringExtra("edit_add").equals("edit");
+            txtKm.setText(String.valueOf((int)(getIntent().getDoubleExtra("radius", 600.0))));
+            if(getIntent().getStringExtra("enter_leave").equals("enter")){
+                rbEnter.setChecked(true);
+            }else{
+                rbLeave.setChecked(true);
+            }
+
+            autoCompleteTextView.setText(getIntent().getStringExtra("street"));
+
+
+        }
+
 
         AdressAutoCompleteAdapter adapt = new AdressAutoCompleteAdapter();
         recViewAutoComplete.setAdapter(adapt);
@@ -360,30 +377,54 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                 SharedPreferences sp = LocationMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
                 int queueId = Integer.parseInt(sp.getString("queue_id","1"));
 
-                if(addr == null){
-                    Geocoder g = new Geocoder(LocationMethodSetActivity.this);
-                    try {
-                        addr = g.getFromLocation(latitude, longitude, 1).get(0);
-                        DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Database.db");
+                if(edit){
+                    int pos = getIntent().getIntExtra("pos",-1);
+                    if(pos == -1) finish();
 
-
-                        long specificId = db.addLocation((int)latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius,
-                                getDecFromDouble(radius), addr.getThoroughfare(), radiusMode);
-
-
-
-                        db.addMethod(queueId, 3, -1, -1, "-1", (int) specificId);
-                        //TODO: make sure radius is consistently updated
-                        finish();
-                    } catch (IOException e) {
-                        Toast.makeText(LocationMethodSetActivity.this, "Couldn't find a valid location at your click", Toast.LENGTH_SHORT).show();
-                    }
-                }else{
                     DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Database.db");
-                    long specificId = db.addLocation((int)latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, getDecFromDouble(radius),
-                            addr.getThoroughfare(), radiusMode);
-                    db.addMethod(queueId, 3, -1, -1, "-1", (int) specificId);
-                    finish();
+                    Cursor c = db.getData("Locationdatabase");
+                    if(addr != null) {
+                        db.editLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, getDecFromDouble(radius), addr.getThoroughfare(), radiusMode, pos);
+                        finish();
+                    }else{
+                        Geocoder g = new Geocoder(LocationMethodSetActivity.this);
+                        try {
+                            addr = g.getFromLocation(latitude, longitude, 1).get(0);
+                            db.editLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, getDecFromDouble(radius), addr.getThoroughfare(), radiusMode, pos);
+
+                            finish();
+
+                        } catch (IOException e) {
+                            Toast.makeText(LocationMethodSetActivity.this, "Couldn't find a valid location at your click", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                }else {
+
+                    if (addr == null) {
+                        Geocoder g = new Geocoder(LocationMethodSetActivity.this);
+                        try {
+                            addr = g.getFromLocation(latitude, longitude, 1).get(0);
+                            DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Database.db");
+
+
+                            long specificId = db.addLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius,
+                                    getDecFromDouble(radius), addr.getThoroughfare(), radiusMode);
+
+
+                            db.addMethod(queueId, 3, -1, -1, "-1", (int) specificId);
+                            //TODO: make sure radius is consistently updated
+                            finish();
+                        } catch (IOException e) {
+                            Toast.makeText(LocationMethodSetActivity.this, "Couldn't find a valid location at your click", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Database.db");
+                        long specificId = db.addLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, getDecFromDouble(radius),
+                                addr.getThoroughfare(), radiusMode);
+                        db.addMethod(queueId, 3, -1, -1, "-1", (int) specificId);
+                        finish();
+                    }
                 }
             }
         });
