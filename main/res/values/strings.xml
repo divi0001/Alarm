@@ -208,7 +208,7 @@
     <string name="add_sound_file">Add sound file</string>
     <string name="set_sound">Set sound from above</string>
     <string name="explain_add_sound">You can also add a new sound\nusing the button below</string>
-    <string name="credits_sounds">The alarms were made by musicmakerboy20 on fiverr.com if you need more, definitely check him out!</string>
+    <string name="credits_sounds">The alarms were made by musicmakerboy20 on \nhttps://www.fiverr.com/musicmakerboy20 \nif you need more, definitely check him out!</string>
 
 
 </resources>
