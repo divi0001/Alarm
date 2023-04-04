@@ -204,6 +204,10 @@
     <string name="rbEnter">Enter radius</string>
     <string name="rbLeave">Leave radius</string>
     <string name="queue_key">com.example.alarm.QUEUE_KEY</string>
+    <string name="choose_sound">Choose your alarm sound, or add a new one</string>
+    <string name="add_sound_file">Add sound file</string>
+    <string name="set_sound">Set sound from above</string>
+    <string name="explain_add_sound">You can also add a new sound\nusing the button below</string>
 
 
 </resources>

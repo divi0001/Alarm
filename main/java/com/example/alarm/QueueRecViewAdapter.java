@@ -1,7 +1,9 @@
 package com.example.alarm;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -50,10 +52,42 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onClick(View v) {
-                alarmParameter.remove(position);
-                setAlarmParameter(alarmParameter);
-                notifyDataSetChanged();
-                //TODO: update in db as well
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Are you sure you want to delete " + alarmParameter.get(position).getType() + " ?");
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {dialog.cancel();}});
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        DBHelper db = new DBHelper(context, "Database.db");
+                        Cursor c = db.getData("Methoddatabase");
+                        int id = -1;
+                        if(c.getCount()>0){
+                            while (c.moveToNext()){
+                                System.out.println(c.getInt(6));
+                                if(c.getInt(0) == position) id = c.getInt(6);
+                            }
+                        }
+                        System.out.println(id); //TODO: find and fix the bug with the ids Q_Q
+
+                        db.deleteRow("Methoddatabase", alarmParameter.get(position).getID());
+
+                        String table = typeToTable(alarmParameter.get(position).getType());
+
+                        if(!table.equals("QRBarcodedatabase") && !table.equals("") && id != -1) db.deleteRow(table, id);
+
+                        alarmParameter.remove(position);
+
+                        notifyDataSetChanged();
+                    }
+                });
+                builder.create().show();
+
+
+
             }
         });
 
@@ -136,6 +170,19 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
 
     }
 
+    private String typeToTable(String type) {
+
+        if(type.contains("Math")){
+            return "Mathdatabase";
+        } else if (type.contains("QR")) {
+            return "QRBarcodedatabase";
+        } else if (type.contains("Location")) {
+            return "Locationdatabase";
+        }else {
+            return ""; //todo
+        }
+
+    }
 
 
     @Override

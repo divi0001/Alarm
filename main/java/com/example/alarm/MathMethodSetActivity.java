@@ -103,8 +103,8 @@ public class MathMethodSetActivity extends AppCompatActivity {
 
                                 if(edit){
 
-                                    //TODO: edit data in sql
-                                    db.editMethoddatabase(1,1,
+
+                                    db.editMethoddatabase(1,2,
                                             db.findIdByMethod(rbMeth.getText().toString()), db.findIdByDifficulty(rbDiff.getText().toString()), "-1", spec_id, row_id);
                                     finish();
 
@@ -126,9 +126,8 @@ public class MathMethodSetActivity extends AppCompatActivity {
 
                                     SharedPreferences sp = MathMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
                                     int queueId = Integer.parseInt(sp.getString("queue_id", "1"));
-                                    db.addMethod(queueId, db.findIdByMethodType("math")-1, db.findIdByMethod(rbMeth.getText().toString()), db.findIdByDifficulty(rbDiff.getText().toString()), null, lastId);
+                                    db.addMethod(queueId, db.findIdByMethodType("math"), db.findIdByMethod(rbMeth.getText().toString())-1, db.findIdByDifficulty(rbDiff.getText().toString())-1, null, lastId);
 
-                                    //TODO: functionality for editing existing alarms
 
                                     finish();
                                 }

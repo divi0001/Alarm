@@ -21,6 +21,7 @@ import android.preference.PreferenceManager;
 import android.text.Layout;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -495,6 +496,15 @@ public class EditAlarmActivity extends AppCompatActivity {
         });
 
 
+        btnPickSound.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent iMusic = new Intent(EditAlarmActivity.this, AlarmSoundSetActivity.class);
+                startActivity(iMusic);
+            }
+        });
+
+
     }
 
 
@@ -511,8 +521,8 @@ public class EditAlarmActivity extends AppCompatActivity {
         Cursor c = db.getData("Alarmdatabase");
         ArrayList<String> arrMeth = new ArrayList<>();
 
-        if(c.getCount()>0){
-            while(c.moveToNext()){
+        if (c.getCount() > 0) {
+            while (c.moveToNext()) {
                 arrMeth.add(c.getString(2));
             }
         }
@@ -523,7 +533,6 @@ public class EditAlarmActivity extends AppCompatActivity {
 
         alarmQueue.setAdapter(adapter1);
         alarmQueue.setLayoutManager(new LinearLayoutManager(context));
-
 
 
         imgAddMethodPlus = (ImageView) findViewById(R.id.btnMethodPlus);
@@ -551,8 +560,7 @@ public class EditAlarmActivity extends AppCompatActivity {
                     case "tap_off":
 
                         DBHelper dbHelper = new DBHelper(EditAlarmActivity.this, "Database.db");
-                        dbHelper.addMethod(1,1,-1,-1,"-1",-1);
-
+                        dbHelper.addMethod(1, 1, -1, -1, "-1", -1);
 
                         mkNewAlarmParam();
 
@@ -582,12 +590,14 @@ public class EditAlarmActivity extends AppCompatActivity {
 
         });
 
-    }
 
+        RecyclerView recViewMethod = (RecyclerView) findViewById(R.id.cvQueue);
+
+    }
 
     public String translateIdToMethodType(int id){
         String[] tra =  new String[]{"Tap off","Math: ","QR/Barcode","Location: ","Sudoku","Memory","Passphrase"};
-        return tra[id];
+        return tra[id-1];
     }
 
     public String translateIdToMethod(int id){
@@ -644,10 +654,10 @@ public class EditAlarmActivity extends AppCompatActivity {
         for(int i = 0; i < queueIds.size(); i++) {
 
             String metho;
-            String methodType = translateIdToMethodType(methodTypeIds.get(i));
+            String methodType = translateIdToMethodType(methodTypeIds.get(i));;
             String difficult;
 
-            Log.d(TAG, "mkNewAlarmParam: methodType = "+methodType);
+
 
             int queueId = queueIds.get(i);
 
@@ -664,8 +674,8 @@ public class EditAlarmActivity extends AppCompatActivity {
                 case "Math: ":
 
                     Log.d(TAG, "mkNewAlarmParam: in math");
-                    metho = translateIdToMethod(methodIds.get(i));
-                    difficult = translateIdToDifficulty(difficulties.get(i));
+                    metho = translateIdToMethod(methodIds.get(i)+1);
+                    difficult = translateIdToDifficulty(difficulties.get(i)+1);
                     alarmParameter.get(alarmParameter.size() - 1).setDifficulty(difficult);
                     alarmParameter.get(alarmParameter.size() - 1).setTurnOffMethod(metho);
                     alarmParameter.get(alarmParameter.size() - 1).setDifficulty(difficult);

@@ -17,6 +17,8 @@ public class DBHelper extends SQLiteOpenHelper{
         
         super(context, db, null, 1);
         this.context = context;
+
+
     }
 
     @Override
@@ -24,7 +26,9 @@ public class DBHelper extends SQLiteOpenHelper{
         db.execSQL("create Table Alarmdatabase (id INTEGER primary key autoincrement, label TEXT, method_queue_id INTEGER, sound_path_id INTEGER, privilege_rights INTEGER, snoozable INTEGER, time_wake_up_hours INTEGER, time_wake_up_minutes INTEGER, days_schedule_id INTEGER, weeks_schedule_id INTEGER, check_awake INTEGER, alarm_level_table_id INTEGER)");
         //every int representing a bool is -1 for false                         this is the id of the table and the item in it, for the corresponding method
 
-        db.execSQL("create Table Methoddatabase (id INTEGER primary key autoincrement, queue_id INTEGER, method_type_id INTEGER, method_id INTEGER, difficulty_id INTEGER, label TEXT, method_database_specific_id INTEGER)"); //multiple rows with same queue_id are part of the same queue
+        db.execSQL("create Table Methoddatabase (id INTEGER primary key autoincrement, queue_id INTEGER, method_type_id INTEGER, method_id INTEGER, difficulty_id INTEGER, label TEXT, method_database_specific_id INTEGER)");
+//                +",foreign KEY(method_type_id) references Methodtype(id), foreign key (method_id) references Method(id), foreign key (difficulty_id) references Difficulty(id), foreign key(label) references QRBarcode" +
+//                 "database(label), foreign key (method_database_specific_id) references () )");
         db.execSQL("create Table Methodtype (id INTEGER primary key autoincrement, method_type TEXT)");
         db.execSQL("create Table Method (id INTEGER primary key autoincrement, method TEXT)");
         db.execSQL("create Table Difficulty (id INTEGER primary key autoincrement, difficulty TEXT)");
@@ -94,6 +98,29 @@ public class DBHelper extends SQLiteOpenHelper{
 
     //TODO: I don't need to handle SQLInjection, atleast for now, because sharing of settings is not supported as of now, so this would only harm the person itself, or be a nice niche feature lol
     //(this might change in the future, so i will keep this todo in until publishing, so if i add that feature at any point, i'll know, that i have to take care of that.)
+
+
+    public void deleteRow(String table, int row_id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        long res = db.delete(table, "id=?", new String[]{String.valueOf(row_id+2)});
+        if(res ==0){
+            Toast.makeText(context, "Failed deleting item: " + res, Toast.LENGTH_SHORT).show();
+        }else {
+            Toast.makeText(context, "Success deleting item: " +res, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    public void deleteRow(String table, String label){
+        SQLiteDatabase db = this.getWritableDatabase();
+        long res = db.delete(table, "label=?", new String[]{label});
+
+        if(res ==-1){
+            Toast.makeText(context, "Failed deleting item", Toast.LENGTH_SHORT).show();
+        }else {
+            Toast.makeText(context, "Success deleting item", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     public void addAlarm(String label, int methodQueueId, int soundPathId, boolean privilegeRights, boolean snoozable, int wakeUpTimeHours, int wakeUpTimeMinutes, int daysScheduleId, int weeksScheduleId, boolean checkAwake, int alarmLevelTableId){
 
@@ -396,15 +423,4 @@ public class DBHelper extends SQLiteOpenHelper{
 
     }
 
-    public int getResInt(Cursor c, int columnIndex) {
-        c.moveToNext();
-        if(c.getCount() > 1){
-            System.out.println("Cursor has more than 1 elem");
-        }
-        if(c.getCount() == 0){
-            System.out.println("Error: Cursor is empty");
-        }
-        return c.getInt(columnIndex);
-
-    }
 }
