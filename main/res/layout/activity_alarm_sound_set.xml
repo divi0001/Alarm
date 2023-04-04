@@ -101,4 +101,17 @@
         app:layout_constraintGuide_percent="0.76" />
 
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        android:text="@string/credits_sounds"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:lines="2"
+        android:layout_marginBottom="8dp"/>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
