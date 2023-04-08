@@ -108,6 +108,12 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
                     case "QR/Barcode":
                         classType = QRMethodSetActivity.class;
                         break;
+                    case "Sudoku":
+                        classType = SudokuMethodSetActivity.class;
+                        break;
+                    case "Memory":
+                        classType = MemoryMethodSetActivity.class;
+                        break;
                     default:
                         classType = EditAlarmActivity.class; //TODO: make sure, the names of the string that is switch cased is actually correctly muxed
                         break;
@@ -127,6 +133,8 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
                         break;
                     case "QR/Barcode":
                         iUpdate.putExtra("label", alarmParameter.get(position).getDifficulty());
+                    case "Sudoku":
+                        iUpdate.putExtra("difficulty", alarmParameter.get(position).getDifficulty());
                 }
                 if(type.contains("Location: ")) {
                     double radius = Double.parseDouble(alarmParameter.get(position).getDifficulty().substring(0, alarmParameter.get(position).getDifficulty().indexOf(" "))); //last arg in .substring is exclusive, so no -1 needed
@@ -151,7 +159,7 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
 
                     iUpdate.putExtra("pos",pos);
 
-                    System.out.println(type.substring(type.indexOf(" ")+1) + "\n"+ radius+"\n" +ent_lea );
+
                 }
 
 

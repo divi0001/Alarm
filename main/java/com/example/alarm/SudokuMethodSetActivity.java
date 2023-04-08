@@ -1,15 +1,20 @@
 package com.example.alarm;
 
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.Paint;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 
 public class SudokuMethodSetActivity extends AppCompatActivity {
@@ -32,7 +37,7 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
         btnAddSelected = (Button) findViewById(R.id.btnAddSudoku);
 
 
-        RadioButton rbChecked = findViewById(rgDiff.getCheckedRadioButtonId());
+
 
 
 
@@ -42,7 +47,42 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
                 RadioButton checkedRadioButton = findViewById(group.getCheckedRadioButtonId());
                 difficulty = checkedRadioButton.getText().toString();
 
-                txtExampleSudoku.setText(sudokuToString(generateSudoku(difficulty)));
+                int[][] gene = generateSudoku(difficulty);
+
+                txtExampleSudoku.setText(sudokuToString(gene));
+                txtExampleSudoku.setPaintFlags(txtExampleSudoku.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
+            }
+        });
+
+
+        btnAddSelected.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                DBHelper db = new DBHelper(SudokuMethodSetActivity.this, "Database.db");
+
+                SharedPreferences sp = SudokuMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
+                int queueId = Integer.parseInt(sp.getString("queue_id", "1"));
+
+                if(getIntent().hasExtra("edit_add")){
+                    int row_id = 1;
+                    Cursor c = db.getData("Methoddatabase");
+                    if(c.getCount()>0){
+
+                        while(c.moveToNext()){
+                            if (c.getInt(2) == 5) row_id++;
+                        }
+                    }
+                    RadioButton rbCurr = findViewById(rgDiff.getCheckedRadioButtonId());
+                    difficulty = rbCurr.getText().toString();
+
+                    db.editMethoddatabase(queueId, 5, -1, db.findIdByDifficulty(difficulty), "-1", -1, row_id);
+                    finish();
+                }else {
+                    db.addMethod(queueId, 5, -1, db.findIdByDifficulty(difficulty), "-1", -1);
+                    finish();
+                }
+
             }
         });
 
@@ -50,13 +90,17 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
     }
 
 
-    private String sudokuToString(int[][] generateSudoku) {
+    private String sudokuToString(int[][] gen) {
 
         StringBuilder ret = new StringBuilder();
 
         for(int i = 0; i < 9; i++){
             for (int j = 0; j < 9; j++){
-                ret.append(generateSudoku[i][j]).append("   ");
+                if(gen[i][j] == 0){
+                    ret.append("   | ");
+                }else{
+                    ret.append(gen[i][j]).append(" | ");
+                }
             }
             ret.append("\n");
         }
@@ -67,11 +111,11 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
     private int[][] generateSudoku(String difficulty) {
 
         int[][] sudoku = initSudoku();
-        int[] randSort = new int[9];
-        for(int i = 1; i < 10; i++) randSort[i-1] = i;
+        int[] randSort1 = new int[9];
+        for(int i = 1; i < 10; i++) randSort1[i-1] = i;
 
 
-        randSort = randomize(randSort);
+        int[] randSort = randomize(randSort1);
 
         int[] indices = new int[]{0,3,6,1,4,7,2,5,8};
 
@@ -79,50 +123,67 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
             sudoku[i] = shiftByX(Arrays.copyOf(randSort,9), indices[i]);
         }
 
-        return swapLinesAndRows(sudoku);
+        int[] temp;
+        temp = sudoku[1];
+        sudoku[1] = sudoku[3];
+        sudoku[3] = temp;
+
+
+
+
+        temp = sudoku[0];
+        sudoku[0] = sudoku[4];
+        sudoku[4] = temp;
+
+
+        for (int k = 0; k < sudoku.length; k++) { //needs to be this way cause rows ain't addressable as arrays Q_Q
+            int temp1 = sudoku[k][2];
+            sudoku[k][2] = sudoku[k][5];
+            sudoku[k][5] = temp1;
+
+            temp1 = sudoku[k][3];
+            sudoku[k][3] = sudoku[k][0];
+            sudoku[k][0] = temp1;
+
         }
 
-    private int[][] swapLinesAndRows(int[][] sudoku) {
 
-        Random rand = new Random();
-        int r = rand.nextInt(3);;
-        while(r == 0){
-            r = rand.nextInt(3);
+        temp = sudoku[5];
+        sudoku[5] = sudoku[7];
+        sudoku[7] = temp;
+
+        temp = sudoku[8];
+        sudoku[8] = sudoku[6];
+        sudoku[6] = temp;
+
+
+        for (int k = 0; k < sudoku.length; k++) {
+            int temp1 = sudoku[k][6];
+            sudoku[k][6] = sudoku[k][7];
+            sudoku[k][7] = temp1;
+
+            temp1 = sudoku[k][8];
+            sudoku[k][8] = sudoku[k][5];
+            sudoku[k][5] = temp1;
+
         }
 
-        for(int i = 0; i < r; i++){
-            sudoku = swapRows(i%3, (i+i)%3, sudoku);
-            sudoku = swapLines(i%3, (i+i)%3, sudoku);
 
-            sudoku = swapRows((i%3)+3, ((i+i)%3)+3, sudoku);
-            sudoku = swapLines((i%3)+3, ((i+i)%3)+3, sudoku);
 
-            sudoku = swapRows((i%3)+6, ((i+i)%3)+6, sudoku);
-            sudoku = swapLines((i%3)+6, ((i+i)%3)+6, sudoku);
-        }
-        return sudoku;
 
+        return mkDifficulty(sudoku, difficulty);
     }
 
-    private int[][] swapLines(int i, int i1, int[][] sudoku) {
-        int temp;
-        for(int k = 0; k < sudoku.length; k++){
-            temp = sudoku[i][k];
-            sudoku[i][k] = sudoku[i1][k];
-            sudoku[i1][k] = temp;
-        }
-        return sudoku;
+
+
+    private int[][] swapAll(int[][] s1) {
+
+
+
+        return s1;
     }
 
-    private int[][] swapRows(int i, int i1, int[][] sudoku) {
-        int temp;
-        for(int k = 0; k < sudoku.length; k++){
-            temp = sudoku[k][i];
-            sudoku[k][i] = sudoku[k][i1];
-            sudoku[k][i1] = temp;
-        }
-        return sudoku;
-    }
+
 
     private int[] shiftByX(int[] randSort, int index) {
 
@@ -142,58 +203,6 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
         return temp;
     }
 
-        /*
-
-
-
-
-        delete me later:
-
-
-        while(col < 10) {
-            Log.d("Sudoku", "\nwhile col < 10 \n \n" + sudokuToString(sudoku) +"\n" + todo);
-
-            rTodo = new ArrayList<>();
-            for(int i = 1; i < 10; i++) rTodo.add(i);
-
-            todo = randomize(rTodo);
-            int row = 0;
-        while (todo.size() > 0) {
-                Log.d("Sudoku", "\nwhile todo size > 0 \n \n" + sudokuToString(sudoku) +"\n" + todo + "\n");
-                int pos = 0;
-
-                while (!isValid(todo.get(pos), row, col, sudoku)) {
-                    Log.d("Sudoku", "\n!isValid \n \n" + sudokuToString(sudoku) + "\n" + todo);
-                    pos++;
-                    if(pos == todo.size()) break;
-                }
-
-                if(pos == todo.size()){
-                    //backtracking needed
-                    backtrack = true;
-                    break;
-                }else{
-                    backtrack = false;
-                }
-
-                Log.d("Sudoku", "after");
-
-                sudoku.get(col).set(row,todo.get(pos));
-                todo.remove(pos);
-                row++;
-
-            }
-            Log.d("Sudoku", "backtrack");
-            if(!backtrack) col++;
-
-        }
-
-        return sudoku;
-
-
-
-
-        */
 
 
 
@@ -207,51 +216,7 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
         }
         return sudoku;
     }
-/*
 
-    solution with backtracking though very intense on the cpu it seems, always throws eofException in 4th line wtf
-
-    valid sudoku:
-
-            5,3,7,8,2,4,6,9,1
-            8,4,2,1,6,9,7,3,5
-            1,9,6,5,7,3,2,4,8
-            7,8,3,2,4,1,9,5,6
-            6,5,9,7,3,8,4,1,2
-            2,1,4,6,9,5,3,8,7
-            4,6,1,9,5,7,8,2,3
-            3,2,8,4,1,6,5,7,9
-            9,7,5,3,8,2,1,6,4
-
-
-
-
-
-    private boolean isValid(int num, int row, int col, ArrayList<ArrayList<Integer>> sudoku) {
-
-        int quadCoordRow, quadCoordCol;
-        quadCoordRow = (row/3)*3; //assuming 9x9 grid, so pos in array should never be >= 9
-        quadCoordCol = (col/3)*3;
-
-        for (int i = quadCoordRow; i < quadCoordRow + 3; i ++){
-            for (int j = quadCoordCol; j < quadCoordCol + 3; j++){
-                if(num == sudoku.get(j).get(i)) return false;
-            }
-        }
-
-        for(int i = 0; i < 9; i++){
-            if(num == sudoku.get(i).get(row) && i != col) return false;
-        }
-
-        for(int i = 0; i < 9; i++){
-            if(num == sudoku.get(col).get(i) && i != row) return false;
-        }
-
-
-        return true;
-
-    }
-*/
     private int[] randomize(int[] todo){
 
         Random rand = new Random();
@@ -274,7 +239,7 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
 
 
 
-    private ArrayList<ArrayList<Integer>> mkDifficulty(ArrayList<ArrayList<Integer>> preGen){
+    private int[][] mkDifficulty(int[][] preGen, String difficulty){
 
         Random rand = new Random();
 
@@ -283,23 +248,23 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
 
             case "Extremely easy":
 
-                return mkNulls(preGen, rand.nextInt(1)+1);
+                return mkNulls(preGen, 2);
 
             case "Easy":
 
-                return mkNulls(preGen, rand.nextInt(3)+1);
+                return mkNulls(preGen, 3);
 
             case "Middle":
 
-                return mkNulls(preGen, rand.nextInt(5)+1);
+                return mkNulls(preGen, 5);
 
             case "Hard":
 
-                return mkNulls(preGen, rand.nextInt(7)+1);
+                return mkNulls(preGen, 6);
 
-            case "Extremely Hard":
+            case "Extremely hard":
 
-                return mkNulls(preGen, rand.nextInt(8)+1);
+                return mkNulls(preGen, 8);
 
             default:
                 return preGen;
@@ -311,18 +276,18 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
 
     }
 
-    private ArrayList<ArrayList<Integer>> mkNulls(ArrayList<ArrayList<Integer>> preGen, int i) {
+    private int[][] mkNulls(int[][] preGen, int i1) {
 
         Random rand = new Random();
-        int r1, r2;
+        int r1;
+        int i = rand.nextInt(i1)+1;
 
         for(int k = 0; k < 9; k++) {
-            for (int j = 0; j < i; j++) {
+            for (int j = 0; j <= i; j++) {
 
                 r1 = rand.nextInt(9);
-                r2 = rand.nextInt(9);
 
-                preGen.get(r2).set(r1, 0);
+                preGen[k][r1] = 0;
 
             }
         }

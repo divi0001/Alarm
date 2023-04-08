@@ -596,10 +596,17 @@ public class EditAlarmActivity extends AppCompatActivity {
                         }
 
                         break;
+
                     case "sudoku":
                         Intent iSudoku = new Intent(context, SudokuMethodSetActivity.class);
                         startActivity(iSudoku);
                         break;
+
+                    case "memory":
+                    Intent iMemory = new Intent(context, MemoryMethodSetActivity.class);
+                    startActivity(iMemory);
+                    break;
+
                 }
 
 
@@ -685,12 +692,10 @@ public class EditAlarmActivity extends AppCompatActivity {
                 case "Tap Off":
 
                     alarmParameter.get(alarmParameter.size() - 1).setDifficulty("None");
-                    Log.d(TAG, "mkNewAlarmParam: " + "in tap off");
                     break;
 
                 case "Math: ":
 
-                    Log.d(TAG, "mkNewAlarmParam: in math");
                     metho = translateIdToMethod(methodIds.get(i)+1);
                     difficult = translateIdToDifficulty(difficulties.get(i)+1);
                     alarmParameter.get(alarmParameter.size() - 1).setDifficulty(difficult);
@@ -702,20 +707,14 @@ public class EditAlarmActivity extends AppCompatActivity {
 
                 case "QR/Barcode":
 
-                    Log.d(TAG, "mkNewAlarmParam: in qrbar");
 
-
-
-                    difficult = "";
-                                difficult = labels.get(i);
-
+                    difficult = labels.get(i);
                     alarmParameter.get(alarmParameter.size() - 1).setDifficulty(difficult);
 
                     break;
 
                 case "Location: ":
 
-                    Log.d(TAG, "mkNewAlarmParam: in location");
                     db = new DBHelper(EditAlarmActivity.this, "Database.db");
 
 
@@ -731,6 +730,17 @@ public class EditAlarmActivity extends AppCompatActivity {
 
 
                     break;
+                case "Sudoku":
+
+                case "Memory":
+
+                    db = new DBHelper(EditAlarmActivity.this, "Database.db");
+
+                    difficult = translateIdToDifficulty(difficulties.get(i));
+                    alarmParameter.get(alarmParameter.size() - 1).setDifficulty(difficult);
+
+                    break;
+
             }
         }
         Log.d("TAGAlarmParameter", "mkNewAlarmParam: "+alarmParameter);
