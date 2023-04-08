@@ -7,17 +7,7 @@
     tools:context=".AlarmSoundSetActivity">
 
 
-    <TextView
-        android:id="@+id/txtChooseSound"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/choose_sound"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+
 
     <ScrollView
         android:id="@+id/scrollSounds"
@@ -27,14 +17,37 @@
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtChooseSound">
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="visible">
 
+
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+
+            <TextView
+                android:id="@+id/txtChooseSound"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/choose_sound"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
             android:id="@+id/linLaySounds"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/btnColor">
+            android:backgroundTint="@color/btnColor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtChooseSound"
+            android:layout_marginTop="16dp">
 
 
             <androidx.recyclerview.widget.RecyclerView
@@ -48,7 +61,7 @@
         </LinearLayout>
 
 
-    </ScrollView>
+
 
     <Button
         android:id="@+id/btnSetSound"
@@ -57,7 +70,7 @@
         android:text="@string/set_sound"
         app:layout_constraintEnd_toStartOf="@+id/guideline3"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
-        app:layout_constraintTop_toBottomOf="@+id/scrollSounds"
+        app:layout_constraintTop_toBottomOf="@+id/linLaySounds"
         android:layout_marginTop="32dp"/>
 
 
@@ -86,6 +99,25 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline3"
         app:layout_constraintStart_toStartOf="@+id/guideline2" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:autoLink="web"
+        android:gravity="center"
+        android:lines="3"
+        android:linksClickable="true"
+        android:text="@string/credits_sounds"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@id/btnAddSoundFile"
+        android:layout_marginBottom="64dp"/>
+
+
+
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"
         android:layout_width="wrap_content"
@@ -101,19 +133,60 @@
         app:layout_constraintGuide_percent="0.76" />
 
 
-    <TextView
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="32dp"
+        android:id="@+id/cvSetUrl"
+        app:cardCornerRadius="64dp"
+        android:elevation="64dp"
+        android:visibility="invisible">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/gray">
+
+    <EditText
+        android:id="@+id/editUrl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/put_url"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:autofillHints=""
+        android:inputType="textUri"
+        android:gravity="center"/>
+
+
+    <Button
+        android:id="@+id/btnAddUrl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/guideline3"
-        app:layout_constraintStart_toStartOf="@+id/guideline2"
-        android:text="@string/credits_sounds"
-        android:linksClickable="true"
-        android:autoLink="web"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:lines="3"
-        android:layout_marginBottom="8dp"/>
+        android:text="@string/set_url"
+        app:layout_constraintTop_toBottomOf="@id/editUrl"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"/>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.cardview.widget.CardView>
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

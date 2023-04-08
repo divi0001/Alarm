@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.content.res.XmlResourceParser;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Layout;
@@ -63,6 +65,7 @@ public class EditAlarmActivity extends AppCompatActivity {
     private int id;
     private RelativeLayout relLayoutHideable,relLayAddLvls;
     private String methodToSet;
+    private Uri curr_uri;
 
 
     @Override
@@ -512,6 +515,7 @@ public class EditAlarmActivity extends AppCompatActivity {
 
 
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onResume() {
 
@@ -525,6 +529,15 @@ public class EditAlarmActivity extends AppCompatActivity {
             while (c.moveToNext()) {
                 arrMeth.add(c.getString(2));
             }
+        }
+
+
+        SharedPreferences se = getSharedPreferences(getString(R.string.uri_key),MODE_PRIVATE);
+        if(se.contains("name")){
+            String name = se.getString("name", "Not yet set");
+            if(name.length() < 20) txtCurrSoundName.setText(name);
+            if(name.length() >= 20) txtCurrSoundName.setText(name.substring(0,20) + "...");
+            curr_uri = Uri.parse(se.getString("uri", ""));
         }
 
 
@@ -582,6 +595,10 @@ public class EditAlarmActivity extends AppCompatActivity {
                             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
                         }
 
+                        break;
+                    case "sudoku":
+                        Intent iSudoku = new Intent(context, SudokuMethodSetActivity.class);
+                        startActivity(iSudoku);
                         break;
                 }
 

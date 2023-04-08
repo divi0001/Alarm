@@ -10,21 +10,121 @@
 
 
         <RelativeLayout
+            android:id="@+id/relLaySound"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp">
 
 
+            <ImageView
+                android:id="@+id/imgAlbumArt"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:src="@drawable/ic_map_overlay"
+                android:scaleType="centerCrop"
+                android:contentDescription="@string/to_be_changed"/>
+
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/txtSoundName"
+                android:id="@+id/txtSoundTitle"
+                android:layout_below="@+id/imgAlbumArt"
                 android:text="@string/to_be_changed"
                 android:textSize="32sp"
-                android:background="@color/btnColor"
+                android:layout_marginTop="16dp"
+                android:background="@color/purple"
                 android:textColor="@color/white"
                 android:textStyle="bold"/>
 
+
+            <TextView
+                android:id="@+id/txtSoundSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:text="@string/to_be_changed"
+                android:background="@color/white"
+                android:layout_above="@+id/txtSoundTitle"
+                android:layout_alignEnd="@+id/imgAlbumArt"
+                android:layout_marginEnd="8dp"/>
+
+
+            <TextView
+                android:id="@+id/txtSoundDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:text="@string/to_be_changed"
+                android:background="@color/white"
+                android:layout_above="@+id/txtSoundSize"
+                android:layout_marginBottom="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_alignEnd="@+id/imgAlbumArt"/>
+
+
+            <TextView
+                android:id="@+id/txtSoundId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/to_be_changed"
+                android:textSize="20sp"
+                android:background="@color/white"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"/>
+
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvSoundControls"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/txtSoundTitle"
+                android:layout_marginBottom="64dp"
+                android:layout_marginStart="22dp"
+                app:cardCornerRadius="24dp"
+                android:elevation="24dp"
+                android:visibility="invisible">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:id="@+id/imgSoundPause"
+                android:src="@drawable/ic_pause"
+                android:contentDescription="@string/to_be_changed"
+                android:background="@color/white"
+                android:layout_marginStart="8dp"/>
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:id="@+id/imgSoundPlay"
+                android:src="@drawable/ic_play"
+                android:contentDescription="@string/to_be_changed"
+                android:background="@color/white"
+                android:layout_toEndOf="@+id/imgSoundPause"
+                android:layout_marginStart="16dp"/>
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:id="@+id/imgSoundStop"
+                android:src="@drawable/ic_stop"
+                android:contentDescription="@string/to_be_changed"
+                android:layout_toEndOf="@+id/imgSoundPlay"
+                android:background="@color/white"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"/>
+            </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
 
         </RelativeLayout>
 

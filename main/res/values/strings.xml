@@ -147,7 +147,7 @@
     <string name="labelplaceholder">label me</string>
     <string name="check_wake">Check if you are awake</string>
     <string name="minutes_turn_on">Minutes until the alarm goes on again</string>
-    <string name="inc_intense">Set multiple alarm levels </string>
+    <string name="inc_intense">Set multiple alarm levels (WIP)</string>
     <string name="add_as_level">Add as level (asc)</string>
     <string name="by_label">Listed by label (ascending in level)</string>
     <string name="wake_me_up">Wake me up at</string>
@@ -209,6 +209,9 @@
     <string name="set_sound">Set sound from above</string>
     <string name="explain_add_sound">You can also add a new sound\nusing the button below</string>
     <string name="credits_sounds">The alarms were made by musicmakerboy20 on \nhttps://www.fiverr.com/musicmakerboy20 \nif you need more, definitely check him out!</string>
-
+    <string name="uri_key">com.example.alarm.URI_KEY</string>
+    <string name="put_url">Put in the url to the audio here</string>
+    <string name="set_url">Set url</string>
+    <string name="sudoku_header">Settings for sudoku method: </string>
 
 </resources>
