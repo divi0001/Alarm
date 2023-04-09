@@ -25,22 +25,28 @@ public class DBHelper extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        db.execSQL("create Table Alarmdatabase (id INTEGER primary key autoincrement, label TEXT, method_queue_id INTEGER, sound_path_id INTEGER, privilege_rights INTEGER, snoozable INTEGER, time_wake_up_hours INTEGER, time_wake_up_minutes INTEGER, days_schedule_id INTEGER, weeks_schedule_id INTEGER, check_awake INTEGER, alarm_level_table_id INTEGER)");
-        //every int representing a bool is -1 for false                         this is the id of the table and the item in it, for the corresponding method
+        db.execSQL("create Table Alarmdatabase (id INTEGER primary key autoincrement, label TEXT, method_queue_id INTEGER, privilege_rights INTEGER," +
+                " time_wake_up_hours INTEGER, time_wake_up_minutes INTEGER, days_schedule_id INTEGER, weeks_schedule_id INTEGER, check_awake INTEGER," +
+                " alarm_level_id INTEGER, foreign key (alarm_level_id) references Alarmlevel(id))");
+        //every int representing a bool is -1 for false                                             //represents how many methods are in the queue
+        //alarm_level_id points to the Alarmlevel Table which has the level specific labels, snooze settings, sounds, etc
+        //if alarm levels not used, just set everything as alarm level 1
 
-        db.execSQL("create Table Methoddatabase (id INTEGER primary key autoincrement, queue_id INTEGER, method_type_id INTEGER, method_id INTEGER, difficulty_id INTEGER, label TEXT, method_database_specific_id INTEGER"
-                +", foreign KEY(method_type_id) references Methodtype(id), foreign key (method_id) references Method(id), foreign key (difficulty_id) references Difficulty(id), foreign key(label) references QRBarcode" +
-                 "database(label))");
+        db.execSQL("create Table Methoddatabase (id INTEGER primary key autoincrement, queue_id INTEGER, method_type_id INTEGER, method_id INTEGER, difficulty_id INTEGER," +
+                " label TEXT, method_database_specific_id INTEGER, foreign KEY(method_type_id) references Methodtype(id), foreign key (method_id) references Method(id)," +
+                " foreign key (difficulty_id) references Difficulty(id), foreign key(label) references QRBarcodedatabase(label)," +
+                " foreign KEY(queue_id) references Alarmlevel(id))");
 
         db.execSQL("create Table Methodtype (id INTEGER primary key autoincrement, method_type TEXT)");
         db.execSQL("create Table Method (id INTEGER primary key autoincrement, method TEXT)");
         db.execSQL("create Table Difficulty (id INTEGER primary key autoincrement, difficulty TEXT)");
 
-        db.execSQL("create Table Alarmlevel (id INTEGER primary key autoincrement, level_id INTEGER, method_databse_queue_id INTEGER)"); //multiple rows with the same level_id make up the different Alarmlevels, might add more attribs later
+        db.execSQL("create Table Alarmlevel (id INTEGER primary key autoincrement, label TEXT, snooze_count INTEGER, snooze_time INTEGER, sound_path TEXT)"); //multiple rows with the same level_id make up the different Alarmlevels, might add more attribs later
 
         db.execSQL("create Table QRBarcodedatabase (label TEXT primary key, decoded TEXT)");
         db.execSQL("create Table Mathdatabase (id INTEGER primary key autoincrement, method TEXT, difficulty TEXT)");
-        db.execSQL("create Table Locationdatabase (id INTEGER primary key autoincrement, latitude_int INTEGER, zero_point_latitude INTEGER, longitude_int INTEGER, zero_point_longitude INTEGER, radius_int INTEGER, zero_point_radius INTEGER, street TEXT, radius_mode TEXT)");
+        db.execSQL("create Table Locationdatabase (id INTEGER primary key autoincrement, latitude_int INTEGER, zero_point_latitude INTEGER, longitude_int INTEGER," +
+                " zero_point_longitude INTEGER, radius_int INTEGER, zero_point_radius INTEGER, street TEXT, radius_mode TEXT)");
         setupTablesForPreset(db);
 
     }
@@ -327,6 +333,47 @@ public class DBHelper extends SQLiteOpenHelper{
         }
         return res;
     }
+
+
+    public long addLevel(int id, String label, int snooze_count, int snooze_time, String sound_path){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        if(snooze_count != -2) cv.put("snooze_count", snooze_count);
+        if(snooze_time != -1) cv.put("snooze_time", snooze_time);
+        if(label != null) cv.put("label", label);
+        if(!Objects.equals(sound_path, "-1")) cv.put("sound_path", sound_path);
+
+        long result = db.insert("Alarmlevel", null, cv);
+        if(result == -1){
+            Toast.makeText(context, "Inserting into Alarmlevel failed", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(context, "Successfully added into Alarmlevel", Toast.LENGTH_SHORT).show();
+        }
+        return result;
+
+    }
+
+
+
+    public void editLevel(int id, String label, int snooze_count, int snooze_time, String sound_path){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        if(snooze_count != -2) cv.put("snooze_count", snooze_count);
+        if(snooze_time != -1) cv.put("snooze_time", snooze_time);
+        if(!Objects.equals(label, "-1")) cv.put("label", label);
+        if(!Objects.equals(sound_path, "-1")) cv.put("sound_path", sound_path);
+
+        long result = db.update("Alarmlevel", cv, "id=?", new String[]{String.valueOf(id)});
+        if(result == -1){
+            Toast.makeText(context, "Failed to update alarm level", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(context, "Success updating alarm level", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
 
 
 

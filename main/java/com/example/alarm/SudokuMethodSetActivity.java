@@ -62,7 +62,7 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
                 DBHelper db = new DBHelper(SudokuMethodSetActivity.this, "Database.db");
 
                 SharedPreferences sp = SudokuMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
-                int queueId = Integer.parseInt(sp.getString("queue_id", "1"));
+                int queueId = sp.getInt("queue_id",-1);
 
                 if(getIntent().hasExtra("edit_add") && getIntent().hasExtra("id")){
                     int row_id = getIntent().getIntExtra("id",-1);

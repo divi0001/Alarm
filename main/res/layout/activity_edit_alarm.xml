@@ -442,6 +442,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/checkAlarmLvls"
+                android:layout_marginEnd="64dp"
                 android:layout_centerHorizontal="true"
                 android:id="@+id/relLayAddLevels"
                 android:visibility="invisible">
@@ -451,15 +452,18 @@
                     android:layout_height="wrap_content"
                     android:text="@string/add_as_level"
                     android:textAllCaps="false"
+                    android:layout_centerHorizontal="true"
                     android:id="@+id/btnAddLvl"/>
 
 
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/linLayDisplayLevels"
-                    android:orientation="horizontal"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical"
                     android:layout_below="@+id/btnAddLvl">
 
                     <TextView
@@ -469,7 +473,7 @@
                         android:text="@string/add_as_level"/>
 
                     <androidx.recyclerview.widget.RecyclerView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/cvLevels">
 

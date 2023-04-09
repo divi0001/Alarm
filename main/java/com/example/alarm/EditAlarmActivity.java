@@ -50,7 +50,7 @@ public class EditAlarmActivity extends AppCompatActivity {
     private Spinner spHours,spMins,spMethods;
     private CheckBox mo,di,mi,thu,fr,sa,so,checkWeekDays,checkWeekEnds,checkAllowSnooze,checkAwake,checkAlarmLvls,checkRevokePrivilege;
     private ImageView imgAddMethodPlus, imgBtnDownSnooze, imgBtnUpSnooze;
-    private TextView txtCurrSoundName,txtSetLabel,txtMinutes,txtAllowSnooze;
+    private TextView txtCurrSoundName,txtSetLabel,txtMinutes,txtAllowSnooze, textLevel;
     private Button btnPickSound,btnAddLevel,btnAddSaveAlarm;
     private EditText editLabel, editMinutesCheckAwake, editAmountSnoozes, editMinutesSnooze;
     private ValContainer[] c = new ValContainer[2];
@@ -63,7 +63,8 @@ public class EditAlarmActivity extends AppCompatActivity {
     private QueueRecViewAdapter adapter1;
     private String method,difficulty;
     private int id;
-    private RelativeLayout relLayoutHideable,relLayAddLvls;
+    private int level_id = 1;
+    private RelativeLayout relLayoutHideable, relLayAddLvls;
     private String methodToSet;
     private Uri curr_uri;
 
@@ -72,7 +73,6 @@ public class EditAlarmActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_alarm);
-
 
 
         spHours = (Spinner) findViewById(R.id.spinnerHours);
@@ -508,12 +508,118 @@ public class EditAlarmActivity extends AppCompatActivity {
         });
 
 
+
+        btnAddLevel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                DBHelper db = new DBHelper(context, "Database.db");
+                Cursor levelData = db.execQuery("SELECT max(id) FROM Alarmlevel", null);
+                Cursor queueData = db.getData("Methoddatabase");
+
+                if (queueData.getCount() > 0) {
+                    while (queueData.moveToNext()) {
+                        if (queueData.getInt(1) == level_id) { //it is the 2nd column, did this start counting at 0 or 1? I'll find out, using 1 now for 2nd
+
+                        }
+                    }
+                }
+
+
+                //updating current level with settings
+                SharedPreferences se = getSharedPreferences(getString(R.string.uri_key), MODE_PRIVATE);
+
+                if (editLabel.getText().toString().equals("")) {
+                    Toast.makeText(context, "Set a label for the alarm pls", Toast.LENGTH_SHORT).show();
+                } else {
+                    String lab = editLabel.getText().toString();
+
+                    if (curr_uri != null || se.contains("uri")) {
+                        if (checkAllowSnooze.isChecked()) {
+                            db.editLevel(level_id, lab, Integer.parseInt(editAmountSnoozes.getText().toString()),
+                                    Integer.parseInt(editMinutesSnooze.getText().toString()), se.getString("uri", ""));
+                        } else {
+                            db.editLevel(level_id, lab, -2, -1, se.getString("uri", ""));
+                        }
+                    } else {
+                        if (checkAllowSnooze.isChecked()) {
+                            db.editLevel(level_id, lab, Integer.parseInt(editAmountSnoozes.getText().toString()),
+                                    Integer.parseInt(editMinutesSnooze.getText().toString()), "-1");
+                        } else {
+                            db.editLevel(level_id, lab, -2, -1, "-1");
+                        }
+                    }
+
+                    if (levelData.getCount() > 0) {
+                        levelData.moveToNext();
+                        level_id = levelData.getInt(0) + 1;
+                    }
+
+
+                    //make new level and update level id
+
+                    db.addLevel(level_id, "-1", -2, -1, "-1");
+
+                    AlarmLevelAdapter adapter = new AlarmLevelAdapter(context);
+                    mkAlarmLevels(adapter);
+
+
+                    alarmParameter = new ArrayList<>();
+                    adapter1.setAlarmParameter(alarmParameter);
+                }
+            }
+        });
+
+
+
+
+        alarmLevels.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+            @Override
+            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {return false;}
+
+            @Override
+            public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+
+                textLevel = (TextView) findViewById(rv.getChildAdapterPosition(rv.getFocusedChild()));
+                level_id = Integer.parseInt(textLevel.getText().toString());
+                textLevel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mkNewAlarmParam();
+                    }
+                });
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {}
+        });
+
+
+
+
+
+
+
     }
 
+    private void mkAlarmLevels(AlarmLevelAdapter adapter) {
+
+        ArrayList<String> alarmLevel = new ArrayList<>();
+        DBHelper db = new DBHelper(context, "Database.db");
+        Cursor levelData = db.getData("Alarmlevel");
+
+        if(levelData.getCount()>0){
+            while (levelData.moveToNext()){
+                alarmLevel.add(Integer.toString(levelData.getInt(0)));
+            }
+        }
 
 
+        adapter.setAlarmLevel(alarmLevel);
 
-
+        alarmLevels.setAdapter(adapter);
+        alarmLevels.setLayoutManager(new LinearLayoutManager(context));
+    }
 
 
     @SuppressLint("SetTextI18n")
@@ -563,7 +669,7 @@ public class EditAlarmActivity extends AppCompatActivity {
 
                 SharedPreferences sP = EditAlarmActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
                 SharedPreferences.Editor sE = sP.edit();
-                sE.putString("queue_id", "1"); //todo update when doing alarm levels (Knecht)
+                sE.putInt("queue_id", level_id); //todo update when doing alarm levels (Knecht)
                 sE.apply();
 
                 switch (methodToSet) {
@@ -577,7 +683,7 @@ public class EditAlarmActivity extends AppCompatActivity {
 
                         DBHelper dbHelper = new DBHelper(EditAlarmActivity.this, "Database.db");
                         int l = db.getMaxTableId("Methoddatabase")+1;
-                        dbHelper.addMethod(l, 1, 1, -1, -1, "-1", -1);
+                        dbHelper.addMethod(l, level_id, 1, -1, -1, "-1", -1);
 
                         mkNewAlarmParam();
 
@@ -607,9 +713,9 @@ public class EditAlarmActivity extends AppCompatActivity {
                         break;
 
                     case "memory":
-                    Intent iMemory = new Intent(context, MemoryMethodSetActivity.class);
-                    startActivity(iMemory);
-                    break;
+                        Intent iMemory = new Intent(context, MemoryMethodSetActivity.class);
+                        startActivity(iMemory);
+                        break;
 
                 }
 
@@ -619,7 +725,7 @@ public class EditAlarmActivity extends AppCompatActivity {
         });
 
 
-        RecyclerView recViewMethod = (RecyclerView) findViewById(R.id.cvQueue);
+
 
     }
 
@@ -662,26 +768,26 @@ public class EditAlarmActivity extends AppCompatActivity {
 
 
 
-
-        db = new DBHelper(EditAlarmActivity.this, "Database.db"); //TODO: exception handling (try with ressources)
+        db = new DBHelper(EditAlarmActivity.this, "Database.db");
         Cursor c = db.getData("Methoddatabase");
 
-        int maxQueueId = -1;
+
 
         if (c.getCount() > 0){
+
             while(c.moveToNext()){
                 queueIds.add(c.getInt(0));
 
-                if(queueIds.get(queueIds.size()-1) > maxQueueId )
-                    maxQueueId = queueIds.get(queueIds.size()-1);
-
-                ids.add(c.getInt(0));
-                methodTypeIds.add(c.getInt(2));
-                methodIds.add(c.getInt(3));
-                labels.add(c.getString(5)); // --> if null, wont throw any exception yay :D
-                difficulties.add(c.getInt(4));
-                methodDatabaseSpecificIds.add(c.getInt(6));
+                if(level_id == c.getInt(1)) {
+                    ids.add(c.getInt(0));
+                    methodTypeIds.add(c.getInt(2));
+                    methodIds.add(c.getInt(3));
+                    labels.add(c.getString(5)); // --> if null, wont throw any exception yay :D
+                    difficulties.add(c.getInt(4));
+                    methodDatabaseSpecificIds.add(c.getInt(6));
+                }
             }
+
         }else{
             //todo make a better text explaining how to add methods instead of just stating it empty
             Toast.makeText(this, "No Methods are inside of the queue yet", Toast.LENGTH_SHORT).show();
@@ -699,9 +805,6 @@ public class EditAlarmActivity extends AppCompatActivity {
             String methodType = translateIdToMethodType(methodTypeIds.get(i));;
             String difficult;
 
-
-
-            int queueId = queueIds.get(i);
 
             alarmParameter.add(new Alarm(ids.get(i)));
             alarmParameter.get(alarmParameter.size()-1).setType(methodType);
@@ -741,7 +844,8 @@ public class EditAlarmActivity extends AppCompatActivity {
                         while (resLoc.moveToNext()) {
                             if (resLoc.getInt(0) == methodDatabaseSpecificIds.get(i)) {
                                  alarmParameter.get(alarmParameter.size()-1).setType("Location: " + resLoc.getString(7));
-                                 alarmParameter.get(alarmParameter.size()-1).setDifficulty(resLoc.getInt(5) + " meter: To " + resLoc.getString(8) +" radius");
+                                 alarmParameter.get(alarmParameter.size()-1).setDifficulty(resLoc.getInt(5)
+                                         + " meter: To " + resLoc.getString(8) + " radius");
                             }
                         }
                     }

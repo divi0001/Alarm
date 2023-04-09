@@ -81,7 +81,7 @@ public class QRMethodSetActivity extends AppCompatActivity {
         }
 
         SharedPreferences sp = QRMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
-        int queueId = Integer.parseInt(sp.getString("queue_id","1"));
+        int queueId = sp.getInt("queue_id",-1);
         btnAddFromAbove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
