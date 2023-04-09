@@ -64,22 +64,17 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
                 SharedPreferences sp = SudokuMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
                 int queueId = Integer.parseInt(sp.getString("queue_id", "1"));
 
-                if(getIntent().hasExtra("edit_add")){
-                    int row_id = 1;
-                    Cursor c = db.getData("Methoddatabase");
-                    if(c.getCount()>0){
+                if(getIntent().hasExtra("edit_add") && getIntent().hasExtra("id")){
+                    int row_id = getIntent().getIntExtra("id",-1);
 
-                        while(c.moveToNext()){
-                            if (c.getInt(2) == 5) row_id++;
-                        }
-                    }
                     RadioButton rbCurr = findViewById(rgDiff.getCheckedRadioButtonId());
                     difficulty = rbCurr.getText().toString();
 
                     db.editMethoddatabase(queueId, 5, -1, db.findIdByDifficulty(difficulty), "-1", -1, row_id);
                     finish();
                 }else {
-                    db.addMethod(queueId, 5, -1, db.findIdByDifficulty(difficulty), "-1", -1);
+                    int l = db.getMaxTableId("Methoddatabase")+1;
+                    db.addMethod(l, queueId, 5, -1, db.findIdByDifficulty(difficulty), "-1", -1);
                     finish();
                 }
 

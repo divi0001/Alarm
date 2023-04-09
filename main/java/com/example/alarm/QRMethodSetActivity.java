@@ -86,17 +86,9 @@ public class QRMethodSetActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(getIntent().hasExtra("label") && getIntent().hasExtra("edit_add")){
-                    int row_id = 1;
-                    Cursor c = db.getData("Methoddatabase");
-                    if(c.getCount()>0){
+                if(getIntent().hasExtra("label") && getIntent().hasExtra("edit_add") && getIntent().hasExtra("id")){
+                    int row_id = getIntent().getIntExtra("id",-1);
 
-                        while(c.moveToNext()){
-
-                            if(Objects.equals(c.getString(5), getIntent().getStringExtra("label"))) break;
-                            row_id++;
-                        }
-                    }
 
                     db.editMethoddatabase(queueId, 2, -1, -1, editLabel.getText().toString(), -1, row_id);
                     finish();
@@ -108,7 +100,10 @@ public class QRMethodSetActivity extends AppCompatActivity {
                     } else {
 
                         db.addQRBar(editLabel.getText().toString(), txtDecode.getText().toString());
-                        db.addMethod(queueId, 2, -1, -1, editLabel.getText().toString(), -1);
+
+                        int l = db.getMaxTableId("Methoddatabase")+1;
+
+                        db.addMethod(l, queueId, 2, -1, -1, editLabel.getText().toString(), -1);
                         finish();
                     }
 
@@ -122,25 +117,16 @@ public class QRMethodSetActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(getIntent().hasExtra("label") && getIntent().hasExtra("edit_add")) {
-                    int row_id = 1;
-                    Cursor c = db.getData("Methoddatabase");
-                    if (c.getCount() > 0) {
+                if(getIntent().hasExtra("label") && getIntent().hasExtra("edit_add") && getIntent().hasExtra("id")) {
+                    int row_id = getIntent().getIntExtra("id",-1);
 
-                        while (c.moveToNext()) {
-
-                            if (Objects.equals(c.getString(5), getIntent().getStringExtra("label")))
-                                break;
-                            row_id++;
-                        }
-                    }
 
                     db.editMethoddatabase(queueId, 2, -1, -1, spSavedQRBars.getSelectedItem().toString(), -1, row_id);
                     finish();
 
                 }else {
-
-                    db.addMethod(queueId, 2, -1, -1, spSavedQRBars.getSelectedItem().toString(), -1);
+                    int l = db.getMaxTableId("Methoddatabase")+1;
+                    db.addMethod(l, queueId, 2, -1, -1, spSavedQRBars.getSelectedItem().toString(), -1);
                     finish();
 
                 }

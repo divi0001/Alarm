@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.Objects;
@@ -27,9 +28,10 @@ public class DBHelper extends SQLiteOpenHelper{
         db.execSQL("create Table Alarmdatabase (id INTEGER primary key autoincrement, label TEXT, method_queue_id INTEGER, sound_path_id INTEGER, privilege_rights INTEGER, snoozable INTEGER, time_wake_up_hours INTEGER, time_wake_up_minutes INTEGER, days_schedule_id INTEGER, weeks_schedule_id INTEGER, check_awake INTEGER, alarm_level_table_id INTEGER)");
         //every int representing a bool is -1 for false                         this is the id of the table and the item in it, for the corresponding method
 
-        db.execSQL("create Table Methoddatabase (id INTEGER primary key autoincrement, queue_id INTEGER, method_type_id INTEGER, method_id INTEGER, difficulty_id INTEGER, label TEXT, method_database_specific_id INTEGER)");
-//                +",foreign KEY(method_type_id) references Methodtype(id), foreign key (method_id) references Method(id), foreign key (difficulty_id) references Difficulty(id), foreign key(label) references QRBarcode" +
-//                 "database(label), foreign key (method_database_specific_id) references () )");
+        db.execSQL("create Table Methoddatabase (id INTEGER primary key autoincrement, queue_id INTEGER, method_type_id INTEGER, method_id INTEGER, difficulty_id INTEGER, label TEXT, method_database_specific_id INTEGER"
+                +", foreign KEY(method_type_id) references Methodtype(id), foreign key (method_id) references Method(id), foreign key (difficulty_id) references Difficulty(id), foreign key(label) references QRBarcode" +
+                 "database(label))");
+
         db.execSQL("create Table Methodtype (id INTEGER primary key autoincrement, method_type TEXT)");
         db.execSQL("create Table Method (id INTEGER primary key autoincrement, method TEXT)");
         db.execSQL("create Table Difficulty (id INTEGER primary key autoincrement, difficulty TEXT)");
@@ -42,6 +44,25 @@ public class DBHelper extends SQLiteOpenHelper{
         setupTablesForPreset(db);
 
     }
+
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int verOld, int verNew) {
+        db.execSQL("drop Table if exists Alarmdatabase");
+
+        db.execSQL("drop Table if exists Methoddatabase");
+        db.execSQL("drop Table if exists Methodtype");
+        db.execSQL("drop Table if exists Method");
+        db.execSQL("drop Table if exists Difficulty");
+
+        db.execSQL("drop Table if exists Alarmlevel");
+
+        db.execSQL("drop Table if exists QRBarcodedatabase");
+        db.execSQL("drop Table if exists Mathdatabase");
+        db.execSQL("drop Table if exists Locationdatabase");
+        onCreate(db);
+    }
+
 
     private void setupTablesForPreset(SQLiteDatabase db) {
 
@@ -81,22 +102,24 @@ public class DBHelper extends SQLiteOpenHelper{
 
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int verOld, int verNew) {
-        db.execSQL("drop Table if exists Alarmdatabase");
+    /**
+     * @param database: the string of the table in database.db
+     * @return the max id in the table, if db empty it returns 0
+     */
+    public int getMaxTableId(String database){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c1 = db.rawQuery("SELECT max(id) FROM " + database, null);
+        if(c1.getCount() >0){
+            int id = 0;
+            c1.moveToFirst();
+            id = c1.getInt(0);
+            c1.close();
 
-        db.execSQL("drop Table if exists Methoddatabase");
-        db.execSQL("drop Table if exists Methodtype");
-        db.execSQL("drop Table if exists Method");
-        db.execSQL("drop Table if exists Difficulty");
-
-        db.execSQL("drop Table if exists Alarmlevel");
-
-        db.execSQL("drop Table if exists QRBarcodedatabase");
-        db.execSQL("drop Table if exists Mathdatabase");
-        db.execSQL("drop Table if exists Locationdatabase");
-        onCreate(db);
+            return id;
+        }
+        return 0;
     }
+
 
     //TODO: I don't need to handle SQLInjection, atleast for now, because sharing of settings is not supported as of now, so this would only harm the person itself, or be a nice niche feature lol
     //(this might change in the future, so i will keep this todo in until publishing, so if i add that feature at any point, i'll know, that i have to take care of that.)
@@ -104,7 +127,7 @@ public class DBHelper extends SQLiteOpenHelper{
 
     public void deleteRow(String table, int row_id){
         SQLiteDatabase db = this.getWritableDatabase();
-        long res = db.delete(table, "id=?", new String[]{String.valueOf(row_id+2)});
+        long res = db.delete(table, "id=?", new String[]{String.valueOf(row_id)});
         if(res ==0){
             Toast.makeText(context, "Failed deleting item: " + res, Toast.LENGTH_SHORT).show();
         }else {
@@ -112,17 +135,6 @@ public class DBHelper extends SQLiteOpenHelper{
         }
     }
 
-
-    public void deleteRow(String table, String label){
-        SQLiteDatabase db = this.getWritableDatabase();
-        long res = db.delete(table, "label=?", new String[]{label});
-
-        if(res ==-1){
-            Toast.makeText(context, "Failed deleting item", Toast.LENGTH_SHORT).show();
-        }else {
-            Toast.makeText(context, "Success deleting item", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     public void addAlarm(String label, int methodQueueId, int soundPathId, boolean privilegeRights, boolean snoozable, int wakeUpTimeHours, int wakeUpTimeMinutes, int daysScheduleId, int weeksScheduleId, boolean checkAwake, int alarmLevelTableId){
 
@@ -158,7 +170,7 @@ public class DBHelper extends SQLiteOpenHelper{
     }
 
 
-    public void addMethod(int queueID, int methodTypeId, int methodId, int difficultyId, String label, int methodDatabaseSpecificID){
+    public void addMethod(int id, int queueID, int methodTypeId, int methodId, int difficultyId, String label, int methodDatabaseSpecificID){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 

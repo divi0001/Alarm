@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
@@ -28,7 +29,9 @@ public class MathMethodSetActivity extends AppCompatActivity {
     private RadioGroup rgDifficulty,rgKindOfMath;
     private Button btnSave;
     private boolean edit;
-    private int posAlarmParam, row_id, spec_id;
+    private int posAlarmParam;
+    private int spec_id;
+    private int id;
     private Cursor alarm;
 
 
@@ -48,7 +51,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
 
 
 
-        getIntentData(); //gets the bool for edit which is used below here
+        getIntentData(); //gets the bool for edit which is used below here and more
         txtExample.setText("generating example, as soon \nas you select a different math task");
 
         if(edit){
@@ -105,7 +108,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
 
 
                                     db.editMethoddatabase(1,2,
-                                            db.findIdByMethod(rbMeth.getText().toString()), db.findIdByDifficulty(rbDiff.getText().toString()), "-1", spec_id, row_id);
+                                            db.findIdByMethod(rbMeth.getText().toString())-1, db.findIdByDifficulty(rbDiff.getText().toString())-1, "-1", spec_id, id);
                                     finish();
 
                                 }else {
@@ -126,8 +129,11 @@ public class MathMethodSetActivity extends AppCompatActivity {
 
                                     SharedPreferences sp = MathMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
                                     int queueId = Integer.parseInt(sp.getString("queue_id", "1"));
-                                    db.addMethod(queueId, db.findIdByMethodType("math"), db.findIdByMethod(rbMeth.getText().toString())-1, db.findIdByDifficulty(rbDiff.getText().toString())-1, null, lastId);
 
+                                    int l = db.getMaxTableId("Methoddatabase")+1;
+
+                                    db.addMethod(l, queueId, db.findIdByMethodType("math"), db.findIdByMethod(rbMeth.getText().toString())-1, db.findIdByDifficulty(rbDiff.getText().toString())-1, null, lastId);
+                                    Log.d("math", String.valueOf(l));
 
                                     finish();
                                 }
@@ -150,7 +156,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
 
     private void getIntentData(){
 
-        if(getIntent().hasExtra("edit_add") && getIntent().hasExtra("difficulty") && getIntent().hasExtra("method")){
+        if(getIntent().hasExtra("edit_add") && getIntent().hasExtra("difficulty") && getIntent().hasExtra("method") && getIntent().hasExtra("id")){
 
 
             String edit_add = getIntent().getStringExtra("edit_add");
@@ -158,18 +164,17 @@ public class MathMethodSetActivity extends AppCompatActivity {
 
             String diff = getIntent().getStringExtra("difficulty");
             String meth = getIntent().getStringExtra("method");
+            id = getIntent().getIntExtra("id",-1);
 
-            posAlarmParam = getIntent().getIntExtra("alarmParamId", -1);
+
             DBHelper db = new DBHelper(MathMethodSetActivity.this, "Database.db");
             alarm = db.getData("Methoddatabase");
 
-            row_id = 1;
 
             if(alarm.getCount() >0){
                 while(alarm.moveToNext()){
-                    if(alarm.getInt(2) == 1) row_id++;
 
-                    if(posAlarmParam == alarm.getInt(0)){
+                    if(id == alarm.getInt(0)){
                         spec_id = alarm.getInt(6);
                         break;
                     }

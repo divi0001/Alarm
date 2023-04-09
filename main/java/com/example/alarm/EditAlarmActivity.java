@@ -515,6 +515,7 @@ public class EditAlarmActivity extends AppCompatActivity {
 
 
 
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onResume() {
@@ -534,10 +535,12 @@ public class EditAlarmActivity extends AppCompatActivity {
 
         SharedPreferences se = getSharedPreferences(getString(R.string.uri_key),MODE_PRIVATE);
         if(se.contains("name")){
+
             String name = se.getString("name", "Not yet set");
             if(name.length() < 20) txtCurrSoundName.setText(name);
             if(name.length() >= 20) txtCurrSoundName.setText(name.substring(0,20) + "...");
             curr_uri = Uri.parse(se.getString("uri", ""));
+
         }
 
 
@@ -573,7 +576,8 @@ public class EditAlarmActivity extends AppCompatActivity {
                     case "tap_off":
 
                         DBHelper dbHelper = new DBHelper(EditAlarmActivity.this, "Database.db");
-                        dbHelper.addMethod(1, 1, -1, -1, "-1", -1);
+                        int l = db.getMaxTableId("Methoddatabase")+1;
+                        dbHelper.addMethod(l, 1, 1, -1, -1, "-1", -1);
 
                         mkNewAlarmParam();
 
@@ -634,9 +638,21 @@ public class EditAlarmActivity extends AppCompatActivity {
         return tra[id-1];
     }
 
+
+    public int getAlarmPosFromId(int m){
+        for(int i = 0; i < alarmParameter.size(); i++){
+            if (alarmParameter.get(m).getID() == m){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+
     private void mkNewAlarmParam() {
 
         DBHelper db;
+        ArrayList<Integer> ids = new ArrayList<>();
         ArrayList<Integer> queueIds = new ArrayList<>();
         ArrayList<Integer> methodTypeIds = new ArrayList<>();
         ArrayList<Integer> methodIds = new ArrayList<>();
@@ -659,6 +675,7 @@ public class EditAlarmActivity extends AppCompatActivity {
                 if(queueIds.get(queueIds.size()-1) > maxQueueId )
                     maxQueueId = queueIds.get(queueIds.size()-1);
 
+                ids.add(c.getInt(0));
                 methodTypeIds.add(c.getInt(2));
                 methodIds.add(c.getInt(3));
                 labels.add(c.getString(5)); // --> if null, wont throw any exception yay :D
@@ -666,16 +683,17 @@ public class EditAlarmActivity extends AppCompatActivity {
                 methodDatabaseSpecificIds.add(c.getInt(6));
             }
         }else{
+            //todo make a better text explaining how to add methods instead of just stating it empty
             Toast.makeText(this, "No Methods are inside of the queue yet", Toast.LENGTH_SHORT).show();
             return;
         }
         String TAG = "TAGAlarmParameter";
-        Log.d(TAG, "mkNewAlarmParam: id-yfied:"+ " \nMethodTypeid "+ methodTypeIds+ " \nMethodid "+methodIds+ " \nLabel "+labels+ " \nspecific to db "+methodDatabaseSpecificIds);
+        Log.d(TAG, "mkNewAlarmParam: id-yfied:"+ "\n ids" + ids + " \nMethodTypeid "+ methodTypeIds+ " \nMethodid "+methodIds+ " \nLabel "+labels+ " \nspecific to db "+methodDatabaseSpecificIds);
 
         alarmParameter = new ArrayList<>();
 
 
-        for(int i = 0; i < queueIds.size(); i++) {
+        for(int i = 0; i < ids.size(); i++) {
 
             String metho;
             String methodType = translateIdToMethodType(methodTypeIds.get(i));;
@@ -685,22 +703,22 @@ public class EditAlarmActivity extends AppCompatActivity {
 
             int queueId = queueIds.get(i);
 
-            alarmParameter.add(new Alarm(alarmParameter.size()));
-            alarmParameter.get(alarmParameter.size() - 1).setType(methodType);
+            alarmParameter.add(new Alarm(ids.get(i)));
+            alarmParameter.get(alarmParameter.size()-1).setType(methodType);
 
             switch (methodType) {
                 case "Tap Off":
 
-                    alarmParameter.get(alarmParameter.size() - 1).setDifficulty("None");
+                     alarmParameter.get(alarmParameter.size()-1).setDifficulty("None");
                     break;
 
                 case "Math: ":
 
                     metho = translateIdToMethod(methodIds.get(i)+1);
                     difficult = translateIdToDifficulty(difficulties.get(i)+1);
-                    alarmParameter.get(alarmParameter.size() - 1).setDifficulty(difficult);
-                    alarmParameter.get(alarmParameter.size() - 1).setTurnOffMethod(metho);
-                    alarmParameter.get(alarmParameter.size() - 1).setDifficulty(difficult);
+
+                     alarmParameter.get(alarmParameter.size()-1).setTurnOffMethod(metho);
+                     alarmParameter.get(alarmParameter.size()-1).setDifficulty(difficult);
 
 
                     break;
@@ -709,7 +727,7 @@ public class EditAlarmActivity extends AppCompatActivity {
 
 
                     difficult = labels.get(i);
-                    alarmParameter.get(alarmParameter.size() - 1).setDifficulty(difficult);
+                     alarmParameter.get(alarmParameter.size()-1).setDifficulty(difficult);
 
                     break;
 
@@ -722,8 +740,8 @@ public class EditAlarmActivity extends AppCompatActivity {
                     if (resLoc.getCount() > 0) {
                         while (resLoc.moveToNext()) {
                             if (resLoc.getInt(0) == methodDatabaseSpecificIds.get(i)) {
-                                alarmParameter.get(alarmParameter.size() - 1).setType("Location: " + resLoc.getString(7));
-                                alarmParameter.get(alarmParameter.size() - 1).setDifficulty(resLoc.getInt(5) + " meter: To " + resLoc.getString(8) +" radius");
+                                 alarmParameter.get(alarmParameter.size()-1).setType("Location: " + resLoc.getString(7));
+                                 alarmParameter.get(alarmParameter.size()-1).setDifficulty(resLoc.getInt(5) + " meter: To " + resLoc.getString(8) +" radius");
                             }
                         }
                     }
@@ -734,10 +752,8 @@ public class EditAlarmActivity extends AppCompatActivity {
 
                 case "Memory":
 
-                    db = new DBHelper(EditAlarmActivity.this, "Database.db");
-
                     difficult = translateIdToDifficulty(difficulties.get(i));
-                    alarmParameter.get(alarmParameter.size() - 1).setDifficulty(difficult);
+                     alarmParameter.get(alarmParameter.size()-1).setDifficulty(difficult);
 
                     break;
 

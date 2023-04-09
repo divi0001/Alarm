@@ -75,7 +75,7 @@ public class LocationMethodSetActivity extends AppCompatActivity {
     private double zoom = 15.7;
     private double radius = 0.0;
     private ImageView currentImg;
-    private int km;
+    private int km,id;
     private PolygonOptions currPoly;
     private RecyclerView recViewAutoComplete;
     private String text, radiusMode;
@@ -116,8 +116,11 @@ public class LocationMethodSetActivity extends AppCompatActivity {
 
         currentImg = imgSatelliteExpanded;
 
-        if(getIntent().hasExtra("edit_add")) {
+        if(getIntent().hasExtra("edit_add") && getIntent().hasExtra("id")) {
+
             edit = getIntent().getStringExtra("edit_add").equals("edit");
+            id = getIntent().getIntExtra("id", -1);
+
             txtKm.setText(String.valueOf((int)(getIntent().getDoubleExtra("radius", 600.0))));
             if(getIntent().getStringExtra("enter_leave").equals("enter")){
                 rbEnter.setChecked(true);
@@ -411,8 +414,9 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                             long specificId = db.addLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius,
                                     getDecFromDouble(radius), addr.getThoroughfare(), radiusMode);
 
+                            int l = db.getMaxTableId("Methoddatabase")+1;
 
-                            db.addMethod(queueId, 3, -1, -1, "-1", (int) specificId);
+                            db.addMethod(l, queueId, 3, -1, -1, "-1", (int) specificId);
                             //TODO: make sure radius is consistently updated
                             finish();
                         } catch (IOException e) {
@@ -422,7 +426,10 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                         DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Database.db");
                         long specificId = db.addLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, getDecFromDouble(radius),
                                 addr.getThoroughfare(), radiusMode);
-                        db.addMethod(queueId, 3, -1, -1, "-1", (int) specificId);
+
+                        int l = db.getMaxTableId("Methoddatabase")+1;
+
+                        db.addMethod(l, queueId, 3, -1, -1, "-1", (int) specificId);
                         finish();
                     }
                 }

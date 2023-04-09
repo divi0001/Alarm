@@ -45,6 +45,8 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
 
         this.holder = holder;
 
+
+        holder.txtId.setText(String.valueOf(alarmParameter.get(position).getID()));
         holder.txtMethod.setText(alarmParameter.get(position).getType() + alarmParameter.get(position).getTurnOffMethod());
         holder.txtDifficulty.setText(alarmParameter.get(position).getDifficulty());
 
@@ -63,16 +65,8 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
                     public void onClick(DialogInterface dialog, int which) {
 
                         DBHelper db = new DBHelper(context, "Database.db");
-                        Cursor c = db.getData("Methoddatabase");
-                        int id = -1;
-                        if(c.getCount()>0){
-                            while (c.moveToNext()){
-                                System.out.println(c.getInt(6));
-                                if(c.getInt(0) == position) id = c.getInt(6);
-                            }
-                        }
-                        System.out.println(id); //TODO: find and fix the bug with the ids Q_Q
 
+                        int id = alarmParameter.get(position).getID();
                         db.deleteRow("Methoddatabase", alarmParameter.get(position).getID());
 
                         String table = typeToTable(alarmParameter.get(position).getType());
@@ -124,12 +118,12 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
                 }
 
                 Intent iUpdate = new Intent(context, classType);
+                iUpdate.putExtra("edit_add","edit");
 
                 switch (type) {
                     case "Math: ":
                         iUpdate.putExtra("method", alarmParameter.get(position).getTurnOffMethod());
                         iUpdate.putExtra("difficulty", alarmParameter.get(position).getDifficulty());
-                        iUpdate.putExtra("alarmParamId", position);
                         break;
                     case "QR/Barcode":
                         iUpdate.putExtra("label", alarmParameter.get(position).getDifficulty());
@@ -158,12 +152,11 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
                     }
 
                     iUpdate.putExtra("pos",pos);
-
+                     //todo meh, there is a better way, but this requires putting an id into locationdatabase
 
                 }
+                iUpdate.putExtra("id",alarmParameter.get(position).getID());
 
-
-                iUpdate.putExtra("edit_add","edit");
 
                 context.startActivity(iUpdate);
             }
@@ -213,13 +206,14 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
     public class ViewHolder extends RecyclerView.ViewHolder{
 
 
-        private TextView txtMethod,txtDifficulty;
+        private TextView txtMethod,txtDifficulty, txtId;
         private ImageView imgThreeDots,imgMinusDelete;
         public CardView parent;
 
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            txtId = itemView.findViewById(R.id.txtMethodId);
             txtMethod = itemView.findViewById(R.id.txtMethodType);
             txtDifficulty = itemView.findViewById(R.id.txtDifficultyType);
             imgThreeDots = itemView.findViewById(R.id.threeDotsEdit);

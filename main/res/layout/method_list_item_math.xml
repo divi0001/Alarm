@@ -29,7 +29,16 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/txtMethodId"
+            android:text="@string/to_be_changed"
+            android:textStyle="bold"
+            tools:ignore="RelativeOverlap" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:id="@+id/txtMathod"
+            android:layout_below="@+id/txtMethodId"
             android:text="@string/method"/>
 
         <TextView
@@ -39,6 +48,7 @@
             android:text="@string/to_be_changed"
             android:layout_toEndOf="@+id/txtMathod"
             android:layout_marginStart="20dp"
+            android:layout_below="@+id/txtMethodId"
             tools:ignore="RelativeOverlap" />
 
             <TextView
