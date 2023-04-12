@@ -44,8 +44,9 @@ import com.mapbox.mapboxsdk.Mapbox;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
-public class EditAlarmActivity extends AppCompatActivity {
+public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAdapter.EditAlarms {
 
     private Spinner spHours,spMins,spMethods;
     private CheckBox mo,di,mi,thu,fr,sa,so,checkWeekDays,checkWeekEnds,checkAllowSnooze,checkAwake,checkAlarmLvls,checkRevokePrivilege;
@@ -125,7 +126,7 @@ public class EditAlarmActivity extends AppCompatActivity {
 
         //TODO: in xml + java, add a possiblility to edit the turnus (weekly alarms/every 2 weeks, on a specific date,...)
 
-        adapter = new AlarmLevelAdapter(context);
+        adapter = new AlarmLevelAdapter(context, this);
         mkAlarmLevels(adapter);
 
         alarmLevels.setAdapter(adapter);
@@ -581,72 +582,14 @@ public class EditAlarmActivity extends AppCompatActivity {
 
 
 
+    btnAddSaveAlarm.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            //todo check if sound & atleast 1 method was set to the queue, if so fetch all methodqueue data and leveldata, then put it into a new database
+            // combining all together and then finish();
+        }
+    });
 
-        alarmLevels.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-            @Override
-            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {return false;}
-
-            @Override
-            public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-
-
-                DBHelper db = new DBHelper(context, "Database.db");
-
-                String lab = editLabel.getText().toString();
-
-                int snoozeAmount = -1;
-                int snoozeTime = -1;
-
-                if(checkAllowSnooze.isChecked()){
-                    snoozeAmount = Integer.parseInt(editAmountSnoozes.getText().toString());
-                    snoozeTime = Integer.parseInt(editMinutesSnooze.getText().toString());
-                }
-
-                String sound_path = "";
-                String sound_name = "";
-
-                sound_path = curr_uri.toString();
-                sound_name = txtCurrSoundName.getText().toString();
-
-
-                db.editLevel(level_id, lab, snoozeAmount, snoozeTime, sound_path, sound_name);
-
-
-                textLevel = (TextView) findViewById(rv.getChildAdapterPosition(rv.getFocusedChild()));
-                level_id = Integer.parseInt(textLevel.getText().toString());
-                textLevel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mkNewAlarmParam();
-                    } //todo new level_id
-
-
-                });
-
-                Cursor levelData = db.getData("Alarmlevel");
-                if(levelData.getCount() > 0){
-                    while (levelData.moveToNext()){
-                        if (level_id == levelData.getInt(0)){
-                            editLabel.setText(levelData.getString(1));
-                            if(levelData.getInt(3) == -2){
-                                checkAllowSnooze.setChecked(false);
-                            }else{
-                                editAmountSnoozes.setText(String.valueOf(levelData.getInt(2)));
-                                editMinutesSnooze.setText(String.valueOf(levelData.getInt(3)));
-                            }
-                            curr_uri = Uri.parse(levelData.getString(4));
-                            txtCurrSoundName.setText(levelData.getString(5));
-
-                        }
-                    }
-                }
-                mkNewAlarmParam();
-
-            }
-
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {}
-        });
 
 
 
@@ -658,6 +601,59 @@ public class EditAlarmActivity extends AppCompatActivity {
 
 
 
+
+
+
+
+
+    @Override
+    public void setIfClicked(int levelId) {
+
+        DBHelper db = new DBHelper(context, "Database.db");
+
+        String lab = editLabel.getText().toString();
+
+        int snoozeAmount = -1;
+        int snoozeTime = -1;
+
+        if(checkAllowSnooze.isChecked()){
+            snoozeAmount = Integer.parseInt(editAmountSnoozes.getText().toString());
+            snoozeTime = Integer.parseInt(editMinutesSnooze.getText().toString());
+        }
+
+        String sound_path = "";
+        String sound_name = "";
+
+        boolean noUri = false;
+
+        if(!Objects.equals(curr_uri, null)) sound_path = curr_uri.toString();
+        sound_name = txtCurrSoundName.getText().toString();
+
+
+        db.editLevel(level_id, lab, snoozeAmount, snoozeTime, sound_path, sound_name);
+
+        level_id = levelId;
+
+        Cursor levelData = db.getData("Alarmlevel");
+        if(levelData.getCount() > 0){
+            while (levelData.moveToNext()){
+                if (level_id == levelData.getInt(0)){
+                    editLabel.setText(levelData.getString(1));
+                    if(levelData.getInt(3) == -2){
+                        checkAllowSnooze.setChecked(false);
+                    }else{
+                        editAmountSnoozes.setText(String.valueOf(levelData.getInt(2)));
+                        editMinutesSnooze.setText(String.valueOf(levelData.getInt(3)));
+                    }
+                    if(!Objects.equals(levelData.getString(4), null)) curr_uri = Uri.parse(levelData.getString(4));
+                    txtCurrSoundName.setText(levelData.getString(5));
+
+                }
+            }
+        }
+        mkNewAlarmParam();
+
+    }
 
 
 
@@ -939,4 +935,6 @@ public class EditAlarmActivity extends AppCompatActivity {
             startActivity(iLoc);
         }
     }
+
+
 }

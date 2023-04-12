@@ -18,22 +18,32 @@ import java.util.ArrayList;
 public class AlarmLevelAdapter extends RecyclerView.Adapter<AlarmLevelAdapter.ViewHolder>{
 
     Context context;
+
+    EditAlarms mEdit;
+
     ArrayList<String> alarmLevel = new ArrayList<>();
 
-    public AlarmLevelAdapter(Context context) {
+    public AlarmLevelAdapter(Context context, EditAlarms mEdit) {
         this.context = context;
+        this.mEdit = mEdit;
         }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.alarm_level_list_item, parent, false);
-        return new ViewHolder(view);
+        return new ViewHolder(view, mEdit);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
         holder.txtAlarmLevel.setText(alarmLevel.get(position));
+        holder.txtAlarmLevel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mEdit.setIfClicked(Integer.parseInt(alarmLevel.get(position)));
+            }
+        });
     }
 
     @Override
@@ -52,13 +62,20 @@ public class AlarmLevelAdapter extends RecyclerView.Adapter<AlarmLevelAdapter.Vi
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         private TextView txtAlarmLevel;
-        private CardView cvParentLevel;
-        public ViewHolder(@NonNull View itemView){
+        private View parent;
+        private EditAlarms mEdit;
+        public ViewHolder(@NonNull View itemView, EditAlarms mEdit){
             super(itemView);
             txtAlarmLevel = itemView.findViewById(R.id.txtAlarmLvl);
-            cvParentLevel = itemView.findViewById(R.id.cvParentLevel);
+            parent = itemView;
+            this.mEdit = mEdit;
         }
 
+    }
+
+
+    interface EditAlarms{
+        void setIfClicked(int levelId);
     }
 
 
