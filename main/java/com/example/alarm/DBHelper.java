@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.util.Objects;
@@ -41,7 +40,8 @@ public class DBHelper extends SQLiteOpenHelper{
         db.execSQL("create Table Method (id INTEGER primary key autoincrement, method TEXT)");
         db.execSQL("create Table Difficulty (id INTEGER primary key autoincrement, difficulty TEXT)");
 
-        db.execSQL("create Table Alarmlevel (id INTEGER primary key autoincrement, label TEXT, snooze_count INTEGER, snooze_time INTEGER, sound_path TEXT)"); //multiple rows with the same level_id make up the different Alarmlevels, might add more attribs later
+        db.execSQL("create Table Alarmlevel (id INTEGER primary key autoincrement, label TEXT, snooze_count INTEGER, snooze_time INTEGER, sound_path TEXT, sound_name TEXT)");
+        //multiple rows with the same level_id make up the different Alarmlevels, might add more attribs later
 
         db.execSQL("create Table QRBarcodedatabase (label TEXT primary key, decoded TEXT)");
         db.execSQL("create Table Mathdatabase (id INTEGER primary key autoincrement, method TEXT, difficulty TEXT)");
@@ -335,14 +335,16 @@ public class DBHelper extends SQLiteOpenHelper{
     }
 
 
-    public long addLevel(int id, String label, int snooze_count, int snooze_time, String sound_path){
+    public long addLevel(int id, String label, int snooze_count, int snooze_time, String sound_path, String soundName){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
         if(snooze_count != -2) cv.put("snooze_count", snooze_count);
         if(snooze_time != -1) cv.put("snooze_time", snooze_time);
-        if(label != null) cv.put("label", label);
-        if(!Objects.equals(sound_path, "-1")) cv.put("sound_path", sound_path);
+        if(!Objects.equals(label, "")) cv.put("label", label);
+        if(!Objects.equals(sound_path, "")) cv.put("sound_path", sound_path);
+        if(id != -1) cv.put("id", id);
+        if(!Objects.equals(soundName, "")) cv.put("sound_name", soundName);
 
         long result = db.insert("Alarmlevel", null, cv);
         if(result == -1){
@@ -356,14 +358,15 @@ public class DBHelper extends SQLiteOpenHelper{
 
 
 
-    public void editLevel(int id, String label, int snooze_count, int snooze_time, String sound_path){
+    public void editLevel(int id, String label, int snooze_count, int snooze_time, String sound_path, String sound_name){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
         if(snooze_count != -2) cv.put("snooze_count", snooze_count);
         if(snooze_time != -1) cv.put("snooze_time", snooze_time);
-        if(!Objects.equals(label, "-1")) cv.put("label", label);
-        if(!Objects.equals(sound_path, "-1")) cv.put("sound_path", sound_path);
+        if(!Objects.equals(label, "")) cv.put("label", label);
+        if(!Objects.equals(sound_path, "")) cv.put("sound_path", sound_path);
+        if(!Objects.equals(sound_name, "")) cv.put("sound_name", sound_name);
 
         long result = db.update("Alarmlevel", cv, "id=?", new String[]{String.valueOf(id)});
         if(result == -1){

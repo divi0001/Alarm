@@ -2,6 +2,7 @@ package com.example.alarm;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +28,7 @@ public class AlarmLevelAdapter extends RecyclerView.Adapter<AlarmLevelAdapter.Vi
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.alarm_level_list_item, parent, false);
-        return new AlarmLevelAdapter.ViewHolder(view);
+        return new ViewHolder(view);
     }
 
     @Override
@@ -50,12 +51,12 @@ public class AlarmLevelAdapter extends RecyclerView.Adapter<AlarmLevelAdapter.Vi
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
-        TextView txtAlarmLevel;
-        CardView cvParentLevel;
+        private TextView txtAlarmLevel;
+        private CardView cvParentLevel;
         public ViewHolder(@NonNull View itemView){
             super(itemView);
-            itemView.findViewById(R.id.txtAlarmLevel);
-            itemView.findViewById(R.id.cvParentLevel);
+            txtAlarmLevel = itemView.findViewById(R.id.txtAlarmLvl);
+            cvParentLevel = itemView.findViewById(R.id.cvParentLevel);
         }
 
     }

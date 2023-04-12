@@ -63,10 +63,13 @@ public class EditAlarmActivity extends AppCompatActivity {
     private QueueRecViewAdapter adapter1;
     private String method,difficulty;
     private int id;
-    private int level_id = 1;
+    private int level_id = 0;
     private RelativeLayout relLayoutHideable, relLayAddLvls;
     private String methodToSet;
     private Uri curr_uri;
+    AlarmLevelAdapter adapter;
+
+    ArrayList<String> alarmLevel = new ArrayList<>();
 
 
     @Override
@@ -121,6 +124,12 @@ public class EditAlarmActivity extends AppCompatActivity {
         c[CONTAINER_POS_CHECK_WEEKEND] = b;
 
         //TODO: in xml + java, add a possiblility to edit the turnus (weekly alarms/every 2 weeks, on a specific date,...)
+
+        adapter = new AlarmLevelAdapter(context);
+        mkAlarmLevels(adapter);
+
+        alarmLevels.setAdapter(adapter);
+        alarmLevels.setLayoutManager(new LinearLayoutManager(context));
 
         //populate Spinners with arrays in strings.xml
         ArrayAdapter<CharSequence> adapt1, adapt2, adapt3;
@@ -515,17 +524,21 @@ public class EditAlarmActivity extends AppCompatActivity {
 
                 DBHelper db = new DBHelper(context, "Database.db");
                 Cursor levelData = db.execQuery("SELECT max(id) FROM Alarmlevel", null);
+
+
                 Cursor queueData = db.getData("Methoddatabase");
 
                 if (queueData.getCount() > 0) {
                     while (queueData.moveToNext()) {
                         if (queueData.getInt(1) == level_id) { //it is the 2nd column, did this start counting at 0 or 1? I'll find out, using 1 now for 2nd
-
+                            //?????????? dont remember what i wanted to do here lol knecht
                         }
                     }
                 }
-
-
+                if (levelData.getCount()>0) {
+                    levelData.moveToNext();
+                    level_id = levelData.getInt(0)+1;
+                }
                 //updating current level with settings
                 SharedPreferences se = getSharedPreferences(getString(R.string.uri_key), MODE_PRIVATE);
 
@@ -533,39 +546,35 @@ public class EditAlarmActivity extends AppCompatActivity {
                     Toast.makeText(context, "Set a label for the alarm pls", Toast.LENGTH_SHORT).show();
                 } else {
                     String lab = editLabel.getText().toString();
+                    int amountSnoozes = -2;
+                    int timeSnooze = -1;
 
-                    if (curr_uri != null || se.contains("uri")) {
-                        if (checkAllowSnooze.isChecked()) {
-                            db.editLevel(level_id, lab, Integer.parseInt(editAmountSnoozes.getText().toString()),
-                                    Integer.parseInt(editMinutesSnooze.getText().toString()), se.getString("uri", ""));
-                        } else {
-                            db.editLevel(level_id, lab, -2, -1, se.getString("uri", ""));
-                        }
-                    } else {
-                        if (checkAllowSnooze.isChecked()) {
-                            db.editLevel(level_id, lab, Integer.parseInt(editAmountSnoozes.getText().toString()),
-                                    Integer.parseInt(editMinutesSnooze.getText().toString()), "-1");
-                        } else {
-                            db.editLevel(level_id, lab, -2, -1, "-1");
-                        }
+                    if(checkAllowSnooze.isChecked()) {
+                        amountSnoozes = Integer.parseInt(editAmountSnoozes.getText().toString());
+                        timeSnooze = Integer.parseInt(editMinutesSnooze.getText().toString());
                     }
 
-                    if (levelData.getCount() > 0) {
-                        levelData.moveToNext();
-                        level_id = levelData.getInt(0) + 1;
-                    }
+                    String uri = "";
+                    String name = "";
+
+                    if(se.contains("uri")) uri = se.getString("uri","");
+                    if(se.contains("name")) name = se.getString("name", "");
+
+                    db.addLevel(level_id, lab, amountSnoozes, timeSnooze, uri, name);
 
 
-                    //make new level and update level id
-
-                    db.addLevel(level_id, "-1", -2, -1, "-1");
-
-                    AlarmLevelAdapter adapter = new AlarmLevelAdapter(context);
                     mkAlarmLevels(adapter);
+
+
+                    alarmLevels.setAdapter(adapter);
+                    alarmLevels.setLayoutManager(new LinearLayoutManager(context));
 
 
                     alarmParameter = new ArrayList<>();
                     adapter1.setAlarmParameter(alarmParameter);
+
+
+
                 }
             }
         });
@@ -580,14 +589,59 @@ public class EditAlarmActivity extends AppCompatActivity {
             @Override
             public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
 
+
+                DBHelper db = new DBHelper(context, "Database.db");
+
+                String lab = editLabel.getText().toString();
+
+                int snoozeAmount = -1;
+                int snoozeTime = -1;
+
+                if(checkAllowSnooze.isChecked()){
+                    snoozeAmount = Integer.parseInt(editAmountSnoozes.getText().toString());
+                    snoozeTime = Integer.parseInt(editMinutesSnooze.getText().toString());
+                }
+
+                String sound_path = "";
+                String sound_name = "";
+
+                sound_path = curr_uri.toString();
+                sound_name = txtCurrSoundName.getText().toString();
+
+
+                db.editLevel(level_id, lab, snoozeAmount, snoozeTime, sound_path, sound_name);
+
+
                 textLevel = (TextView) findViewById(rv.getChildAdapterPosition(rv.getFocusedChild()));
                 level_id = Integer.parseInt(textLevel.getText().toString());
                 textLevel.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         mkNewAlarmParam();
-                    }
+                    } //todo new level_id
+
+
                 });
+
+                Cursor levelData = db.getData("Alarmlevel");
+                if(levelData.getCount() > 0){
+                    while (levelData.moveToNext()){
+                        if (level_id == levelData.getInt(0)){
+                            editLabel.setText(levelData.getString(1));
+                            if(levelData.getInt(3) == -2){
+                                checkAllowSnooze.setChecked(false);
+                            }else{
+                                editAmountSnoozes.setText(String.valueOf(levelData.getInt(2)));
+                                editMinutesSnooze.setText(String.valueOf(levelData.getInt(3)));
+                            }
+                            curr_uri = Uri.parse(levelData.getString(4));
+                            txtCurrSoundName.setText(levelData.getString(5));
+
+                        }
+                    }
+                }
+                mkNewAlarmParam();
+
             }
 
             @Override
@@ -602,24 +656,11 @@ public class EditAlarmActivity extends AppCompatActivity {
 
     }
 
-    private void mkAlarmLevels(AlarmLevelAdapter adapter) {
-
-        ArrayList<String> alarmLevel = new ArrayList<>();
-        DBHelper db = new DBHelper(context, "Database.db");
-        Cursor levelData = db.getData("Alarmlevel");
-
-        if(levelData.getCount()>0){
-            while (levelData.moveToNext()){
-                alarmLevel.add(Integer.toString(levelData.getInt(0)));
-            }
-        }
 
 
-        adapter.setAlarmLevel(alarmLevel);
 
-        alarmLevels.setAdapter(adapter);
-        alarmLevels.setLayoutManager(new LinearLayoutManager(context));
-    }
+
+
 
 
     @SuppressLint("SetTextI18n")
@@ -728,6 +769,27 @@ public class EditAlarmActivity extends AppCompatActivity {
 
 
     }
+
+
+
+    private void mkAlarmLevels(AlarmLevelAdapter adapter) {
+
+        alarmLevel = new ArrayList<>();
+        DBHelper db = new DBHelper(context, "Database.db");
+        Cursor levelData = db.getData("Alarmlevel");
+
+        if(levelData.getCount()>0){
+            while (levelData.moveToNext()){
+                alarmLevel.add(levelData.getString(0));
+                Log.d("alarm level", " \n"+alarmLevel);
+            }
+        }
+
+        Log.d("alarm level", " \n"+alarmLevel);
+        adapter.setAlarmLevel(alarmLevel);
+    }
+
+
 
     public String translateIdToMethodType(int id){
         String[] tra =  new String[]{"Tap off","Math: ","QR/Barcode","Location: ","Sudoku","Memory","Passphrase"};
