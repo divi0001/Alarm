@@ -31,6 +31,11 @@ public class DBHelper extends SQLiteOpenHelper{
         //alarm_level_id points to the Alarmlevel Table which has the level specific labels, snooze settings, sounds, etc
         //if alarm levels not used, just set everything as alarm level 1
 
+        db.execSQL("create Table AlarmAllTable (id INTEGER primary key autoincrement, level_num INTEGER primary key, method_type_id INTEGER, " +
+                "method_id INTEGER, difficulty_id INTEGER, label TEXT, decoded TEXT, radius INTEGER, lat INTEGER, lat_komma INTEGER, lon INTEGER," +
+                "lon_komma INTEGER, address TEXT)"); //more keys? todo add foreign to keys
+
+
         db.execSQL("create Table Methoddatabase (id INTEGER primary key autoincrement, queue_id INTEGER, method_type_id INTEGER, method_id INTEGER, difficulty_id INTEGER," +
                 " label TEXT, method_database_specific_id INTEGER, foreign KEY(method_type_id) references Methodtype(id), foreign key (method_id) references Method(id)," +
                 " foreign key (difficulty_id) references Difficulty(id), foreign key(label) references QRBarcodedatabase(label)," +

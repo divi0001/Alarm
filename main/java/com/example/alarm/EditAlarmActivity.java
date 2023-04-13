@@ -531,8 +531,8 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
                 if (queueData.getCount() > 0) {
                     while (queueData.moveToNext()) {
-                        if (queueData.getInt(1) == level_id) { //it is the 2nd column, did this start counting at 0 or 1? I'll find out, using 1 now for 2nd
-                            //?????????? dont remember what i wanted to do here lol knecht
+                        if (queueData.getInt(1) == level_id) {
+                            //?????????? don't remember what i wanted to do here lol knecht
                         }
                     }
                 }
@@ -587,6 +587,23 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         public void onClick(View v) {
             //todo check if sound & atleast 1 method was set to the queue, if so fetch all methodqueue data and leveldata, then put it into a new database
             // combining all together and then finish();
+
+            if(alarmParameter.size() > 0 && !Objects.equals(null, curr_uri)){
+
+                DBHelper db = new DBHelper(context, "Database.db");
+                Cursor queueData, locData, qrData, levelData;
+
+                queueData = db.getData("Methoddatabase");
+                locData = db.getData("Locationdatabase");
+                qrData = db.getData("QRBarcodedatabase");
+                levelData = db.getData("Alarmlevel");
+
+
+
+            }else{
+                Toast.makeText(context, "You need to set at least 1 method to the queue and a sound to play", Toast.LENGTH_SHORT).show();
+            }
+
         }
     });
 
@@ -887,7 +904,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                 case "QR/Barcode":
 
 
-                    difficult = labels.get(i);
+                     difficult = labels.get(i);
                      alarmParameter.get(alarmParameter.size()-1).setDifficulty(difficult);
 
                     break;
