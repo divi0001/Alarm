@@ -387,13 +387,13 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                     DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Database.db");
                     Cursor c = db.getData("Locationdatabase");
                     if(addr != null) {
-                        db.editLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, getDecFromDouble(radius), addr.getThoroughfare(), radiusMode, pos);
+                        db.editLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, addr.getThoroughfare(), radiusMode, pos);
                         finish();
                     }else{
                         Geocoder g = new Geocoder(LocationMethodSetActivity.this);
                         try {
                             addr = g.getFromLocation(latitude, longitude, 1).get(0);
-                            db.editLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, getDecFromDouble(radius), addr.getThoroughfare(), radiusMode, pos);
+                            db.editLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, addr.getThoroughfare(), radiusMode, pos);
 
                             finish();
 
@@ -411,8 +411,7 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                             DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Database.db");
 
 
-                            long specificId = db.addLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius,
-                                    getDecFromDouble(radius), addr.getThoroughfare(), radiusMode);
+                            long specificId = db.addLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, addr.getThoroughfare(), radiusMode);
 
                             int l = db.getMaxTableId("Methoddatabase")+1;
 
@@ -424,7 +423,7 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                         }
                     } else {
                         DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Database.db");
-                        long specificId = db.addLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, getDecFromDouble(radius),
+                        long specificId = db.addLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius,
                                 addr.getThoroughfare(), radiusMode);
 
                         int l = db.getMaxTableId("Methoddatabase")+1;

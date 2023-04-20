@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class DBHelper extends SQLiteOpenHelper{
@@ -24,17 +25,27 @@ public class DBHelper extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        db.execSQL("create Table Alarmdatabase (id INTEGER primary key autoincrement, label TEXT, method_queue_id INTEGER, privilege_rights INTEGER," +
-                " time_wake_up_hours INTEGER, time_wake_up_minutes INTEGER, days_schedule_id INTEGER, weeks_schedule_id INTEGER, check_awake INTEGER," +
-                " alarm_level_id INTEGER, foreign key (alarm_level_id) references Alarmlevel(id))");
-        //every int representing a bool is -1 for false                                             //represents how many methods are in the queue
-        //alarm_level_id points to the Alarmlevel Table which has the level specific labels, snooze settings, sounds, etc
-        //if alarm levels not used, just set everything as alarm level 1
+        db.execSQL("create Table Alarmdatabase (id INTEGER primary key autoincrement, label TEXT, privilege_rights INTEGER," +
+                " time_wake_up_hours INTEGER, time_wake_up_minutes INTEGER, days_schedule_id INTEGER, weeks_schedule_amount INTEGER, check_awake INTEGER)");
 
-        db.execSQL("create Table AlarmAllTable (id INTEGER primary key autoincrement, level_num INTEGER primary key, method_type_id INTEGER, " +
-                "method_id INTEGER, difficulty_id INTEGER, label TEXT, decoded TEXT, radius INTEGER, lat INTEGER, lat_komma INTEGER, lon INTEGER," +
-                "lon_komma INTEGER, address TEXT)"); //more keys? todo add foreign to keys
+        //need final tables for adding: Methoddatabase, Alarmlevel, QRBarcode, Location, dayschedule, i think i don't use the Mathdatabase for functional uses, todo check this, and delete if the data is never used
 
+        db.execSQL("create Table finalMethods(id integer primary key autoincrement, queue_id integer, method_type_id integer, method_id integer, difficulty_id integer," +
+                    " label text, method_database_specific_id integer)");
+        db.execSQL("create Table finalLevels(id integer primary key autoincrement, label text, snooze_count integer, snooze_time integer, sound_path text," +
+                "sound_name text, alarm_id integer)");
+        db.execSQL("create Table finalQRBar (label text primary key, decoded text)");
+        db.execSQL("create Table finalLocation (id integer primary key autoincrement, lat_int integer, point_lat integer, lon_int integer, point_lon integer, " +
+                "radius integer, street text, radius_mode text)");
+        db.execSQL("create Table inbetweenDayschedule (id integer primary key autoincrement, schedule_id integer, foreign key (schedule_id) references finalDayschedule(id))"); //todo implement syncing here
+        db.execSQL("create Table finalDayschedule (id integer primary key autoincrement, mon integer, tue integer, wed integer, thu integer, fri integer, sat integer, sun integer)");
+
+
+
+
+
+        db.execSQL("create Table Dayschedule (id INTEGER primary key autoincrement, mon INTEGER, tue INTEGER, wed INTEGER, thu INTEGER, fri INTEGER, sat INTEGER, sun INTEGER)");
+        //id, mon, tue, wed, thu, fri, sat, sun
 
         db.execSQL("create Table Methoddatabase (id INTEGER primary key autoincrement, queue_id INTEGER, method_type_id INTEGER, method_id INTEGER, difficulty_id INTEGER," +
                 " label TEXT, method_database_specific_id INTEGER, foreign KEY(method_type_id) references Methodtype(id), foreign key (method_id) references Method(id)," +
@@ -45,21 +56,38 @@ public class DBHelper extends SQLiteOpenHelper{
         db.execSQL("create Table Method (id INTEGER primary key autoincrement, method TEXT)");
         db.execSQL("create Table Difficulty (id INTEGER primary key autoincrement, difficulty TEXT)");
 
-        db.execSQL("create Table Alarmlevel (id INTEGER primary key autoincrement, label TEXT, snooze_count INTEGER, snooze_time INTEGER, sound_path TEXT, sound_name TEXT)");
-        //multiple rows with the same level_id make up the different Alarmlevels, might add more attribs later
+        db.execSQL("create Table Alarmlevel (id INTEGER primary key autoincrement, label TEXT, snooze_count INTEGER, snooze_time INTEGER, sound_path TEXT, " +
+                "sound_name TEXT, alarm_id INTEGER, foreign key (alarm_id) references Alarmdatabase(id) )");
+        //multiple rows with the same level_id make up the different Alarmlevels
 
         db.execSQL("create Table QRBarcodedatabase (label TEXT primary key, decoded TEXT)");
         db.execSQL("create Table Mathdatabase (id INTEGER primary key autoincrement, method TEXT, difficulty TEXT)");
         db.execSQL("create Table Locationdatabase (id INTEGER primary key autoincrement, latitude_int INTEGER, zero_point_latitude INTEGER, longitude_int INTEGER," +
-                " zero_point_longitude INTEGER, radius_int INTEGER, zero_point_radius INTEGER, street TEXT, radius_mode TEXT)");
-        setupTablesForPreset(db);
+                " zero_point_longitude INTEGER, radius_int INTEGER, street TEXT, radius_mode TEXT)");
 
+
+
+
+        setupTablesForPreset(db);
+        db.close();
     }
 
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int verOld, int verNew) {
+
         db.execSQL("drop Table if exists Alarmdatabase");
+
+        db.execSQL("drop Table if exists finalLevels");
+
+        db.execSQL("drop Table if exists finalMethods");
+
+        db.execSQL("drop Table if exists finalQRBar");
+        db.execSQL("drop Table if exists finalLocation");
+        db.execSQL("drop Table if exists finalDayschedule");
+
+
+        db.execSQL("drop Table if exists Dayschedule");
 
         db.execSQL("drop Table if exists Methoddatabase");
         db.execSQL("drop Table if exists Methodtype");
@@ -72,6 +100,7 @@ public class DBHelper extends SQLiteOpenHelper{
         db.execSQL("drop Table if exists Mathdatabase");
         db.execSQL("drop Table if exists Locationdatabase");
         onCreate(db);
+        db.close();
     }
 
 
@@ -121,19 +150,201 @@ public class DBHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c1 = db.rawQuery("SELECT max(id) FROM " + database, null);
         if(c1.getCount() >0){
-            int id = 0;
+            int id;
             c1.moveToFirst();
             id = c1.getInt(0);
             c1.close();
 
+            db.close();
+
             return id;
         }
+        db.close();
         return 0;
     }
 
 
-    //TODO: I don't need to handle SQLInjection, atleast for now, because sharing of settings is not supported as of now, so this would only harm the person itself, or be a nice niche feature lol
+    //TODO: I don't need to handle SQLInjection, at least for now, because sharing of settings is not supported as of now, so this would only harm the person itself, or be a nice niche feature lol
     //(this might change in the future, so i will keep this todo in until publishing, so if i add that feature at any point, i'll know, that i have to take care of that.)
+
+
+
+
+    //syncing is not necessary the other way (temp with final) i think
+    /**
+     * Syncs the persistent database up with the temporary one after each alarm insert or on editing an alarm
+     * @param id - the id of the to change row of alarmdatabase
+     * @return true if successfull, else false
+     */
+    public boolean syncFinalWithTempDB(int id){
+
+
+        SQLiteDatabase dbWrite = this.getWritableDatabase();
+        SQLiteDatabase dbRead = this.getReadableDatabase();
+
+        Cursor levelData = dbRead.rawQuery("SELECT * FROM Alarmlevel", null);
+        if(levelData.getCount()>0){
+
+            ArrayList<Integer> levelIds = new ArrayList<>();
+            ArrayList<String> labels = new ArrayList<>();
+            ArrayList<Integer> snoozeCounts = new ArrayList<>();
+            ArrayList<Integer> snoozeTimes = new ArrayList<>();
+            ArrayList<String> sound_paths = new ArrayList<>();
+            ArrayList<String> sound_names = new ArrayList<>();
+
+            while(levelData.moveToNext()){
+
+                if(levelData.getInt(6) == id){
+                    levelIds.add(levelData.getInt(0));
+                    labels.add(levelData.getString(1));
+                    if(levelData.getInt(2) == -1){
+                        snoozeCounts.add(-1);
+                        snoozeTimes.add(-2);
+                    }else{
+                        snoozeCounts.add(levelData.getInt(2));
+                        snoozeTimes.add(levelData.getInt(3));
+                    }
+                    sound_paths.add(levelData.getString(4));
+                    sound_names.add(levelData.getString(5));
+                }
+
+            }
+
+
+            Cursor queueData = dbRead.rawQuery("SELECT * FROM Methoddatabase", null);
+
+            if(queueData.getCount()>0) {
+
+                ArrayList<Integer> ids = new ArrayList<>();
+                ArrayList<Integer> queueIds = new ArrayList<>();
+                ArrayList<Integer> methodTypeIds = new ArrayList<>();
+                ArrayList<Integer> methods = new ArrayList<>();
+                ArrayList<Integer> difficulties = new ArrayList<>();
+                ArrayList<String> labelsQueue = new ArrayList<>();
+                ArrayList<Integer> specificIds = new ArrayList<>();
+
+                while (queueData.moveToNext()){
+
+                    ids.add(queueData.getInt(0));
+                    queueIds.add(queueData.getInt(1));
+                    methodTypeIds.add(queueData.getInt(2));
+                    methods.add(queueData.getInt(3));
+                    difficulties.add(queueData.getInt(4));
+                    labelsQueue.add(queueData.getString(5));
+                    specificIds.add(queueData.getInt(6));
+                }
+
+
+
+                Cursor cursor = dbRead.rawQuery("SELECT alarm_id FROM finalLevels WHERE alarm_id=?", new String[]{String.valueOf(id)});
+
+                for (int i = 0; i < levelIds.size(); i++) {
+
+                    ContentValues cv = new ContentValues();
+                    cv.put("id", levelIds.get(i));
+                    cv.put("label", labels.get(i));
+                    cv.put("snooze_count", snoozeCounts.get(i));
+                    cv.put("snooze_time", snoozeTimes.get(i));
+                    cv.put("sound_path", sound_paths.get(i));
+                    cv.put("sound_name", sound_names.get(i));
+                    cv.put("alarm_id", id);
+
+                    if (cursor.getCount() > 0) {
+                        dbWrite.update("finalLevels", cv, "alarm_id=?", new String[]{String.valueOf(id)});
+                    } else {
+                        dbWrite.insert("finalLevels", null, cv);
+                    }
+                }
+
+
+                for(int i = 0; i < queueIds.size(); i++) {
+
+                    ContentValues cv = new ContentValues();
+                    cv.put("id", ids.get(i));
+                    cv.put("queue_id", queueIds.get(i));
+                    if (methodTypeIds.get(i) != 3 || methodTypeIds.get(i) != 2) {
+                        cv.put("method_type_id", methodTypeIds.get(i));
+                    }else if (methodTypeIds.get(i) == 3){
+                        cv.put("method_type_id", methodTypeIds.get(i));
+
+                        Cursor locationData = dbRead.rawQuery("SELECT * FROM Locationdatabase WHERE id=?", new String[]{String.valueOf(specificIds.get(i))});
+                        locationData.moveToFirst();
+                        ContentValues vals = new ContentValues();
+                        vals.put("id", locationData.getInt(0));
+                        vals.put("lat_int", locationData.getInt(1));
+                        vals.put("point_lat", locationData.getInt(2));
+                        vals.put("lon_int", locationData.getInt(3));
+                        vals.put("point_lon", locationData.getInt(4));
+                        vals.put("radius", locationData.getInt(5));
+                        vals.put("street", locationData.getString(6));
+                        vals.put("radius_mode", locationData.getString(7));
+
+
+                        if(cursor.getCount()>0){
+                            dbWrite.update("finalLocation", vals, "id=?", new String[]{String.valueOf(specificIds.get(i))});
+                        }else{
+                            dbWrite.insert("finalLocation", null, cv);
+                        }
+                        locationData.close();
+                    } else if (methodTypeIds.get(i) == 2) {
+                        cv.put("method_type_id", methodTypeIds.get(i));
+
+                        Cursor qrData = dbRead.rawQuery("SELECT * FROM QRBarcodedatabase WHERE label=?", new String[]{labelsQueue.get(i)});
+                        qrData.moveToFirst();
+                        ContentValues vals = new ContentValues();
+
+                        vals.put("label", qrData.getString(0));
+                        vals.put("decoded", qrData.getString(1));
+
+                        if(cursor.getCount()>0){
+                            dbWrite.update("finalQRBar", vals, "label=?", new String[]{labelsQueue.get(i)});
+                        }else{
+                            dbWrite.insert("finalQRBar", null, cv);
+                        }
+                        qrData.close();
+                    }
+                    cv.put("method_id", methods.get(i));
+                    cv.put("difficulty", difficulties.get(i));
+                    cv.put("label", labelsQueue.get(i));
+                    cv.put("method_database_specific_id", specificIds.get(i));
+
+
+                    if (cursor.getCount() > 0) {
+                        dbWrite.update("finalMethods", cv, "id=?", new String[]{String.valueOf(ids.get(i))});
+                    } else {
+                        dbWrite.insert("finalMethods", null, cv);
+                    }
+                }
+
+                cursor.close();
+
+
+            }else{
+                System.out.println("How?!");
+                dbRead.close();
+                dbWrite.close();
+                return false;
+            }
+
+
+
+            queueData.close();
+            levelData.close();
+            dbRead.close();
+            dbWrite.close();
+            return true;
+
+        }else{
+            levelData.close();
+            dbRead.close();
+            dbWrite.close();
+            return false;
+        }
+
+
+    }
+
+
 
 
     public void deleteRow(String table, int row_id){
@@ -144,16 +355,17 @@ public class DBHelper extends SQLiteOpenHelper{
         }else {
             Toast.makeText(context, "Success deleting item: " +res, Toast.LENGTH_SHORT).show();
         }
+        db.close();
     }
 
 
-    public void addAlarm(String label, int methodQueueId, int soundPathId, boolean privilegeRights, boolean snoozable, int wakeUpTimeHours, int wakeUpTimeMinutes, int daysScheduleId, int weeksScheduleId, boolean checkAwake, int alarmLevelTableId){
+    public void addAlarm(int id, String label, int soundPathId, boolean privilegeRights, boolean snoozable, int wakeUpTimeHours, int wakeUpTimeMinutes, int daysScheduleId, int weeksScheduleAmount, boolean checkAwake){
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
         cv.put("label", label);
-        cv.put("method_queue_id",methodQueueId);
+        cv.put("id", id);
         cv.put("sound_path_id",soundPathId);
         if(privilegeRights){
         cv.put("privilege_rights",1);}
@@ -166,17 +378,17 @@ public class DBHelper extends SQLiteOpenHelper{
         cv.put("time_wake_up_hours", wakeUpTimeHours);
         cv.put("time_wake_up_minutes", wakeUpTimeMinutes);
         cv.put("days_schedule_id",daysScheduleId);
-        cv.put("weeks_schedule_id",weeksScheduleId);
+        cv.put("weeks_schedule_amount",weeksScheduleAmount);
         if(checkAwake){
         cv.put("check_awake", 1);}else{
             cv.put("check_awake", 0);}
-        cv.put("alarm_level_table_id",alarmLevelTableId);
         long res = db.insert("Alarmdatabase", null, cv);
         if(res == -1){
             Toast.makeText(context, "Inserting into Alarmdatabase failed", Toast.LENGTH_SHORT).show();
         }else{
             Toast.makeText(context, "Successfully added into Alarmdatabase", Toast.LENGTH_SHORT).show();
         }
+        db.close();
 
     }
 
@@ -316,9 +528,9 @@ public class DBHelper extends SQLiteOpenHelper{
             Toast.makeText(context, "Successfully added into QRBarcodedatabase", Toast.LENGTH_SHORT).show();
         }
     }
-    //        Locationdatabase latitude_int INTEGER, zero_point_latitude INTEGER, longitude_int INTEGER, zero_point_longitude INTEGER, radius_int INTEGER, zero_point_radius INTEGER, street TEXT)");
 
-    public long addLocation(int latitudeInt, int zeroPointLatitude, int longitudeInt, int zeroPointLongitude, int radiusInt, int zeroPointRadius, String street, String radiusMode){
+
+    public long addLocation(int latitudeInt, int zeroPointLatitude, int longitudeInt, int zeroPointLongitude, int radiusInt, String street, String radiusMode){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -327,7 +539,6 @@ public class DBHelper extends SQLiteOpenHelper{
         cv.put("longitude_int",longitudeInt);
         cv.put("zero_point_longitude",zeroPointLongitude);
         cv.put("radius_int",radiusInt);
-        cv.put("zero_point_radius",zeroPointRadius);
         cv.put("street",street);
         cv.put("radius_mode", radiusMode);
         long res = db.insert("Locationdatabase", null, cv);
@@ -340,7 +551,7 @@ public class DBHelper extends SQLiteOpenHelper{
     }
 
 
-    public long addLevel(int id, String label, int snooze_count, int snooze_time, String sound_path, String soundName){
+    public long addLevel(int id, String label, int snooze_count, int snooze_time, String sound_path, String soundName, int alarm_id){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -350,6 +561,7 @@ public class DBHelper extends SQLiteOpenHelper{
         if(!Objects.equals(sound_path, "")) cv.put("sound_path", sound_path);
         if(id != -1) cv.put("id", id);
         if(!Objects.equals(soundName, "")) cv.put("sound_name", soundName);
+        cv.put("alarm_id", alarm_id);
 
         long result = db.insert("Alarmlevel", null, cv);
         if(result == -1){
@@ -363,7 +575,7 @@ public class DBHelper extends SQLiteOpenHelper{
 
 
 
-    public void editLevel(int id, String label, int snooze_count, int snooze_time, String sound_path, String sound_name){
+    public void editLevel(int id, int alarm_id, String label, int snooze_count, int snooze_time, String sound_path, String sound_name){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -373,7 +585,7 @@ public class DBHelper extends SQLiteOpenHelper{
         if(!Objects.equals(sound_path, "")) cv.put("sound_path", sound_path);
         if(!Objects.equals(sound_name, "")) cv.put("sound_name", sound_name);
 
-        long result = db.update("Alarmlevel", cv, "id=?", new String[]{String.valueOf(id)});
+        long result = db.update("Alarmlevel", cv, "id=?&&alarm_id=?", new String[]{String.valueOf(id), String.valueOf(alarm_id)});
         if(result == -1){
             Toast.makeText(context, "Failed to update alarm level", Toast.LENGTH_SHORT).show();
         }else{
@@ -426,11 +638,11 @@ public class DBHelper extends SQLiteOpenHelper{
     }
 
 
-    public void editLocation(int lat, int zerolat, int lon, int zerolon, int radius, int zeroradius, String street, String enter_leave, int row_id){
+    public void editLocation(int lat, int zerolat, int lon, int zerolon, int radius, String street, String enter_leave, int row_id){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
-        int currlat, currzerolat, currlon, currzerolon, currradius, currzeroradius;
+        int currlat, currzerolat, currlon, currzerolon, currradius;
         String currstreet, currenterleave;
 
         Cursor c = getData("Locationdatabase");
@@ -443,7 +655,6 @@ public class DBHelper extends SQLiteOpenHelper{
                     currlon = c.getInt(3);
                     currzerolon = c.getInt(4);
                     currradius = c.getInt(5);
-                    currzeroradius = c.getInt(6);
                     currstreet = c.getString(7);
                     currenterleave = c.getString(8);
 
@@ -452,7 +663,6 @@ public class DBHelper extends SQLiteOpenHelper{
                     if (lon != currlon) cv.put("longitude_int", lon);
                     if (zerolon != currzerolon) cv.put("zero_point_longitude", zerolon);
                     if (radius != currradius) cv.put("radius_int", radius);
-                    if (zeroradius != currzeroradius) cv.put("zero_point_radius", zeroradius);
                     if (!Objects.equals(street, currstreet)) cv.put("street", street);
                     if (!Objects.equals(enter_leave,currenterleave)) cv.put("radius_mode", enter_leave);
                 }

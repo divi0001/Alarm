@@ -63,7 +63,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
     private final Context context = this;
     private QueueRecViewAdapter adapter1;
     private String method,difficulty;
-    private int id;
+    private int alarmId, hour, minute;
     private int level_id = 0;
     private RelativeLayout relLayoutHideable, relLayAddLvls;
     private String methodToSet;
@@ -132,15 +132,30 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         alarmLevels.setAdapter(adapter);
         alarmLevels.setLayoutManager(new LinearLayoutManager(context));
 
+        hour = 0;
+        minute = 0;
+
         //populate Spinners with arrays in strings.xml
         ArrayAdapter<CharSequence> adapt1, adapt2, adapt3;
         adapt1 = ArrayAdapter.createFromResource(this, R.array.hours, android.R.layout.simple_spinner_item);
         adapt1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spHours.setAdapter(adapt1);
+        spHours.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                hour = position;
+            }
+        });
 
         adapt2 = ArrayAdapter.createFromResource(this, R.array.secmins, android.R.layout.simple_spinner_item);
         adapt2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spMins.setAdapter(adapt2);
+        spMins.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                minute = position;
+            }
+        });
 
         adapt3 = ArrayAdapter.createFromResource(this, R.array.spinner_method, android.R.layout.simple_spinner_item);
         adapt3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -561,7 +576,10 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     if(se.contains("uri")) uri = se.getString("uri","");
                     if(se.contains("name")) name = se.getString("name", "");
 
-                    db.addLevel(level_id, lab, amountSnoozes, timeSnooze, uri, name);
+                    SharedPreferences sp = getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE);
+                    alarmId = sp.getInt("id", 1);
+
+                    db.addLevel(level_id, lab, amountSnoozes, timeSnooze, uri, name, alarmId);
 
 
                     mkAlarmLevels(adapter);
@@ -585,20 +603,23 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
     btnAddSaveAlarm.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            //todo check if sound & atleast 1 method was set to the queue, if so fetch all methodqueue data and leveldata, then put it into a new database
-            // combining all together and then finish();
 
             if(alarmParameter.size() > 0 && !Objects.equals(null, curr_uri)){
 
                 DBHelper db = new DBHelper(context, "Database.db");
-                Cursor queueData, locData, qrData, levelData;
 
-                queueData = db.getData("Methoddatabase");
-                locData = db.getData("Locationdatabase");
-                qrData = db.getData("QRBarcodedatabase");
-                levelData = db.getData("Alarmlevel");
+                SharedPreferences sp = getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE);
+                alarmId = sp.getInt("id", 1);
+
+                //todo if set do x if edit do y
+                //if set:
+                db.addAlarm(alarmId, editLabel.getText().toString(), ,
+                        checkRevokePrivilege.isChecked(), checkAllowSnooze.isChecked(), hour, minute
+                        , , , checkAwake.isChecked());
 
 
+                db.syncFinalWithTempDB(alarmId);
+                finish();
 
             }else{
                 Toast.makeText(context, "You need to set at least 1 method to the queue and a sound to play", Toast.LENGTH_SHORT).show();
@@ -646,8 +667,10 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         if(!Objects.equals(curr_uri, null)) sound_path = curr_uri.toString();
         sound_name = txtCurrSoundName.getText().toString();
 
+        SharedPreferences sp = getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE);
+        alarmId = sp.getInt("id", 1);
 
-        db.editLevel(level_id, lab, snoozeAmount, snoozeTime, sound_path, sound_name);
+        db.editLevel(level_id, alarmId, lab, snoozeAmount, snoozeTime, sound_path, sound_name);
 
         level_id = levelId;
 
@@ -683,14 +706,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         super.onResume();
         DBHelper db = new DBHelper(EditAlarmActivity.this, "Database.db");
 
-        Cursor c = db.getData("Alarmdatabase");
-        ArrayList<String> arrMeth = new ArrayList<>();
 
-        if (c.getCount() > 0) {
-            while (c.moveToNext()) {
-                arrMeth.add(c.getString(2));
-            }
-        }
 
 
         SharedPreferences se = getSharedPreferences(getString(R.string.uri_key),MODE_PRIVATE);

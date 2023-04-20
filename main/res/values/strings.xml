@@ -215,6 +215,7 @@
     <string name="sudoku_header">Settings for sudoku method: </string>
     <string name="memory_header">Settings for memory method: (WIP)</string>
     <string name="example_size_mem">6x6</string>
+    <string name="alarm_id_key">com.example.alarm.ALARM_ID_KEY</string>
 
 
 </resources>

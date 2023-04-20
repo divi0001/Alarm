@@ -8,6 +8,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -32,6 +33,7 @@ public class AlarmOverViewActivity extends AppCompatActivity {
     private RecyclerView recView;
     private ImageView addAlarm;
     private String path;
+    private Context context = this;
 
 
     @Override
@@ -45,25 +47,31 @@ public class AlarmOverViewActivity extends AppCompatActivity {
         addAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                DBHelper db = new DBHelper(context, "Database.db");
+                Cursor alarmData = db.execQuery("SELECT MAX(id) FROM Alarmdatabase", null);
+                int latest_id = 1;
+
+
+                if(alarmData.getCount()>0){
+                    alarmData.moveToFirst();
+                    latest_id = alarmData.getInt(0);
+                }
+
+
+                SharedPreferences sp = getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE);
+                SharedPreferences.Editor se = sp.edit();
+                se.putInt("id", latest_id);
+                se.apply();
+
                 Intent i = new Intent(AlarmOverViewActivity.this, EditAlarmActivity.class);
                 i.putExtra("createAlarm","true");
                 startActivity(i);
             }
         });
 
-        try {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            JSONArray jsonArray2 = new JSONArray(prefs.getString("AlarmObjectArray", "[]"));
-            for (int i = 0; i < jsonArray2.length(); i++) {
-                Log.d("your JSON Array", (String) jsonArray2.get(i));
-            }
 
-            JSONHandler j = new JSONHandler();
-            ArrayList<Alarm> alarmList = j.fromJAlarmArray(jsonArray2);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
 
 
