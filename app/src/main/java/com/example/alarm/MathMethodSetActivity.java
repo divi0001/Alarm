@@ -246,7 +246,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
     }
 
 
-    private String generateExample(String difficulty, int kindOfMath) {
+    public String generateExample(String difficulty, int kindOfMath) {
         Random rd = new Random();
         int exeasynum1 = rd.nextInt(10);
         int exeasynum2 = rd.nextInt(10);
