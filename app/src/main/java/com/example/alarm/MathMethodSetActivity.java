@@ -32,6 +32,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
     private int posAlarmParam;
     private int spec_id;
     private int id;
+    private int methodID;
     private Cursor alarm;
 
 
@@ -207,30 +208,39 @@ public class MathMethodSetActivity extends AppCompatActivity {
 
             switch (meth){
                 case "Subtraction":
+                    this.methodID = 0;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathSub);
                     break;
                 case "Division":
+                    this.methodID = 1;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathDiv);
                     break;
                 case "Multiplication":
+                    this.methodID = 2;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathMult);
                     break;
                 case "Root":
+                    this.methodID = 3;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathRoot);
                     break;
                 case "Faculty (x!)":
+                    this.methodID = 4;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathFac);
                     break;
                 case "Value for f(x)":
+                    this.methodID = 5;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathFuncValue);
                     break;
                 case "Determine extrema of f(x)":
+                    this.methodID = 6;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathExtrema);
                     break;
                 case "Multiple choice":
+                    this.methodID = 7;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathMultipleChoice);
                     break;
                 default:
+                    this.methodID = 8;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathAdd);
                     break;
             }
@@ -246,7 +256,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
     }
 
 
-    public String generateExample(String difficulty, int kindOfMath) {
+    public String generateExample(String difficulty, int methodID) {
         Random rd = new Random();
         int exeasynum1 = rd.nextInt(10);
         int exeasynum2 = rd.nextInt(10);
@@ -260,7 +270,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
         int exhardnum1 = rd.nextInt(100000);
         int exhardnum2 = rd.nextInt(100000);
 
-        if (kindOfMath == R.id.rbMethodMathFac){
+        if (methodID == 4){
             ergexeasy = faculty(exeasynum1);
             return "(This has no difficulty setting) \n" + exeasynum1 + "! = " + ergexeasy;
         }
@@ -268,70 +278,69 @@ public class MathMethodSetActivity extends AppCompatActivity {
 
         switch (difficulty){
             case "exEasy":
-                if(kindOfMath != R.id.rbMethodMathExtrema && kindOfMath != R.id.rbMethodMathFuncValue){
-                return multiplexKind(exeasynum1, exeasynum2,kindOfMath);}
-                switch (kindOfMath){
-                    case R.id.rbMethodMathFuncValue:
+                if(methodID != 5 && methodID != 6){
+                return multiplexKind(exeasynum1, exeasynum2,methodID);}
+                switch (methodID){
+                    case 5:
                         ergexeasy = exeasynum1;
                         return "For function f(x) = x is f(" + exeasynum1 + ") = " + ergexeasy;
-                    case R.id.rbMethodMathExtrema:
+                    case 6:
                         return "For function f(x) = x is no extremum out of infinity calculable";
                     default:
                         return "Something went terribly wrong >.<";
                 }
 
             case "easy":
-                if(kindOfMath != R.id.rbMethodMathExtrema && kindOfMath != R.id.rbMethodMathFuncValue){
-                    return multiplexKind(easynum1, easynum2,kindOfMath);}
-                switch (kindOfMath){
-                    case R.id.rbMethodMathFuncValue:
+                if(methodID != 5 && methodID != 6){
+                    return multiplexKind(easynum1, easynum2,methodID);}
+                switch (methodID){
+                    case 5:
                         ergexeasy = exeasynum1*exeasynum1 + exeasynum1;
                         return "For function f(x) = x²+x is f(" + exeasynum1 + ") = " + ergexeasy;
-                    case R.id.rbMethodMathExtrema:
+                    case 6:
                         String erg = "{-0.5}";
                         return "For function f(x) = x²+x is the extremum at " + erg;
                     default:
                         return "Something went terribly wrong >.<";
                 }
             case "middle":
-                if(kindOfMath != R.id.rbMethodMathExtrema && kindOfMath != R.id.rbMethodMathFuncValue){
-                    return multiplexKind(middlenum1, middlenum2,kindOfMath);}
-                switch (kindOfMath){
-                    case R.id.rbMethodMathFuncValue:
+                if(methodID != 5 && methodID != 6){
+                    return multiplexKind(middlenum1, middlenum2,methodID);}
+                switch (methodID){
+                    case 5:
                         ergexeasy = exeasynum1*exeasynum1*exeasynum1*middlenum2 + exeasynum1*exeasynum1 * (middlenum1+middlenum2) + middlenum1*middlenum2;
                         return "For function f(x) = " +middlenum2 + "x³+" + middlenum1+middlenum2 + "x²+" + middlenum1*middlenum2 + "x is f(" + exeasynum1 + ") = " + ergexeasy;
-                    case R.id.rbMethodMathExtrema:
+                    case 6:
                         String erg = findExtrema((float) exeasynum1, (float) middlenum2, (float) middlenum1);
                         return "For function f(x) = " +middlenum2 + "x³+" + middlenum1+middlenum2 + "x²+" + middlenum1*middlenum2 + "x  are the extrema at " + erg;
                     default:
                         return "Something went terribly wrong >.<";
                 }
             case "hard":
-                if(kindOfMath != R.id.rbMethodMathExtrema && kindOfMath != R.id.rbMethodMathFuncValue){
-                    return multiplexKind(hardnum1, hardnum2,kindOfMath);}
+                if(methodID != 5 && methodID != 6){
+                    return multiplexKind(hardnum1, hardnum2,methodID);}
                 int rand = rd.nextInt(10);
                 while (rand == 0) rand = rd.nextInt(10);
-                switch (kindOfMath){
-                    case R.id.rbMethodMathFuncValue:
-
+                switch (methodID){
+                    case 5:
                         ergexeasy = exeasynum1*exeasynum1*exeasynum1*exeasynum1*hardnum2 + exeasynum1*exeasynum1*exeasynum1*(hardnum1+hardnum2) + exeasynum1*exeasynum1*hardnum1*rand + exeasynum1*hardnum1/rand;
                         return "For function f(x) = " +hardnum2 + "x⁴+" + hardnum1+hardnum2 + "x³+" + hardnum1*rand + "x²+" + hardnum1/rand + "x is f(" + exeasynum1 + ") = " + ergexeasy;
-                    case R.id.rbMethodMathExtrema:
+                    case 6:
                         String erg = findExtremaBig((float) exeasynum1, (float) hardnum1, (float) hardnum2, (float) rand, difficulty);
                         return "For function f(x) = " +hardnum2 + "x⁴+" + hardnum1+hardnum2 + "x³+" + hardnum1*rand + "x²+" + hardnum1/rand + "x are the extrema at " + erg;
                     default:
                         return "Something went terribly wrong >.<";
                 }
             case "exHard":
-                if(kindOfMath != R.id.rbMethodMathExtrema && kindOfMath != R.id.rbMethodMathFuncValue){
-                    return multiplexKind(exhardnum1, exhardnum2, kindOfMath);}
+                if(methodID != 5 && methodID != 6){
+                    return multiplexKind(exhardnum1, exhardnum2, methodID);}
                 rand = rd.nextInt(10);
                 while (rand == 0) rand = rd.nextInt(10);
-                switch (kindOfMath){
-                    case R.id.rbMethodMathFuncValue:
+                switch (methodID){
+                    case 5:
                         ergexeasy = exeasynum1*exeasynum1*exeasynum1*exeasynum1*exeasynum1*exhardnum2 + exeasynum1*exeasynum1*exeasynum1*exeasynum1*(exhardnum1+exhardnum2) + exeasynum1*exeasynum1*exeasynum1*exhardnum1*rand + exeasynum1*exeasynum1*exhardnum1/rand + exeasynum1*rand;
                         return "For function f(x) = " +exhardnum2 + "x⁵+" + exhardnum1+exhardnum2 + "x⁴+" + exhardnum1*rand + "x³+" + exhardnum1/rand + "x²+" + rand + "x is f(" + exeasynum1 + ") = " + ergexeasy;
-                    case R.id.rbMethodMathExtrema:
+                    case 6:
                         String erg = findExtremaBig((float) exeasynum1, (float) exhardnum1, (float) exhardnum2, (float) rand, difficulty);
                         return "For function f(x) = " +exhardnum2 + "x⁵+" + exhardnum1+exhardnum2 + "x⁴+" + exhardnum1*rand + "x³+" + exhardnum1/rand + "x²+" + rand + "x are the extrema at " + erg;
                     default:
@@ -427,38 +436,36 @@ public class MathMethodSetActivity extends AppCompatActivity {
 
 
 
-    private String multiplexKind(int num1, int num2, int kindOfMath) {
+    private String multiplexKind(int num1, int num2, int methodID) {
 
         int erg;
         String example = "Something went pretty wrong";
-        RadioButton rb = findViewById(kindOfMath);
-        CharSequence kind = rb.getText();
 
-
-        if ("Addition".contentEquals(kind)) {
-            erg = num1 + num2;
-            example = num1 + " + " + num2 + " = " + erg;
-
-        } else if ("Subtraction".contentEquals(kind)) {
-            erg = num1 - num2;
-            example = num1 + " - " + num2 + " = " + erg;
-
-        } else if ("Multiplication".contentEquals(kind)) {
-            erg = num1 * num2;
-            example = num1 + " * " + num2 + " = " + erg;
-
-        } else if ("Division".contentEquals(kind)) {
-            erg = num1 / num2;
-            example = "(Only integerdivision, so round the number down)\n" + num1 + " / " + num2 + " = " + erg;
-
-        } else if ("Root".contentEquals(kind)) {
-            erg = num1 * num1;
-            example = "√" + erg + " = " + num1 + "warning, setting this on extremely hard might generate numbers bigger than allowed, use at own risk";
-            if (erg < 0){
-                example = "The number was so big, it overflowed the range of int (~2,1 trillion)";
-            }
+        switch(methodID){
+            case 8:
+                erg = num1 + num2;
+                example = num1 + " + " + num2 + " = " + erg;
+                break;
+            case 0:
+                erg = num1 - num2;
+                example = num1 + " - " + num2 + " = " + erg;
+                break;
+            case 1:
+                erg = num1 * num2;
+                example = num1 + " * " + num2 + " = " + erg;
+                break;
+            case 2:
+                erg = num1 / num2;
+                example = "(Only integerdivision, so round the number down)\n" + num1 + " / " + num2 + " = " + erg;
+                break;
+            case 3:
+                erg = num1 * num1;
+                example = "√" + erg + " = " + num1 + "warning, setting this on extremely hard might generate numbers bigger than allowed, use at own risk";
+                if (erg < 0){
+                    example = "The number was so big, it overflowed the range of int (~2,1 trillion)"; //todo this is an extremely unsafe implementation, change asap
+                }
+                break;
         }
-
         return example;
     }
 

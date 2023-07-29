@@ -1,47 +1,61 @@
 package com.example.alarm;
 
 import java.util.Arrays;
+import java.util.Random;
 
 public class AlarmMethod {
 
-    private int id,difficulty, type;
+    private int id,difficulty, type, subType;
 
-    private String[] translationTypeList = new String[]{"TapOff", "Math", "QRCode", "Location", "Sudoku", "Memory", "Passphrase"};
-    private String[] translationDiffList = new String[]{"exEasy","easy","middle","hard","exHard"};
+    private final String[] translationTypeList = new String[]{"TapOff", "Math", "QRCode", "Location", "Sudoku", "Memory", "Passphrase"};
+    private final String[] translationDiffList = new String[]{"exEasy","easy","middle","hard","exHard"};
 
-    public AlarmMethod(int id, int difficulty, int type){
+    public AlarmMethod(int id, int difficulty, int type, int subType){
         this.id = id;
         this.difficulty = difficulty;
         this.type = type;
+        this.subType = subType;
     }
 
-    public String calcExample(int type){
+    public void calcExample(int type){
         if(!(type == 0) && !(type == 2) && !(type == 3) && !(type == 6) ){
 
             if(type == 1) {
                 MathMethodSetActivity math = new MathMethodSetActivity();
-                math.generateExample(translationDiffList[this.difficulty], this.type);
+                math.generateExample(translationDiffList[this.difficulty], this.subType); //todo check if snd arg is correct
             } else if (type == 4) {
                 SudokuMethodSetActivity sudo = new SudokuMethodSetActivity();
                 sudo.sudokuToString(sudo.generateSudoku(translationDiffList[difficulty]));
             } else if (type == 5) {
                 generatePointerMemory(difficulty);
             }
-        }else{
-
-
-
-
         }
     }
 
-    public String[][]  generatePointerMemory(int difficulty){
+    public String[][] generatePointerMemory(int difficulty){
         //difficulty+x is size here
-        String[][] memory = new String[((difficulty+3)*2)/2][((difficulty+3)*2)/2];
-        
+        int size = difficulty+3;
+        if(size%2!=0) size++;
+        String[][] memory = new String[size][size];
 
+        for (int i = 0; i < (size*size)/2; i++){
+            memory[i/size][i%size] = String.valueOf(i);
+        }
 
+        for (int i = 0; i < size; i++) {
+            for(int j = 0; j < size; j++){
 
+                Random rand = new Random();
+                int randi = rand.nextInt(size);
+                int randj = rand.nextInt(size);
+                String temp = memory[i][j];
+                memory[i][j] = memory[randi][randj];
+                memory[randi][randj] = temp;
+
+            }
+        }
+
+        return memory;
     }
 
 
@@ -70,17 +84,22 @@ public class AlarmMethod {
         this.type = type;
     }
 
+    public String[] getTranslationTypeList() {
+        return translationTypeList;
+    }
+
+    public String[] getTranslationDiffList() {
+        return translationDiffList;
+    }
+
     @Override
     public String toString() {
         return "AlarmMethod{" +
                 "id=" + id +
                 ", difficulty=" + difficulty +
                 ", type=" + type +
-                ", translationList=" + Arrays.toString(translationList) +
+                ", translationTypeList=" + Arrays.toString(translationTypeList) +
+                ", translationDiffList=" + Arrays.toString(translationDiffList) +
                 '}';
-    }
-
-    public String[] getTranslationList() {
-        return translationList;
     }
 }

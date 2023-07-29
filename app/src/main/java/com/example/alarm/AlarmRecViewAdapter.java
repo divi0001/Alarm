@@ -42,13 +42,9 @@ public class AlarmRecViewAdapter extends RecyclerView.Adapter<AlarmRecViewAdapte
 
 
         holder.clock.setFormat24Hour(alarms.get(position).getT());
-        holder.method.setText(alarms.get(position).getTurnOffMethod());
-        holder.sound.setText(alarms.get(position).getSoundPath());
-        if(alarms.get(position).isExtendedPrivileges()){
-            holder.privileg.setText("True");
-        }else{
-            holder.privileg.setText("False");
-        }
+        holder.method.setText(alarms.get(position).mainMethod(position));
+        holder.sound.setText(alarms.get(position).mainSoundPath(position));
+
 
         holder.imgBtnDown.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,7 +113,6 @@ public class AlarmRecViewAdapter extends RecyclerView.Adapter<AlarmRecViewAdapte
         private TextClock clock;
         private TextView method;
         private TextView sound;
-        private TextView privileg;
         private TextView delete;
         private SwitchCompat turnOnOff;
         private ImageView imgBtnDown;
@@ -132,7 +127,6 @@ public class AlarmRecViewAdapter extends RecyclerView.Adapter<AlarmRecViewAdapte
             clock = itemView.findViewById(R.id.clock);
             method = itemView.findViewById(R.id.txtMethod);
             sound = itemView.findViewById(R.id.txtSound);
-            privileg = itemView.findViewById(R.id.txtTrueFalse);
             turnOnOff = itemView.findViewById(R.id.switchAlarmOff);
             imgBtnDown = itemView.findViewById(R.id.btnDown);
             imgBtnUp = itemView.findViewById(R.id.btnUp);

@@ -405,7 +405,6 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                 }
 
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
@@ -423,9 +422,6 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
             public void onClick(View v) {
 
 
-
-
-                //TODO: this is in onCreate, so only adding Tap off method should be allowed
                 if (adapter1.getItemCount() > 5) {
                     Toast.makeText(EditAlarmActivity.this, "Do you really need more than 5 methods for this Level?", Toast.LENGTH_SHORT).show();
                     return;
@@ -436,11 +432,10 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                 edi.apply();
                 if(methodToSet.equals("tap_off")) {
 
-                    alarmParameter.add(new Alarm(alarmParameter.size()));
-                    alarmParameter.get(alarmParameter.size() - 1).setTurnOffMethod(getString(R.string.method_tap_off));
-                    alarmParameter.get(alarmParameter.size() - 1).setDifficulty("None");
-                    alarmParameter.get(alarmParameter.size() - 1).setType("Tap off");
-
+                    alarmParameter.add(new Alarm(alarmParameter.size())); //0 sub, 1 mult, 2 div, 3 root, 4 fac, 5 func val, 6 extrema, 7 multiple choice, 8 add
+                    AlarmMethod al = new AlarmMethod(alarmParameter.size()-1, -1, 0, -1);
+                    ArrayList<AlarmMethod> currQueue = alarmParameter.get(alarmParameter.size()-1).getmQueue(alarmParameter.size()-1);
+                    currQueue.add(al);
 
                 }else{
                         Toast.makeText(context, "The selected spMethod did not register", Toast.LENGTH_SHORT).show();
