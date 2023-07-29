@@ -85,7 +85,7 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
     }
 
 
-    private String sudokuToString(int[][] gen) {
+    public String sudokuToString(int[][] gen) {
 
         StringBuilder ret = new StringBuilder();
 
@@ -103,7 +103,7 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
         return ret.toString();
     }
 
-    private int[][] generateSudoku(String difficulty) {
+    public int[][] generateSudoku(String difficulty) {
 
         int[][] sudoku = initSudoku();
         int[] randSort1 = new int[9];

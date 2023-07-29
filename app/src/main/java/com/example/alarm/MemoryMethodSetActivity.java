@@ -25,7 +25,7 @@ public class MemoryMethodSetActivity extends AppCompatActivity {
             ,R.drawable.sample8,R.drawable.sample9,R.drawable.sample10,R.drawable.sample11,R.drawable.sample12,R.drawable.sample13,R.drawable.sample14,
             R.drawable.sample15,R.drawable.sample16};
     ImageView currImgView;
-    int[] pos = new int[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+    int[] pos = new int[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}; //for the memes lol
     int currPos = -1;
 
 
