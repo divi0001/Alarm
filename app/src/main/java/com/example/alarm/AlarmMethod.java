@@ -5,16 +5,15 @@ import java.util.Random;
 
 public class AlarmMethod {
 
-    private int id,difficulty, type, subType;
+    private int id,difficulty;
+    private Enums.Method method;
+    private Enums.SubMethod subMethod;
 
-    private final String[] translationTypeList = new String[]{"TapOff", "Math", "QRCode", "Location", "Sudoku", "Memory", "Passphrase"};
-    private final String[] translationDiffList = new String[]{"exEasy","easy","middle","hard","exHard"};
-
-    public AlarmMethod(int id, int difficulty, int type, int subType){
+    public AlarmMethod(int id, int difficulty, Enums.Method method, Enums.SubMethod subMethod){
         this.id = id;
         this.difficulty = difficulty;
-        this.type = type;
-        this.subType = subType;
+        this.method = method;
+        this.subMethod = subMethod;
     }
 
     public void calcExample(int type){

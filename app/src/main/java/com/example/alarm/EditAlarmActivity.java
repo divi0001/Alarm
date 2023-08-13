@@ -62,13 +62,14 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
     private final Context context = this;
     private QueueRecViewAdapter adapter1;
-    private String method,difficulty;
+    private Enums.Difficulties difficulty;
     private int alarmId, hour, minute;
     private int level_id = 0;
     private RelativeLayout relLayoutHideable, relLayAddLvls;
-    private String methodToSet;
+    private Enums.Method methodToSet;
     private Uri curr_uri;
     AlarmLevelAdapter adapter;
+    private Enums.SubMethod subMethod;
 
     private Alarm alarmParameter;
 
@@ -381,35 +382,11 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                switch(position){
-                    case 0:
-                        methodToSet = "tap_off";
-                        break;
-
-                    case 1:
-                        methodToSet = "math";
-                        break;
-
-                    case 2:
-                        methodToSet = "scan_qr_barcode";
-                        break;
-                    case 3:
-                        methodToSet = "location_based";
-                        break;
-                    case 4:
-                        methodToSet = "sudoku";
-                        break;
-                    case 5:
-                        methodToSet = "memory";
-                        break;
-                    case 6:
-                        methodToSet = "type_passphrase";
-                        break;
-                }
+                        methodToSet = Enums.Method.values()[position];
 
             }
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            public void onNothingSelected(AdapterView<?> parent) {methodToSet= Enums.Method.TapOff}
         });
 
         adapter1 = new QueueRecViewAdapter(context);
@@ -432,7 +409,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                 SharedPreferences.Editor edi = pref.edit();
                 edi.putString("method", "set_alarm");
                 edi.apply();
-                if(methodToSet.equals("tap_off")) {
+                if(methodToSet.equals(Enums.Method.TapOff)) {
 
                     if(alarmParameter.isHasLevels()){
 
@@ -750,9 +727,16 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         super.onResume();
         DBHelper db = new DBHelper(EditAlarmActivity.this, "Database.db");
 
-
-
-
+        SharedPreferences shared = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE); //todo after the code is done, reset this shardedpref to default value, so if it fails, it wont put in the same val twice
+        if(shared.contains("Method")){ //todo this is the if that should be changed (see todo above)
+            methodToSet = Enums.Method.valueOf(shared.getString("Method", (Enums.Method.None).toString()));
+        }
+        if(shared.contains("Difficulty")){
+            difficulty = Enums.Difficulties.valueOf(shared.getString("Difficulty", (Enums.Difficulties.None).toString()));
+        }
+        if(shared.contains("SubMethod")){
+            subMethod = Enums.SubMethod.valueOf(shared.getString("SubMethod", Enums.SubMethod.None.toString()));
+        }
         SharedPreferences se = getSharedPreferences(getString(R.string.uri_key),MODE_PRIVATE);
         if(se.contains("name")){
 
@@ -761,6 +745,20 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
             if(name.length() >= 20) txtCurrSoundName.setText(name.substring(0,20) + "...");
             curr_uri = Uri.parse(se.getString("uri", ""));
 
+        }
+        alarmParameter = addAlarm(); //todo looks if any of the 3 following values is none, if not, adds/edits the alarm accordingly?
+        if(!methodToSet.equals(Enums.Method.None)){ //set it to None now, so the same value wont get added twice todo add the same for the shared prefs
+            methodToSet = Enums.Method.None;
+            //...
+        } //todo check if the value differs, when setting this to none, since this is the same reference (is enum callbyreference?)
+
+        if(!subMethod.equals(Enums.SubMethod.None)){
+            subMethod = Enums.SubMethod.None;
+            //... (yes the above doesnt have to be in the if, but does the shared pref?)
+        }
+
+        if(!difficulty.equals(Enums.Difficulties.None)){
+            difficulty = Enums.Difficulties.None;
         }
 
 
@@ -779,32 +777,11 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
     }
 
-    public String translateIdToMethodType(int id){
-        String[] tra =  new String[]{"Tap off","Math: ","QR/Barcode","Location: ","Sudoku","Memory","Passphrase"};
-        return tra[id-1];
-    }
 
-    public String translateIdToMethod(int id){
-        String[] tra = new String[]{"null","Addition","Subtraction","Multiplication","Division","Faculty","Root","Value of f(x)","Extrema of f(x)","Multiple Choice","Enter radius","Leave radius"};
-        return tra[id-1];
-    }
 
-    public String translateIdToDifficulty(int id){
-        String[] tra = new String[]{"extremely easy","easy","middle","hard","extremely hard"};
-        return tra[id-1];
-    }
+
 
 /*
-    public int getAlarmPosFromId(int m){
-        for(int i = 0; i < alarmParameter.size(); i++){
-            if (alarmParameter.get(m).getID() == m){
-                return i;
-            }
-        }
-        return -1;
-    }
-
-
     private void mkNewAlarmParam() {
 
         DBHelper db;
