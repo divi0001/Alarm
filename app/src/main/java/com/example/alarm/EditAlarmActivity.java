@@ -777,7 +777,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
 
 
-
+/*
     private void mkNewAlarmParam() {
 
         DBHelper db;
