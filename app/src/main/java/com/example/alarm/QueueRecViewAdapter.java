@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapter.ViewHolder>{
 
-    private ArrayList<Alarm> alarmParameter;
+    private ArrayList<AlarmMethod> alarmMethods;
     private Context context;
     private ViewHolder holder;
 
@@ -46,9 +46,9 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
         this.holder = holder;
 
 
-        holder.txtId.setText(String.valueOf(alarmParameter.get(position).getID()));
-        holder.txtMethod.setText(alarmParameter.get(position).getType() + alarmParameter.get(position).getTurnOffMethod());
-        holder.txtDifficulty.setText(alarmParameter.get(position).getDifficulty());
+        holder.txtId.setText(String.valueOf(alarmMethods.get(position).getId()));
+        holder.txtMethod.setText(alarmMethods.get(position).getType() + toMethod(alarmMethods.get(position).get));
+        holder.txtDifficulty.setText(alarmMethods.get(position).getDifficulty());
 
         holder.imgMinusDelete.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("NotifyDataSetChanged")

@@ -59,7 +59,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
     public final int CONTAINER_POS_CHECK_WEEKEND = 1;
     private RecyclerView alarmQueue,alarmLevels;
     private final int REQ_CODE_MATH_METHOD = 1234;
-    private ArrayList<Alarm> alarmParameter = new ArrayList<>();
+
     private final Context context = this;
     private QueueRecViewAdapter adapter1;
     private String method,difficulty;
@@ -70,7 +70,10 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
     private Uri curr_uri;
     AlarmLevelAdapter adapter;
 
+    private Alarm alarmParameter;
+
     ArrayList<String> alarmLevel = new ArrayList<>();
+    private int lvlID;
 
 
     @Override
@@ -127,7 +130,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         //TODO: in xml + java, add a possiblility to edit the turnus (weekly alarms/every 2 weeks, on a specific date,...)
 
         adapter = new AlarmLevelAdapter(context, this);
-        mkAlarmLevels(adapter);
+        adapter.setAlarmLevel(alarmParameter.getlQueue());
 
         alarmLevels.setAdapter(adapter);
         alarmLevels.setLayoutManager(new LinearLayoutManager(context));
@@ -410,8 +413,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         });
 
         adapter1 = new QueueRecViewAdapter(context);
-        mkNewAlarmParam();
-
+        //todo not entirely sure, if removing mkNewAlarmParms() is right here, but after all, the rest of the code here should update the views right?
         alarmQueue.setAdapter(adapter1);
         alarmQueue.setLayoutManager(new LinearLayoutManager(context));
 
@@ -432,21 +434,62 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                 edi.apply();
                 if(methodToSet.equals("tap_off")) {
 
-                    alarmParameter.add(new Alarm(alarmParameter.size())); //0 sub, 1 mult, 2 div, 3 root, 4 fac, 5 func val, 6 extrema, 7 multiple choice, 8 add
-                    AlarmMethod al = new AlarmMethod(alarmParameter.size()-1, -1, 0, -1);
-                    ArrayList<AlarmMethod> currQueue = alarmParameter.get(alarmParameter.size()-1).getmQueue(alarmParameter.size()-1);
-                    currQueue.add(al);
+                    if(alarmParameter.isHasLevels()){
+
+                        //todo while this might be redundant and be removed later, also make sure to update the selected lvl here
+                        int sel = getSelectedLvl();
+                        alarmParameter.setSelectedLvl(sel);
+                        ArrayList<AlarmMethod> aL = alarmParameter.getmQueue(sel);
+                        aL.add(new AlarmMethod(getMaxMQueueID(alarmParameter,sel)+1, -1,0,-1));
+                        alarmParameter.setmQueue(aL,-1);
+
+                    }else{
+                        ArrayList<AlarmMethod> mQ = alarmParameter.getmQueue(-1);
+                        mQ.add(new AlarmMethod(getMaxMQueueID(alarmParameter,-1)+1, -1,0,-1));
+                        alarmParameter.setmQueue(mQ,-1);
+                    }
+
+
 
                 }else{
-                        Toast.makeText(context, "The selected spMethod did not register", Toast.LENGTH_SHORT).show();
 
+                            switch (methodToSet) {
+                                case "math":
 
+                                    Intent iMath = new Intent(context, MathMethodSetActivity.class);
+                                    startActivity(iMath);
+
+                                    break;
+
+                                case "scan_qr_barcode":
+
+                                    Intent iScan = new Intent(context, QRMethodSetActivity.class);
+                                    startActivity(iScan);
+                                    break;
+                                case "location_based":
+
+                                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                        Mapbox.getInstance(EditAlarmActivity.this, getResources().getString(R.string.mapbox_access_token));
+                                        Intent iLoc = new Intent(context, LocationMethodSetActivity.class);
+                                        startActivity(iLoc);
+                                    } else {
+                                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+                                    }
+
+                                    break;
+
+                                case "sudoku":
+                                    Intent iSudoku = new Intent(context, SudokuMethodSetActivity.class);
+                                    startActivity(iSudoku);
+                                    break;
+
+                                case "memory":
+                                    Intent iMemory = new Intent(context, MemoryMethodSetActivity.class);
+                                    startActivity(iMemory);
+                                    break;
+
+                            }
                 }
-
-                mkNewAlarmParam();
-
-
-
             }
         });
 
@@ -540,23 +583,13 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
             @Override
             public void onClick(View v) {
 
-                DBHelper db = new DBHelper(context, "Database.db");
-                Cursor levelData = db.execQuery("SELECT max(id) FROM Alarmlevel", null);
-
-
-                Cursor queueData = db.getData("Methoddatabase");
-
-
-                if (levelData.getCount()>0) {
-                    levelData.moveToNext();
-                    level_id = levelData.getInt(0)+1;
-                }
                 //updating current level with settings
                 SharedPreferences se = getSharedPreferences(getString(R.string.uri_key), MODE_PRIVATE);
 
                 if (editLabel.getText().toString().equals("")) {
                     Toast.makeText(context, "Set a label for the alarm pls", Toast.LENGTH_SHORT).show();
                 } else {
+
                     String lab = editLabel.getText().toString();
                     int amountSnoozes = -2;
                     int timeSnooze = -1;
@@ -566,19 +599,16 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                         timeSnooze = Integer.parseInt(editMinutesSnooze.getText().toString());
                     }
 
-                    String uri = "";
+                    String uri = ""; //todo make this the standard sound uri
                     String name = "";
 
-                    if(se.contains("uri")) uri = se.getString("uri","");
-                    if(se.contains("name")) name = se.getString("name", "");
-
-                    SharedPreferences sp = getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE);
-                    alarmId = sp.getInt("id", 1);
-
-                    db.addLevel(level_id, lab, amountSnoozes, timeSnooze, uri, name, alarmId);
+                    ArrayList<AlarmLevel> aL = alarmParameter.getlQueue();
+                    aL.add(new AlarmLevel(getMaxLQueueID()));
+                    lvlID = aL.size()-1;
+                    alarmParameter.setlQueue(aL, lvlID);
 
 
-                    mkAlarmLevels(adapter);
+                    adapter.setAlarmLevel(alarmParameter.getlQueue());
 
 
                     alarmLevels.setAdapter(adapter);
@@ -634,17 +664,36 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
     }
 
+    private int getMaxLQueueID() {
+        ArrayList<AlarmLevel> aL = alarmParameter.getlQueue();
+        int maxID = 0;
+        for(AlarmLevel m: aL){
+            if(m.getID() > maxID) maxID = m.getID();
+        }
+        return maxID;
+    }
 
+    private int getSelectedLvl() {
+        return this.lvlID;
+    }
 
+    private int getMaxMQueueID(Alarm alarmParameter, int pos) {
 
-
-
+        ArrayList<AlarmMethod> me = alarmParameter.getmQueue(pos);
+        int maxID = 0;
+        for(AlarmMethod m: me){
+            if(m.getId() > maxID){
+                maxID = m.getId();
+            }
+        }
+        return maxID;
+    }
 
 
     @Override
     public void setIfClicked(int levelId) {
-
-        DBHelper db = new DBHelper(context, "Database.db");
+        this.lvlID = levelId;
+        //DBHelper db = new DBHelper(context, "Database.db");
 
         String lab = editLabel.getText().toString();
 
@@ -658,8 +707,6 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
         String sound_path = "";
         String sound_name = "";
-
-        boolean noUri = false;
 
         if(!Objects.equals(curr_uri, null)) sound_path = curr_uri.toString();
         sound_name = txtCurrSoundName.getText().toString();
@@ -718,104 +765,19 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
 
         adapter1 = new QueueRecViewAdapter(context);
-        mkNewAlarmParam();
+        adapter1.setAlarmParameter(alarmParameter);
 
         alarmQueue.setAdapter(adapter1);
         alarmQueue.setLayoutManager(new LinearLayoutManager(context));
 
 
         imgAddMethodPlus = (ImageView) findViewById(R.id.btnMethodPlus);
-        imgAddMethodPlus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                if (adapter1.getItemCount() > 4) {
-                    Toast.makeText(EditAlarmActivity.this, "Do you really need more than 5 methods for this Level?", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                SharedPreferences sP = EditAlarmActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
-                SharedPreferences.Editor sE = sP.edit();
-                sE.putInt("queue_id", level_id); //todo update when doing alarm levels (Knecht)
-                sE.apply();
-
-                switch (methodToSet) {
-                    case "math":
-
-                        Intent iMath = new Intent(context, MathMethodSetActivity.class);
-                        startActivity(iMath);
-
-                        break;
-                    case "tap_off":
-
-                        DBHelper dbHelper = new DBHelper(EditAlarmActivity.this, "Database.db");
-                        int l = db.getMaxTableId("Methoddatabase")+1;
-                        dbHelper.addMethod(l, level_id, 1, -1, -1, "-1", -1);
-
-                        mkNewAlarmParam();
-
-                        adapter1.setAlarmParameter(alarmParameter);
-
-                        break;
-                    case "scan_qr_barcode":
-
-                        Intent iScan = new Intent(context, QRMethodSetActivity.class);
-                        startActivity(iScan);
-                        break;
-                    case "location_based":
-
-                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                            Mapbox.getInstance(EditAlarmActivity.this, getResources().getString(R.string.mapbox_access_token));
-                            Intent iLoc = new Intent(context, LocationMethodSetActivity.class);
-                            startActivity(iLoc);
-                        } else {
-                            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
-                        }
-
-                        break;
-
-                    case "sudoku":
-                        Intent iSudoku = new Intent(context, SudokuMethodSetActivity.class);
-                        startActivity(iSudoku);
-                        break;
-
-                    case "memory":
-                        Intent iMemory = new Intent(context, MemoryMethodSetActivity.class);
-                        startActivity(iMemory);
-                        break;
-
-                }
-
-
-            }
-
-        });
 
 
 
 
     }
-
-
-
-    private void mkAlarmLevels(AlarmLevelAdapter adapter) {
-
-        alarmLevel = new ArrayList<>();
-        DBHelper db = new DBHelper(context, "Database.db");
-        Cursor levelData = db.getData("Alarmlevel");
-
-        if(levelData.getCount()>0){
-            while (levelData.moveToNext()){
-                alarmLevel.add(levelData.getString(0));
-                Log.d("alarm level", " \n"+alarmLevel);
-            }
-        }
-
-        Log.d("alarm level", " \n"+alarmLevel);
-        adapter.setAlarmLevel(alarmLevel);
-    }
-
-
 
     public String translateIdToMethodType(int id){
         String[] tra =  new String[]{"Tap off","Math: ","QR/Barcode","Location: ","Sudoku","Memory","Passphrase"};
@@ -832,7 +794,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         return tra[id-1];
     }
 
-
+/*
     public int getAlarmPosFromId(int m){
         for(int i = 0; i < alarmParameter.size(); i++){
             if (alarmParameter.get(m).getID() == m){
@@ -890,7 +852,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         for(int i = 0; i < ids.size(); i++) {
 
             String metho;
-            String methodType = translateIdToMethodType(methodTypeIds.get(i));;
+            String methodType = translateIdToMethodType(methodTypeIds.get(i));
             String difficult;
 
 
@@ -954,7 +916,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         Log.d("TAGAlarmParameter", "mkNewAlarmParam: "+alarmParameter);
         adapter1.setAlarmParameter(alarmParameter);
 
-    }
+    }*/
 
 
     @Override

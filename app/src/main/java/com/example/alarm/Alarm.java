@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class Alarm implements java.io.Serializable {
 
     private CharSequence t;
-    int ID;
+    int ID,selectedLvl;
 
     //todo extendedPriveleges as a global setting, not per Alarm
     private boolean isActive, snoozable, extraAwakeCheck, hasLevels;
@@ -24,7 +24,7 @@ public class Alarm implements java.io.Serializable {
 
     public Alarm(CharSequence t, int id, String soundPath, boolean isActive, boolean[] weekDays, boolean snoozable, String label,
                  boolean extraAwakeCheck, boolean hasLevels, @Nullable ArrayList<AlarmMethod> mQueue, @Nullable ArrayList<AlarmLevel> lQueue) {
-        this.t = t; //t = time?
+        this.t = t; //t = time
         this.ID = id;
         this.isActive = isActive;
         this.weekDays = weekDays;
@@ -33,6 +33,7 @@ public class Alarm implements java.io.Serializable {
         this.hasLevels = hasLevels;
         if (hasLevels) {
             this.lQueue = lQueue;
+            this.selectedLvl = 0;
         }else{
             this.mQueue = mQueue;
             this.label = label;
@@ -57,7 +58,7 @@ public class Alarm implements java.io.Serializable {
         this.mQueue = new ArrayList<AlarmMethod>();
         this.soundPath = ""; //todo change this to the location of the standard alarm
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); //todo make sure, time is also shown as of now in the spinners
         LocalDateTime now = LocalDateTime.now();
         this.t = dtf.format(now);
     }
@@ -206,8 +207,17 @@ public class Alarm implements java.io.Serializable {
         return lQueue;
     }
 
-    public void setlQueue(ArrayList<AlarmLevel> lQueue) {
+    public void setlQueue(ArrayList<AlarmLevel> lQueue, int selectedlvl) {
         this.lQueue = lQueue;
+        setSelectedLvl(selectedlvl);
+    }
+
+    public int getSelectedLvl() {
+        return selectedLvl;
+    }
+
+    public void setSelectedLvl(int selectedLvl) {
+        this.selectedLvl = selectedLvl;
     }
 
     public String mainMethod(int position){

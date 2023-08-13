@@ -33,6 +33,8 @@ public class AlarmOverViewActivity extends AppCompatActivity {
     private RecyclerView recView;
     private ImageView addAlarm;
     private String path;
+
+    private ArrayList<Alarm> alarms = new ArrayList<>();
     private Context context = this;
 
 

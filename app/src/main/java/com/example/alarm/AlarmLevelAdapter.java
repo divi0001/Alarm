@@ -21,7 +21,7 @@ public class AlarmLevelAdapter extends RecyclerView.Adapter<AlarmLevelAdapter.Vi
 
     EditAlarms mEdit;
 
-    ArrayList<String> alarmLevel = new ArrayList<>();
+    ArrayList<AlarmLevel> alarmLevel = new ArrayList<>();
 
     public AlarmLevelAdapter(Context context, EditAlarms mEdit) {
         this.context = context;
@@ -37,11 +37,11 @@ public class AlarmLevelAdapter extends RecyclerView.Adapter<AlarmLevelAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
-        holder.txtAlarmLevel.setText(alarmLevel.get(position));
+        holder.txtAlarmLevel.setText(alarmLevel.get(position).getLabel());
         holder.txtAlarmLevel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mEdit.setIfClicked(Integer.parseInt(alarmLevel.get(position)));
+                mEdit.setIfClicked(Integer.parseInt(alarmLevel.get(position).getLabel()));
             }
         });
     }
@@ -53,7 +53,7 @@ public class AlarmLevelAdapter extends RecyclerView.Adapter<AlarmLevelAdapter.Vi
 
 
     @SuppressLint("NotifyDataSetChanged")
-    public void setAlarmLevel(ArrayList<String> a){
+    public void setAlarmLevel(ArrayList<AlarmLevel> a){
         this.alarmLevel = a;
         notifyDataSetChanged();
     }

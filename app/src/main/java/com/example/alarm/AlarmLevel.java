@@ -8,14 +8,36 @@ public class AlarmLevel {
     private ArrayList<AlarmMethod> mQueue;
     private String label, soundPath;
     private boolean snoozable, extraAwakeCheck;
+    private int ID;
 
 
-    public AlarmLevel(ArrayList<AlarmMethod> mQueue, String label, String soundPath, boolean snoozable, boolean extraAwakeCheck){
+    public AlarmLevel(int id, ArrayList<AlarmMethod> mQueue, String label, String soundPath, boolean snoozable, boolean extraAwakeCheck){
+        this.ID = id;
         this.mQueue = mQueue;
         this.label = label;
         this.snoozable = snoozable;
         this.soundPath = soundPath;
         this.extraAwakeCheck = extraAwakeCheck;
+    }
+
+    /**
+     * @implNote sets everything to a standard value
+     */
+    public AlarmLevel(int id){
+        this.ID = id;
+        this.mQueue = new ArrayList<>();
+        this.label = "Please set a unique label";
+        this.snoozable = false;
+        this.soundPath = ""; //todo set standard soundpath here
+        this.extraAwakeCheck = false;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
     }
 
     public ArrayList<AlarmMethod> getmQueue() {

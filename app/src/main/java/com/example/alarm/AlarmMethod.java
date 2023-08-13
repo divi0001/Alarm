@@ -92,12 +92,21 @@ public class AlarmMethod {
         return translationDiffList;
     }
 
+    public int getSubType() {
+        return subType;
+    }
+
+    public void setSubType(int subType) {
+        this.subType = subType;
+    }
+
     @Override
     public String toString() {
         return "AlarmMethod{" +
                 "id=" + id +
                 ", difficulty=" + difficulty +
                 ", type=" + type +
+                ", subType=" + subType +
                 ", translationTypeList=" + Arrays.toString(translationTypeList) +
                 ", translationDiffList=" + Arrays.toString(translationDiffList) +
                 '}';
