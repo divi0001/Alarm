@@ -1,3 +1,4 @@
+/*
 package com.example.alarm;
 
 import org.json.JSONArray;
@@ -78,3 +79,5 @@ public class JSONHandler {
     }
 
 }
+*/
+//todo i left this here just in case i need it, if it works the next time, the program is runnable, delete this class

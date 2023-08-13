@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +21,7 @@ import java.util.ArrayList;
 
 public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapter.ViewHolder>{
 
-    private ArrayList<AlarmMethod> alarmMethods;
+    private ArrayList<AlarmMethod> alarmParameter;
     private Context context;
     private ViewHolder holder;
 
@@ -46,9 +45,9 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
         this.holder = holder;
 
 
-        holder.txtId.setText(String.valueOf(alarmMethods.get(position).getId()));
-        holder.txtMethod.setText(alarmMethods.get(position).getType() + toMethod(alarmMethods.get(position).get));
-        holder.txtDifficulty.setText(alarmMethods.get(position).getDifficulty());
+        holder.txtId.setText(String.valueOf(alarmParameter.get(position).getId()));
+        holder.txtMethod.setText(alarmParameter.get(position).getType().toString() + alarmParameter.get(position).getSubType().toString());
+        holder.txtDifficulty.setText(alarmParameter.get(position).getDifficulty().toString());
 
         holder.imgMinusDelete.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("NotifyDataSetChanged")
@@ -66,10 +65,10 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
 
                         DBHelper db = new DBHelper(context, "Database.db");
 
-                        int id = alarmParameter.get(position).getID();
-                        db.deleteRow("Methoddatabase", alarmParameter.get(position).getID());
+                        int id = alarmParameter.get(position).getId();
+                        db.deleteRow("Methoddatabase", alarmParameter.get(position).getId());
 
-                        String table = typeToTable(alarmParameter.get(position).getType());
+                        String table = typeToTable(alarmParameter.get(position).getType().toString());
 
                         if(!table.equals("QRBarcodedatabase") && !table.equals("") && id != -1) db.deleteRow(table, id);
 
@@ -89,23 +88,23 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
             @Override
             public void onClick(View v) {
 
-                String type = alarmParameter.get(position).getType();
+                Enums.Method type = alarmParameter.get(position).getType();
                 Class classType = EditAlarmActivity.class;
 
                 switch (type){
-                    case "Tap Off":
+                    case TapOff:
                         Toast.makeText(context, "What exactly do you want to edit here? :D", Toast.LENGTH_SHORT).show();
                         break;
-                    case "Math: ":
+                    case Math:
                         classType = MathMethodSetActivity.class;
                         break;
-                    case "QR/Barcode":
+                    case QRBar:
                         classType = QRMethodSetActivity.class;
                         break;
-                    case "Sudoku":
+                    case Sudoku:
                         classType = SudokuMethodSetActivity.class;
                         break;
-                    case "Memory":
+                    case Memory:
                         classType = MemoryMethodSetActivity.class;
                         break;
                     default:
@@ -113,7 +112,7 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
                         break;
                 }
 
-                if(type.contains("Location: ")){
+                if(type == Enums.Method.Location){
                     classType = LocationMethodSetActivity.class;
                 }
 
@@ -121,41 +120,27 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
                 iUpdate.putExtra("edit_add","edit");
 
                 switch (type) {
-                    case "Math: ":
-                        iUpdate.putExtra("method", alarmParameter.get(position).getTurnOffMethod());
+                    case Math:
+                        iUpdate.putExtra("method", type.toString());
                         iUpdate.putExtra("difficulty", alarmParameter.get(position).getDifficulty());
                         break;
-                    case "QR/Barcode":
+                    case QRBar:
                         iUpdate.putExtra("label", alarmParameter.get(position).getDifficulty());
-                    case "Sudoku":
+                    case Sudoku:
                         iUpdate.putExtra("difficulty", alarmParameter.get(position).getDifficulty());
                 }
-                if(type.contains("Location: ")) {
-                    double radius = Double.parseDouble(alarmParameter.get(position).getDifficulty().substring(0, alarmParameter.get(position).getDifficulty().indexOf(" "))); //last arg in .substring is exclusive, so no -1 needed
-                    String enter_leave = alarmParameter.get(position).getDifficulty().substring(alarmParameter.get(position).getDifficulty().indexOf("To ")+3);
+                if(type == Enums.Method.Location) {
+                    double radius = alarmParameter.get(position).getLocationRadius(); //last arg in .substring is exclusive, so no -1 needed
+                    String enter_leave = alarmParameter.get(position).getSubType().toString();
                     String ent_lea = enter_leave.substring(0,enter_leave.indexOf(" "));
 
-                    iUpdate.putExtra("street", type.substring(type.indexOf(" ")+1));
+                    iUpdate.putExtra("street", alarmParameter.get(position).getAdress().getSubThoroughfare()); //todo dont you also want stuff like housenumber etc?
                     iUpdate.putExtra("radius",radius);
                     iUpdate.putExtra("enter_leave", ent_lea);
 
 
-                    DBHelper db = new DBHelper(context,"Database.db");
-                    int pos = -1;
-
-                    Cursor c1 = db.getData("Locationdatabase");
-
-                    if(c1.getCount()>0){
-                        while (c1.moveToNext()){
-                            if(c1.getString(7).equals(type.substring(type.indexOf(" ")+1)) && c1.getInt(5) == (int)radius && c1.getString(8).equals(ent_lea)) pos = c1.getInt(0);
-                        }
-                    }
-
-                    iUpdate.putExtra("pos",pos);
-                     //todo meh, there is a better way, but this requires putting an id into locationdatabase
-
                 }
-                iUpdate.putExtra("id",alarmParameter.get(position).getID());
+                iUpdate.putExtra("id",alarmParameter.get(position).getId());
 
 
                 context.startActivity(iUpdate);
@@ -170,6 +155,7 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
         //});
 
     }
+
 
     private String typeToTable(String type) {
 
@@ -195,7 +181,7 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void setAlarmParameter(ArrayList<Alarm> alarmParameter) {
+    public void setAlarmParameter(ArrayList<AlarmMethod> alarmParameter) {
 
         this.alarmParameter = alarmParameter;
         notifyDataSetChanged();

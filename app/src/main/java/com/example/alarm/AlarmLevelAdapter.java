@@ -41,7 +41,7 @@ public class AlarmLevelAdapter extends RecyclerView.Adapter<AlarmLevelAdapter.Vi
         holder.txtAlarmLevel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mEdit.setIfClicked(Integer.parseInt(alarmLevel.get(position).getLabel()));
+                mEdit.setIfClicked(alarmLevel.get(position).getLabel());
             }
         });
     }
@@ -75,7 +75,7 @@ public class AlarmLevelAdapter extends RecyclerView.Adapter<AlarmLevelAdapter.Vi
 
 
     interface EditAlarms{
-        void setIfClicked(int levelId);
+        void setIfClicked(String label);
     }
 
 

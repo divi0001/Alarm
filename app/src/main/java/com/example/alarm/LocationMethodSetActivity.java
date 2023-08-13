@@ -1,5 +1,7 @@
 package com.example.alarm;
 
+import static com.example.alarm.Enums.SubMethod.Enter;
+import static com.example.alarm.Enums.SubMethod.Leave;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
@@ -152,8 +154,6 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     Toast.makeText(LocationMethodSetActivity.this, "This field is empty already", Toast.LENGTH_SHORT).show();
                 }
-
-                Log.d("autoCompletedText", lAddr.toString()); //TODO delete this line eventually, it is here for debugging
                 adapt.setlAddr(lAddr);
 
                 if (adapt.getvC().getVal() != null){
@@ -366,15 +366,15 @@ public class LocationMethodSetActivity extends AppCompatActivity {
         });
 
 
-
         btnGo.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
 
                 if(isLeaveMode) {
-                    radiusMode = "leave";
+                    radiusMode = String.valueOf(Leave);
                 }else{
-                    radiusMode = "enter";
+                    radiusMode = String.valueOf(Enter);
                 }
 
                 SharedPreferences sp = LocationMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
@@ -606,6 +606,7 @@ public class LocationMethodSetActivity extends AppCompatActivity {
         }
         return polygons;
     }
+
 
 
 }

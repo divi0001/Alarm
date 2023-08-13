@@ -18,8 +18,8 @@ public class Alarm implements java.io.Serializable {
     private boolean isActive, snoozable, extraAwakeCheck, hasLevels;
     private String soundPath, label;
     private boolean[] weekDays;
-    private ArrayList<AlarmMethod> mQueue;
-    private ArrayList<AlarmLevel> lQueue;
+    private ArrayList<AlarmMethod> mQueue = new ArrayList<>();
+    private ArrayList<AlarmLevel> lQueue = new ArrayList<>();
 
 
     public Alarm(CharSequence t, int id, String soundPath, boolean isActive, boolean[] weekDays, boolean snoozable, String label,

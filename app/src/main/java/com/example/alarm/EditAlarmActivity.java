@@ -17,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.content.res.XmlResourceParser;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Address;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -63,19 +64,19 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
     private final Context context = this;
     private QueueRecViewAdapter adapter1;
 
-    private Enums.Difficulties difficulty;
+    private Enums.Difficulties difficulty = Enums.Difficulties.None;
     private int alarmId, hour, minute;
     private int level_id = 0;
     private RelativeLayout relLayoutHideable, relLayAddLvls;
-    private Enums.Method methodToSet;
-    private Enums.SubMethod subMethod;
+    private Enums.Method methodToSet = Enums.Method.None;
+    private Enums.SubMethod subMethod = Enums.SubMethod.None;
     private Uri curr_uri;
     AlarmLevelAdapter adapter;
 
-    private Alarm alarmParameter;
+    private Alarm alarmParameter = new Alarm(0);
 
     ArrayList<String> alarmLevel = new ArrayList<>();
-    private int lvlID;
+    private int lvlID = -1;
 
 
     @Override
@@ -392,13 +393,12 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         //todo not entirely sure, if removing mkNewAlarmParms() is right here, but after all, the rest of the code here should update the views right?
         alarmQueue.setAdapter(adapter1);
         alarmQueue.setLayoutManager(new LinearLayoutManager(context));
-
+        adapter1.setAlarmParameter(alarmParameter.getmQueue(lvlID));
 
         imgAddMethodPlus.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-
 
                 if (adapter1.getItemCount() > 5) {
                     Toast.makeText(EditAlarmActivity.this, "Do you really need more than 5 methods for this Level?", Toast.LENGTH_SHORT).show();
@@ -428,19 +428,19 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                 }else{
 
                             switch (methodToSet) {
-                                case "math":
+                                case Math:
 
                                     Intent iMath = new Intent(context, MathMethodSetActivity.class);
                                     startActivity(iMath);
 
                                     break;
 
-                                case "scan_qr_barcode":
+                                case QRBar:
 
                                     Intent iScan = new Intent(context, QRMethodSetActivity.class);
                                     startActivity(iScan);
                                     break;
-                                case "location_based":
+                                case Location:
 
                                     if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                                         Mapbox.getInstance(EditAlarmActivity.this, getResources().getString(R.string.mapbox_access_token));
@@ -452,12 +452,12 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
                                     break;
 
-                                case "sudoku":
+                                case Sudoku:
                                     Intent iSudoku = new Intent(context, SudokuMethodSetActivity.class);
                                     startActivity(iSudoku);
                                     break;
 
-                                case "memory":
+                                case Memory:
                                     Intent iMemory = new Intent(context, MemoryMethodSetActivity.class);
                                     startActivity(iMemory);
                                     break;
@@ -560,8 +560,8 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                 //updating current level with settings
                 SharedPreferences se = getSharedPreferences(getString(R.string.uri_key), MODE_PRIVATE);
 
-                if (editLabel.getText().toString().equals("")) {
-                    Toast.makeText(context, "Set a label for the alarm pls", Toast.LENGTH_SHORT).show();
+                if (editLabel.getText().toString().equals("") || editAmountSnoozes.getText().toString().equals("")||editMinutesSnooze.getText().toString().equals("")) {
+                    Toast.makeText(context, "Data is missing", Toast.LENGTH_SHORT).show();
                 } else {
 
                     String lab = editLabel.getText().toString();
@@ -577,7 +577,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     String name = "";
 
                     ArrayList<AlarmLevel> aL = alarmParameter.getlQueue();
-                    aL.add(new AlarmLevel(getMaxLQueueID()));
+                    aL.add(new AlarmLevel(getMaxLQueueID())); //todo before this, isn't checkAwake settings missing?
                     lvlID = aL.size()-1;
                     alarmParameter.setlQueue(aL, lvlID);
 
@@ -588,9 +588,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     alarmLevels.setAdapter(adapter);
                     alarmLevels.setLayoutManager(new LinearLayoutManager(context));
 
-
-                    alarmParameter = new ArrayList<>();
-                    adapter1.setAlarmParameter(alarmParameter);
+                    adapter1.setAlarmParameter(alarmParameter.getmQueue(lvlID));
 
 
 
@@ -603,8 +601,8 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
     btnAddSaveAlarm.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-
-            if(alarmParameter.size() > 0 && !Objects.equals(null, curr_uri)){
+                    //first condition might be redundant
+            if((alarmParameter.getlQueue().size() > 0 || alarmParameter.getmQueue(-1).size() > 0)&& !Objects.equals(null, curr_uri)){
 
                 DBHelper db = new DBHelper(context, "Database.db");
 
@@ -663,53 +661,57 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         return maxID;
     }
 
-
+    /**
+     * @implNote Specifies what happens, if you click one of the alarm lvl texts
+     * @param label
+     */
     @Override
-    public void setIfClicked(int levelId) {
-        this.lvlID = levelId;
+    public void setIfClicked(String label) {
+
+        for (AlarmLevel lvl: alarmParameter.getlQueue()){
+            if(lvl.getLabel().equals(label)) this.lvlID = lvl.getID();
+        }
+        AlarmLevel currLvl = alarmParameter.getlQueue().get(this.lvlID);
+
+
+
+
+        adapter1.setAlarmParameter(currLvl.getmQueue()); //todo check if this updates the mQueue to the lvl's one
         //DBHelper db = new DBHelper(context, "Database.db");
 
-        String lab = editLabel.getText().toString();
+
 
         int snoozeAmount = -1;
         int snoozeTime = -1;
 
-        if(checkAllowSnooze.isChecked()){
-            snoozeAmount = Integer.parseInt(editAmountSnoozes.getText().toString());
-            snoozeTime = Integer.parseInt(editMinutesSnooze.getText().toString());
+        if(currLvl.isSnoozable()){
+            checkAllowSnooze.setChecked(true);
+            snoozeAmount = currLvl.getSnoozeAmount();
+            snoozeTime = currLvl.getSnoozeMinutes();
+            editAmountSnoozes.setText(Integer.toString(snoozeAmount));
+            editMinutesSnooze.setText(Integer.toString(snoozeTime));
+        }else{
+            checkAllowSnooze.callOnClick();
         }
 
         String sound_path = "";
-        String sound_name = "";
 
-        if(!Objects.equals(curr_uri, null)) sound_path = curr_uri.toString();
-        sound_name = txtCurrSoundName.getText().toString();
-
-        SharedPreferences sp = getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE);
-        alarmId = sp.getInt("id", 1);
-
-        db.editLevel(level_id, alarmId, lab, snoozeAmount, snoozeTime, sound_path, sound_name);
-
-        level_id = levelId;
-
-        Cursor levelData = db.getData("Alarmlevel");
-        if(levelData.getCount() > 0){
-            while (levelData.moveToNext()){
-                if (level_id == levelData.getInt(0)){
-                    editLabel.setText(levelData.getString(1));
-                    if(levelData.getInt(3) == -2){
-                        checkAllowSnooze.setChecked(false);
-                    }else{
-                        editAmountSnoozes.setText(String.valueOf(levelData.getInt(2)));
-                        editMinutesSnooze.setText(String.valueOf(levelData.getInt(3)));
-                    }
-                    if(!Objects.equals(levelData.getString(4), null)) curr_uri = Uri.parse(levelData.getString(4));
-                    txtCurrSoundName.setText(levelData.getString(5));
-
-                }
-            }
+        if(!Objects.equals(currLvl.getLvlSoundPath(), null)){
+            sound_path = currLvl.getLvlSoundPath();
         }
-        mkNewAlarmParam();
+        txtCurrSoundName.setText(sound_path); //todo this might be cause of a bug, there is sound_name apparently, dont remember where that comes from, even though i think it was the same as the path, or depended on something in the setactivity for sounds
+
+
+        int minsUntil = -1;
+
+        if(currLvl.isExtraAwakeCheck()){
+            minsUntil = currLvl.getMinutesUntilTurnBackOn();
+            checkAwake.setChecked(true);
+            editMinutesCheckAwake.setText(Integer.toString(minsUntil));
+        }else{
+            checkAwake.callOnClick();
+        }
+
 
     }
 
@@ -743,25 +745,42 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
             curr_uri = Uri.parse(se.getString("uri", ""));
 
         }
+        ArrayList<AlarmMethod> currMethod;
+        if(alarmParameter.isHasLevels()){
+            AlarmLevel currLevel = alarmParameter.getlQueue().get(lvlID); //todo looks if any of the 3 following values is none, if not, adds/edits the alarm accordingly?
+            currMethod = currLevel.getmQueue();
+        }else{
+            currMethod = alarmParameter.getmQueue(-1);
+        }
 
-        alarmParameter = addAlarm(); //todo looks if any of the 3 following values is none, if not, adds/edits the alarm accordingly?
+
+
+
+
         if(!methodToSet.equals(Enums.Method.None)){ //set it to None now, so the same value wont get added twice todo add the same for the shared prefs
+
+            currMethod.add(new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID), difficulty, methodToSet, subMethod));
+
+            if(!subMethod.equals(Enums.SubMethod.None)){
+                subMethod = Enums.SubMethod.None;
+                //... (yes the above doesn't have to be in the if, but does the shared pref?)
+            }
+
+            if(!difficulty.equals(Enums.Difficulties.None)){
+                difficulty = Enums.Difficulties.None;
+            }
+
             methodToSet = Enums.Method.None;
             //...
-        } //todo check if the value differs, when setting this to none, since this is the same reference (is enum callbyreference?)
+        } //todo check if the value differs, when setting this to none, since this is the same reference (is enum callbyreference?) --> tested in online compiler, no need to worry, if you change the var, the arraylists values dont change aswell
 
-        if(!subMethod.equals(Enums.SubMethod.None)){
-            subMethod = Enums.SubMethod.None;
-            //... (yes the above doesnt have to be in the if, but does the shared pref?)
-        }
 
-        if(!difficulty.equals(Enums.Difficulties.None)){
-            difficulty = Enums.Difficulties.None;
-        }
+
+
 
 
         adapter1 = new QueueRecViewAdapter(context);
-        adapter1.setAlarmParameter(alarmParameter);
+        adapter1.setAlarmParameter(alarmParameter.getmQueue(lvlID));
 
         alarmQueue.setAdapter(adapter1);
         alarmQueue.setLayoutManager(new LinearLayoutManager(context));
@@ -900,6 +919,9 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
             startActivity(iLoc);
         }
     }
+
+
+
 
 
 }

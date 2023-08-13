@@ -1,14 +1,19 @@
 package com.example.alarm;
 
+import android.location.Address;
+
 import java.util.Arrays;
 import java.util.Random;
 
 public class AlarmMethod {
 
+    private double locationRadius;
     private int id;
     private Enums.Difficulties difficulty;
     private Enums.Method method;
     private Enums.SubMethod subMethod;
+
+    private Address adress;
 
     /*
     private final String[] translationTypeList = new String[]{"TapOff", "Math", "QRCode", "Location", "Sudoku", "Memory", "Passphrase"};
@@ -27,12 +32,12 @@ public class AlarmMethod {
 
             if(type == 1) {
                 MathMethodSetActivity math = new MathMethodSetActivity();
-                math.generateExample(translationDiffList[this.difficulty], this.subType); //todo check if snd arg is correct
+                math.generateExample(difficulty.toString(), subMethod.ordinal()); //todo check if snd arg is correct
             } else if (type == 4) {
                 SudokuMethodSetActivity sudo = new SudokuMethodSetActivity();
-                sudo.sudokuToString(sudo.generateSudoku(translationDiffList[difficulty]));
+                sudo.sudokuToString(sudo.generateSudoku(difficulty.toString()));
             } else if (type == 5) {
-                generatePointerMemory(difficulty);
+                generatePointerMemory(difficulty.ordinal());
             }
         }
     }
@@ -73,36 +78,44 @@ public class AlarmMethod {
         this.id = id;
     }
 
-    public int getDifficulty() {
+    public Enums.Difficulties getDifficulty() {
         return difficulty;
     }
 
-    public void setDifficulty(int difficulty) {
+    public void setDifficulty(Enums.Difficulties difficulty) {
         this.difficulty = difficulty;
     }
 
-    public int getType() {
-        return type;
+    public Enums.Method getType() {
+        return this.method;
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setType(Enums.Method type) {
+        this.method = type;
     }
 
-    public String[] getTranslationTypeList() {
-        return translationTypeList;
+    public Enums.SubMethod getSubType() {
+        return subMethod;
     }
 
-    public String[] getTranslationDiffList() {
-        return translationDiffList;
+    public void setSubType(Enums.SubMethod subType) {
+        this.subMethod = subType;
     }
 
-    public int getSubType() {
-        return subType;
+    public Address getAdress() {
+        return adress;
     }
 
-    public void setSubType(int subType) {
-        this.subType = subType;
+    public double getLocationRadius() { //todo this is in no way implemented, just here, to keep away the errors so i can have a bootable app for once, so this will need further coding in locationsetactivity and editalarmactivity
+        return locationRadius;
+    }
+
+    public void setLocationRadius(double locationRadius) {
+        this.locationRadius = locationRadius;
+    }
+
+    public void setAdress(Address adress) {
+        this.adress = adress;
     }
 
     @Override
@@ -110,10 +123,8 @@ public class AlarmMethod {
         return "AlarmMethod{" +
                 "id=" + id +
                 ", difficulty=" + difficulty +
-                ", type=" + type +
-                ", subType=" + subType +
-                ", translationTypeList=" + Arrays.toString(translationTypeList) +
-                ", translationDiffList=" + Arrays.toString(translationDiffList) +
+                ", type=" + method +
+                ", subType=" + subMethod +
                 '}';
     }
 }

@@ -1,14 +1,13 @@
 package com.example.alarm;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class AlarmLevel {
 
     private ArrayList<AlarmMethod> mQueue;
     private String label, soundPath;
     private boolean snoozable, extraAwakeCheck;
-    private int ID;
+    private int ID, snoozeAmount, snoozeMinutes, minutesUntilTurnBackOn;
 
 
     public AlarmLevel(int id, ArrayList<AlarmMethod> mQueue, String label, String soundPath, boolean snoozable, boolean extraAwakeCheck){
@@ -54,6 +53,30 @@ public class AlarmLevel {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public int getSnoozeAmount() {
+        return snoozeAmount;
+    }
+
+    public int getMinutesUntilTurnBackOn() {
+        return minutesUntilTurnBackOn;
+    }
+
+    public void setMinutesUntilTurnBackOn(int minutesUntilTurnBackOn) {
+        this.minutesUntilTurnBackOn = minutesUntilTurnBackOn;
+    }
+
+    public void setSnoozeAmount(int snoozeAmount) {
+        this.snoozeAmount = snoozeAmount;
+    }
+
+    public int getSnoozeMinutes() {
+        return snoozeMinutes;
+    }
+
+    public void setSnoozeMinutes(int snoozeMinutes) {
+        this.snoozeMinutes = snoozeMinutes;
     }
 
     public String getLvlSoundPath() {

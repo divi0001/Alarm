@@ -206,42 +206,41 @@ public class MathMethodSetActivity extends AppCompatActivity {
                     break;
             }
 
-
             switch (meth){
                 case "Subtraction":
-                    this.methodID = 0;
+                    this.methodID = Enums.SubMethod.Sub;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathSub);
                     break;
                 case "Division":
-                    this.methodID = 1;
+                    this.methodID = Enums.SubMethod.Div;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathDiv);
                     break;
                 case "Multiplication":
-                    this.methodID = 2;
+                    this.methodID = Enums.SubMethod.Mult;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathMult);
                     break;
                 case "Root":
-                    this.methodID = 3;
+                    this.methodID = Enums.SubMethod.Root;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathRoot);
                     break;
                 case "Faculty (x!)":
-                    this.methodID = 4;
+                    this.methodID = Enums.SubMethod.Fac;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathFac);
                     break;
                 case "Value for f(x)":
-                    this.methodID = 5;
+                    this.methodID = Enums.SubMethod.FuncVal;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathFuncValue);
                     break;
                 case "Determine extrema of f(x)":
-                    this.methodID = 6;
+                    this.methodID = Enums.SubMethod.Extrema;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathExtrema);
                     break;
                 case "Multiple choice":
-                    this.methodID = 7;
+                    this.methodID = Enums.SubMethod.MultipleChoice;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathMultipleChoice);
                     break;
                 default:
-                    this.methodID = 8;
+                    this.methodID = Enums.SubMethod.None;
                     rbCurrMeth = (RadioButton) findViewById(R.id.rbMethodMathAdd);
                     break;
             }
