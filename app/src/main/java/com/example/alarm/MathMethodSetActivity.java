@@ -32,7 +32,8 @@ public class MathMethodSetActivity extends AppCompatActivity {
     private int posAlarmParam;
     private int spec_id;
     private int id;
-    private int methodID;
+    private Enums.SubMethod methodID;
+    private Enums.Difficulties difficulty;
     private Cursor alarm;
 
 
