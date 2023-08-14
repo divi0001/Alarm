@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class Alarm implements java.io.Serializable {
 
     private CharSequence t;
-    int ID,selectedLvl;
+    int ID,selectedLvl, snoozeAmount, snoozeMinutes, minutesUntilTurnBackOn;
 
     //todo extendedPriveleges as a global setting, not per Alarm
     private boolean isActive, snoozable, extraAwakeCheck, hasLevels;
@@ -93,7 +93,7 @@ public class Alarm implements java.io.Serializable {
      * @return
      */
     public boolean isSnoozable(int position) {
-        if(this.hasLevels) return this.lQueue.get(position).isSnoozable();
+        if(position > -1) return this.lQueue.get(position).isSnoozable();
         return snoozable;
     }
 
@@ -103,7 +103,7 @@ public class Alarm implements java.io.Serializable {
      * @return
      */
     public void setSnoozable(boolean snoozable, int position) {
-        if(this.hasLevels) this.lQueue.get(position).setSnoozable(snoozable);
+        if(position > -1) this.lQueue.get(position).setSnoozable(snoozable);
         else this.snoozable = snoozable;
     }
     /**
@@ -112,7 +112,7 @@ public class Alarm implements java.io.Serializable {
      * @return
      */
     public boolean isExtraAwakeCheck(int position) {
-        if(this.hasLevels) return this.lQueue.get(position).isExtraAwakeCheck();
+        if(position > -1) return this.lQueue.get(position).isExtraAwakeCheck();
         return extraAwakeCheck;
     }
     /**
@@ -121,7 +121,7 @@ public class Alarm implements java.io.Serializable {
      * @return
      */
     public void setExtraAwakeCheck(boolean extraAwakeCheck, int position) {
-        if(this.hasLevels) this.lQueue.get(position).setExtraAwakeCheck(extraAwakeCheck);
+        if(position > -1) this.lQueue.get(position).setExtraAwakeCheck(extraAwakeCheck);
         else this.extraAwakeCheck = extraAwakeCheck;
     }
 
@@ -140,7 +140,7 @@ public class Alarm implements java.io.Serializable {
      * @return
      */
     public String getSoundPath(int position) {
-        if(this.hasLevels) return this.lQueue.get(position).getLvlSoundPath();
+        if(position > -1) return this.lQueue.get(position).getLvlSoundPath();
         return soundPath;
     }
 
@@ -150,7 +150,7 @@ public class Alarm implements java.io.Serializable {
      * @return
      */
     public void setSoundPath(String soundPath, int position) {
-        if(this.hasLevels) this.lQueue.get(position).setLvlSoundPath(soundPath);
+        if(position > -1) this.lQueue.get(position).setLvlSoundPath(soundPath);
         else this.soundPath = soundPath;
     }
 
@@ -160,7 +160,7 @@ public class Alarm implements java.io.Serializable {
      * @return
      */
     public String getLabel(int position) {
-        if(this.hasLevels) return this.lQueue.get(position).getLabel();
+        if(position > -1) return this.lQueue.get(position).getLabel();
         return label;
     }
 
@@ -171,7 +171,7 @@ public class Alarm implements java.io.Serializable {
      */
 
     public void setLabel(String label, int position) {
-        if(this.hasLevels) this.lQueue.get(position).setLabel(label);
+        if(position > -1) this.lQueue.get(position).setLabel(label);
         else this.label = label;
     }
 
@@ -189,7 +189,7 @@ public class Alarm implements java.io.Serializable {
      * @return
      */
     public ArrayList<AlarmMethod> getmQueue(int position) {
-        if(this.hasLevels) return this.lQueue.get(position).getmQueue();
+        if(position > -1) return this.lQueue.get(position).getmQueue();
         return mQueue;
     }
 
@@ -199,7 +199,7 @@ public class Alarm implements java.io.Serializable {
      * @return
      */
     public void setmQueue(ArrayList<AlarmMethod> mQueue, int position) {
-        if(this.hasLevels) this.lQueue.get(position).setmQueue(mQueue);
+        if(position > -1) this.lQueue.get(position).setmQueue(mQueue);
         else this.mQueue = mQueue;
     }
 
@@ -221,10 +221,49 @@ public class Alarm implements java.io.Serializable {
     }
 
     public String mainMethod(int position){
-        if(this.hasLevels) return "Multiple Lvls, first method is "+ this.lQueue.get(position).getmQueue().get(0).toString();
+        if(position > -1) return "Multiple Lvls, first method is "+ this.lQueue.get(position).getmQueue().get(0).toString();
         else if (this.mQueue.size()>1) return "Multiple Methods, fist is " + this.mQueue.get(0).toString();
         else if (this.mQueue.size() == 1) return this.mQueue.get(0).toString();
         else return "No method set yet, default tap off, if nothing is chosen";
+    }
+
+    public int getSnoozeAmount(int pos) {
+        if (pos == -1) return snoozeAmount;
+        return this.lQueue.get(pos).getSnoozeAmount();
+    }
+
+    public void setSnoozeAmount(int snoozeAmount, int pos) {
+        if (pos == -1) this.snoozeAmount = snoozeAmount;
+        else {
+            AlarmLevel lvl = this.lQueue.get(pos);
+            lvl.setSnoozeAmount(snoozeAmount);
+        }
+    }
+
+    public int getSnoozeMinutes(int pos) {
+        if (pos == -1) return snoozeMinutes;
+        return this.lQueue.get(pos).getSnoozeMinutes();
+    }
+
+    public void setSnoozeMinutes(int snoozeMinutes, int pos) {
+        if (pos == -1) this.snoozeMinutes = snoozeMinutes;
+        else {
+            AlarmLevel lvl = this.lQueue.get(pos);
+            lvl.setSnoozeMinutes(snoozeMinutes);
+        }
+    }
+
+    public int getMinutesUntilTurnBackOn(int pos) {
+        if (pos == -1) return minutesUntilTurnBackOn;
+        return this.lQueue.get(pos).getMinutesUntilTurnBackOn(); //todo make sure, the .get does not return errorcodes when calling a submethod on it, but rather the desired return
+    }
+
+    public void setMinutesUntilTurnBackOn(int minutesUntilTurnBackOn, int pos) {
+        if (pos == -1) this.minutesUntilTurnBackOn = minutesUntilTurnBackOn;
+        else{
+            AlarmLevel lvl = this.lQueue.get(pos);
+            lvl.setMinutesUntilTurnBackOn(minutesUntilTurnBackOn);
+        }
     }
 
     public String mainSoundPath(int pos){
@@ -236,6 +275,10 @@ public class Alarm implements java.io.Serializable {
         return "Alarm{" +
                 "t=" + t +
                 ", ID=" + ID +
+                ", selectedLvl=" + selectedLvl +
+                ", snoozeAmount=" + snoozeAmount +
+                ", snoozeMinutes=" + snoozeMinutes +
+                ", minutesUntilTurnBackOn=" + minutesUntilTurnBackOn +
                 ", isActive=" + isActive +
                 ", snoozable=" + snoozable +
                 ", extraAwakeCheck=" + extraAwakeCheck +

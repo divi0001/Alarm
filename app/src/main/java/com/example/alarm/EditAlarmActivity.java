@@ -45,6 +45,7 @@ import com.mapbox.mapboxsdk.Mapbox;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Objects;
 
 public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAdapter.EditAlarms {
@@ -73,7 +74,8 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
     private Uri curr_uri;
     AlarmLevelAdapter adapter;
 
-    private Alarm alarmParameter = new Alarm(0);
+    private Alarm alarmParameter = new Alarm(0); //todo change this to get the id from overViewActivity
+    //todo soundactivity should not use db
 
     ArrayList<String> alarmLevel = new ArrayList<>();
     private int lvlID = -1;
@@ -150,9 +152,37 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 hour = position;
+                String hh;
+                if(hour < 10){
+                    hh = "0"+ hour;
+                }else{
+                    hh = Integer.toString(hour);
+                }
+                CharSequence t = alarmParameter.getT();
+                CharSequence newT = "";
+                newT+=t.subSequence(0,11).toString();
+                newT+= hh;
+                newT+=t.subSequence(13,t.length()).toString();
+                //todo test this
+                alarmParameter.setT(newT);
             }
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            public void onNothingSelected(AdapterView<?> parent) {
+                Calendar c = Calendar.getInstance();
+                hour = c.get(Calendar.HOUR_OF_DAY);
+                String hh;
+                if(hour < 10){
+                    hh = "0"+ hour;
+                }else{
+                    hh = Integer.toString(hour);
+                }
+                CharSequence t = alarmParameter.getT();
+                CharSequence newT = "";
+                newT+=t.subSequence(0,11).toString();
+                newT+= hh;
+                newT+=t.subSequence(13,t.length()).toString();
+                alarmParameter.setT(newT);
+            }
         });
 
         adapt2 = ArrayAdapter.createFromResource(this, R.array.secmins, android.R.layout.simple_spinner_item);
@@ -162,11 +192,36 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 minute = position;
+                String hh;
+                if(minute < 10){
+                    hh = "0"+ minute;
+                }else{
+                    hh = Integer.toString(minute);
+                }
+                CharSequence t = alarmParameter.getT();
+                CharSequence newT = "";
+                newT+=t.subSequence(0,14).toString();
+                newT+= hh;
+                newT+=t.subSequence(16,t.length()).toString();
+                alarmParameter.setT(newT);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                Calendar c = Calendar.getInstance();
+                minute = c.get(Calendar.MINUTE);
+                String hh;
+                if(minute < 10){
+                    hh = "0"+ minute;
+                }else{
+                    hh = Integer.toString(minute);
+                }
+                CharSequence t = alarmParameter.getT();
+                CharSequence newT = "";
+                newT+=t.subSequence(0,14).toString();
+                newT+= hh;
+                newT+=t.subSequence(16,t.length()).toString();
+                alarmParameter.setT(newT);
             }
         });
 
@@ -197,6 +252,13 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     if (!rep.contains("fr")) rep.add("fr");
 
                     a.setVal(rep);
+
+                    boolean[] weekdays = alarmParameter.getWeekDays();
+                    for(int i = 0; i < 5; i++){
+                        weekdays[i] = true;
+                    }
+                    alarmParameter.setWeekDays(weekdays);
+
                 }else{
                     mo.setChecked(false);
                     di.setChecked(false);
@@ -211,6 +273,13 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     rep.remove("fr");
 
                     a.setVal(rep);
+
+                    boolean[] weekdays = alarmParameter.getWeekDays();
+                    for(int i = 0; i < 5; i++){
+                        weekdays[i] = false;
+                    }
+                    alarmParameter.setWeekDays(weekdays);
+
                 }
             }
         });
@@ -232,6 +301,12 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
                     a.setVal(rep);
 
+                    boolean[] weekends = alarmParameter.getWeekDays();
+                    weekends[5] = true;
+                    weekends[6] = true;
+                    alarmParameter.setWeekDays(weekends);
+
+
                 }else{
                     sa.setChecked(false);
                     so.setChecked(false);
@@ -240,6 +315,11 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     rep.remove("so");
 
                     a.setVal(rep);
+
+                    boolean[] weekends = alarmParameter.getWeekDays();
+                    weekends[5] = false;
+                    weekends[6] = false;
+                    alarmParameter.setWeekDays(weekends);
 
                 }
             }
@@ -262,6 +342,9 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     rep.remove("mo");
                 }
                 a.setVal(rep);
+                boolean[] b = alarmParameter.getWeekDays();
+                b[0] = isChecked;
+                alarmParameter.setWeekDays(b);
             }
         });
 
@@ -281,6 +364,9 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     rep.remove("di");
                 }
                 a.setVal(rep);
+                boolean[] b = alarmParameter.getWeekDays();
+                b[1] = isChecked;
+                alarmParameter.setWeekDays(b);
             }
         });
 
@@ -300,6 +386,9 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     rep.remove("mi");
                 }
                 a.setVal(rep);
+                boolean[] b = alarmParameter.getWeekDays();
+                b[2] = isChecked;
+                alarmParameter.setWeekDays(b);
             }
         });
 
@@ -319,6 +408,9 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     rep.remove("thu");
                 }
                 a.setVal(rep);
+                boolean[] b = alarmParameter.getWeekDays();
+                b[3] = isChecked;
+                alarmParameter.setWeekDays(b);
             }
         });
 
@@ -338,7 +430,9 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     rep.remove("fr");
                 }
                 a.setVal(rep);
-
+                boolean[] b = alarmParameter.getWeekDays();
+                b[4] = isChecked;
+                alarmParameter.setWeekDays(b);
             }
         });
 
@@ -358,6 +452,9 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     rep.remove("sa");
                 }
                 a.setVal(rep);
+                boolean[] b = alarmParameter.getWeekDays();
+                b[5] = isChecked;
+                alarmParameter.setWeekDays(b);
             }
         });
 
@@ -377,6 +474,9 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     rep.remove("so");
                 }
                 a.setVal(rep);
+                boolean[] b = alarmParameter.getWeekDays();
+                b[6] = isChecked;
+                alarmParameter.setWeekDays(b);
             }
         });
 
@@ -410,7 +510,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                 edi.apply();
                 if(methodToSet.equals(Enums.Method.TapOff)) {
 
-                    if(alarmParameter.isHasLevels()){
+                    if(alarmParameter.isHasLevels() && alarmParameter.getlQueue().size()>0){
 
                         //todo while this might be redundant and be removed later, also make sure to update the selected lvl here
                         int sel = getSelectedLvl();
@@ -489,8 +589,58 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     imgBtnDownSnooze.setVisibility(View.INVISIBLE);
                     relLayoutHideable.setVisibility(View.INVISIBLE);
                 }
+                alarmParameter.setSnoozable(isChecked, lvlID);
             }
         });
+
+        editMinutesSnooze.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    try{
+                        editMinutesSnooze.setText(String.valueOf(Integer.parseInt(editMinutesSnooze.getText().toString()))); //multiple parses here to make sure an
+                        //invalid input would cause an exception and the text to be rewritten
+
+                        alarmParameter.setSnoozeMinutes(Integer.parseInt(editMinutesSnooze.getText().toString()), lvlID);
+                    }catch (Exception e){
+                        editMinutesSnooze.setText("1");
+                        alarmParameter.setSnoozeMinutes(1, lvlID);
+                    }
+                }
+            }
+        });
+
+        editAmountSnoozes.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus){
+                    try{
+                        editAmountSnoozes.setText(String.valueOf(Integer.parseInt(editAmountSnoozes.getText().toString())));
+                        alarmParameter.setSnoozeAmount(Integer.parseInt(editAmountSnoozes.getText().toString()), lvlID);
+                    } catch (Exception e){
+                        editAmountSnoozes.setText("-1");
+                        alarmParameter.setSnoozeAmount(-1,lvlID);
+                    }
+                }
+            }
+        });
+
+        editMinutesCheckAwake.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus){
+                    try {
+                        editMinutesCheckAwake.setText(String.valueOf(Integer.parseInt(editMinutesCheckAwake.getText().toString())));
+                        alarmParameter.setMinutesUntilTurnBackOn(Integer.parseInt(editMinutesCheckAwake.getText().toString()), lvlID);
+                    }catch (Exception e){
+                        editMinutesCheckAwake.setText("1");
+                        alarmParameter.setMinutesUntilTurnBackOn(1,lvlID);
+                    }
+                }
+            }
+        });
+
+
         imgBtnDownSnooze.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -527,6 +677,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                 }else{
                     editMinutesCheckAwake.setVisibility(View.INVISIBLE);
                 }
+                alarmParameter.setExtraAwakeCheck(isChecked, lvlID);
             }
         });
 
@@ -539,6 +690,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                 }else{
                     relLayAddLvls.setVisibility(View.INVISIBLE);
                 }
+                alarmParameter.setHasLevels(isChecked);
             }
         });
 
@@ -557,28 +709,44 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
             @Override
             public void onClick(View v) {
 
-                //updating current level with settings
+                //initializing current level w.r.t. alarmParameter
                 SharedPreferences se = getSharedPreferences(getString(R.string.uri_key), MODE_PRIVATE);
 
                 if (editLabel.getText().toString().equals("") || editAmountSnoozes.getText().toString().equals("")||editMinutesSnooze.getText().toString().equals("")) {
                     Toast.makeText(context, "Data is missing", Toast.LENGTH_SHORT).show();
                 } else {
 
+                    ArrayList<AlarmLevel> aL = alarmParameter.getlQueue();
+                    aL.add(new AlarmLevel(getMaxLQueueID()));
+                    lvlID = aL.size()-1;
+                    AlarmLevel newLvl = aL.get(lvlID);
+
                     String lab = editLabel.getText().toString();
+
+                    newLvl.setLabel(lab);
+
                     int amountSnoozes = -2;
                     int timeSnooze = -1;
-
+                    newLvl.setSnoozable(checkAllowSnooze.isChecked());
                     if(checkAllowSnooze.isChecked()) {
                         amountSnoozes = Integer.parseInt(editAmountSnoozes.getText().toString());
                         timeSnooze = Integer.parseInt(editMinutesSnooze.getText().toString());
+                        newLvl.setSnoozeMinutes(timeSnooze);
+                        newLvl.setSnoozeAmount(amountSnoozes);
                     }
 
-                    String uri = ""; //todo make this the standard sound uri
+
+                    String uri = ""; //todo make this the standard sound uri & update it
                     String name = "";
 
-                    ArrayList<AlarmLevel> aL = alarmParameter.getlQueue();
-                    aL.add(new AlarmLevel(getMaxLQueueID())); //todo before this, isn't checkAwake settings missing?
-                    lvlID = aL.size()-1;
+                    newLvl.setLvlSoundPath(uri);
+
+                    newLvl.setExtraAwakeCheck(checkAwake.isChecked());
+                    if(checkAwake.isChecked()) newLvl.setMinutesUntilTurnBackOn(Integer.parseInt(editMinutesCheckAwake.getText().toString()));
+                    aL.add(lvlID, newLvl);
+
+                     //todo before this, isn't checkAwake settings missing?
+
                     alarmParameter.setlQueue(aL, lvlID);
 
 
@@ -629,7 +797,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
 
 
-
+    updateViews();
 
 
 
@@ -673,13 +841,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         }
         AlarmLevel currLvl = alarmParameter.getlQueue().get(this.lvlID);
 
-
-
-
         adapter1.setAlarmParameter(currLvl.getmQueue()); //todo check if this updates the mQueue to the lvl's one
-        //DBHelper db = new DBHelper(context, "Database.db");
-
-
 
         int snoozeAmount = -1;
         int snoozeTime = -1;
@@ -711,8 +873,6 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         }else{
             checkAwake.callOnClick();
         }
-
-
     }
 
 
@@ -746,7 +906,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
         }
         ArrayList<AlarmMethod> currMethod;
-        if(alarmParameter.isHasLevels()){
+        if(lvlID > -1){
             AlarmLevel currLevel = alarmParameter.getlQueue().get(lvlID); //todo looks if any of the 3 following values is none, if not, adds/edits the alarm accordingly?
             currMethod = currLevel.getmQueue();
         }else{
@@ -790,6 +950,41 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
 
 
+
+        updateViews();
+    }
+
+    private void updateViews() {
+        adapter1.setAlarmParameter(alarmParameter.getmQueue(lvlID));
+        CharSequence prevT = alarmParameter.getT();
+        int hh = Integer.parseInt(prevT.subSequence(11,13).toString());
+        int mm = Integer.parseInt(prevT.subSequence(14,16).toString()); //todo make sure the indexes are right with the yyyy-mm-dd hh:mm:ss format
+        spHours.setSelection(hh);
+        spMins.setSelection(mm);
+        boolean[] b = alarmParameter.getWeekDays();
+        CheckBox[] checks = new CheckBox[]{mo,di,mi,thu,fr,sa,so};
+        int g = 0;
+        for (boolean b1: b){
+            checks[g].setChecked(b1);
+            g++;
+        }
+
+        txtCurrSoundName.setText(alarmParameter.getSoundPath(lvlID));
+        if (checkAllowSnooze.isChecked() != alarmParameter.isSnoozable(lvlID)) checkAllowSnooze.callOnClick();
+        if(alarmParameter.isSnoozable(lvlID)){ //todo stricter conditions to have coherent lvldata
+            editAmountSnoozes.setText(alarmParameter.getSnoozeAmount(lvlID));
+            editMinutesSnooze.setText(alarmParameter.getSnoozeMinutes(lvlID));
+        }
+
+        editLabel.setText(alarmParameter.getLabel(lvlID));
+
+        if(checkAwake.isChecked() != alarmParameter.isExtraAwakeCheck(lvlID)) checkAwake.callOnClick();
+        if(alarmParameter.isExtraAwakeCheck(lvlID)) editMinutesCheckAwake.setText(alarmParameter.getMinutesUntilTurnBackOn(lvlID));
+
+        if (checkAlarmLvls.isChecked() != alarmParameter.isHasLevels()){
+            checkAlarmLvls.callOnClick(); //todo make sure none of the callOnClick ends in an endless recursion or resetting values wrong
+        }
+        //todo what is with privilege rights? did i remove it, so should i delete the view?
 
 
     }

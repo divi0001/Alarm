@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".EditAlarmActivity">
 
-
+<!-- TODO make checkboxes always appear on the left side of the option they are toggling-->
 
     <ScrollView
         android:layout_width="wrap_content"
