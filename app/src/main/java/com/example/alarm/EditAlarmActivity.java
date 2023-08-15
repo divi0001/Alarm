@@ -1,5 +1,9 @@
 package com.example.alarm;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -510,18 +515,14 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                 edi.apply();
                 if(methodToSet.equals(Enums.Method.TapOff)) {
 
-                    if(alarmParameter.isHasLevels() && alarmParameter.getlQueue().size()>0){
-
-                        //todo while this might be redundant and be removed later, also make sure to update the selected lvl here
-                        int sel = getSelectedLvl();
-                        alarmParameter.setSelectedLvl(sel);
-                        ArrayList<AlarmMethod> aL = alarmParameter.getmQueue(sel);
-                        aL.add(new AlarmMethod(getMaxMQueueID(alarmParameter,sel)+1, Enums.Difficulties.None, Enums.Method.TapOff, Enums.SubMethod.None));
+                    if(alarmParameter.getlQueue().size()>0){ //referential problems solved ^^
+                        ArrayList<AlarmMethod> aL = (ArrayList<AlarmMethod>) alarmParameter.getmQueue(-1).clone();
+                        aL.add(new AlarmMethod(getMaxMQueueID(alarmParameter,lvlID)+1, Enums.Difficulties.None, Enums.Method.TapOff, Enums.SubMethod.None));
                         alarmParameter.setmQueue(aL,-1);
 
                     }else{
                         ArrayList<AlarmMethod> mQ = alarmParameter.getmQueue(-1);
-                        mQ.add(new AlarmMethod(getMaxMQueueID(alarmParameter,-1)+1, Enums.Difficulties.None, Enums.Method.TapOff, Enums.SubMethod.None));
+                        mQ.add(new AlarmMethod(getMaxMQueueID(alarmParameter,lvlID)+1, Enums.Difficulties.None, Enums.Method.TapOff, Enums.SubMethod.None));
                         alarmParameter.setmQueue(mQ,-1);
                     }
 
@@ -531,6 +532,25 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                                 case Math:
 
                                     Intent iMath = new Intent(context, MathMethodSetActivity.class);
+                                    iMath.putExtra("edit_add", "add");
+                                    ActivityResultLauncher<Intent> mathResLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                                            new ActivityResultCallback<ActivityResult>() {
+                                                @Override
+                                                public void onActivityResult(ActivityResult result) {
+                                                    if(result.getResultCode() == Activity.RESULT_OK){
+                                                        Bundle data = getIntent().getExtras();
+                                                        //todo what if return data is null?
+                                                        try {
+                                                            AlarmMethod met = (AlarmMethod) data.getParcelable("MathMethod");
+                                                            alarmParameter.getmQueue(-1).add(met); //todo check if this works?
+
+                                                        }catch (Exception ignored){
+
+                                                        }
+
+                                                    }
+                                                }
+                                            });
                                     startActivity(iMath);
 
                                     break;
@@ -711,14 +731,22 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
                 //initializing current level w.r.t. alarmParameter
                 SharedPreferences se = getSharedPreferences(getString(R.string.uri_key), MODE_PRIVATE);
+                boolean skip = false;
+                for (AlarmLevel lv: alarmParameter.getlQueue()){
+                    if(lv.getLabel().equals(editLabel.getText().toString())){
+                        Toast.makeText(context, "Please choose a unique label", Toast.LENGTH_SHORT).show();
+                        skip = true;
+                    }
+                }
 
-                if (editLabel.getText().toString().equals("") || editAmountSnoozes.getText().toString().equals("")||editMinutesSnooze.getText().toString().equals("")) {
+                if (editLabel.getText().toString().equals("") || (checkAllowSnooze.isChecked()&&(editAmountSnoozes.getText().toString().equals("")||editMinutesSnooze.getText().toString().equals("")))||(checkAwake.isChecked()&& editMinutesCheckAwake.getText().toString().equals(""))||skip) {
                     Toast.makeText(context, "Data is missing", Toast.LENGTH_SHORT).show();
                 } else {
 
                     ArrayList<AlarmLevel> aL = alarmParameter.getlQueue();
-                    aL.add(new AlarmLevel(getMaxLQueueID()));
-                    lvlID = aL.size()-1;
+                    lvlID = getMaxLQueueID()+1;
+                    aL.add(new AlarmLevel(getMaxLQueueID()+1));
+
                     AlarmLevel newLvl = aL.get(lvlID);
 
                     String lab = editLabel.getText().toString();
@@ -741,11 +769,12 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
                     newLvl.setLvlSoundPath(uri);
 
+                    newLvl.setmQueue(alarmParameter.getmQueue(-1));
+
                     newLvl.setExtraAwakeCheck(checkAwake.isChecked());
                     if(checkAwake.isChecked()) newLvl.setMinutesUntilTurnBackOn(Integer.parseInt(editMinutesCheckAwake.getText().toString()));
-                    aL.add(lvlID, newLvl);
+                    aL.set(lvlID, newLvl);
 
-                     //todo before this, isn't checkAwake settings missing?
 
                     alarmParameter.setlQueue(aL, lvlID);
 
@@ -806,7 +835,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
     private int getMaxLQueueID() {
         ArrayList<AlarmLevel> aL = alarmParameter.getlQueue();
-        int maxID = 0;
+        int maxID = -1;
         for(AlarmLevel m: aL){
             if(m.getID() > maxID) maxID = m.getID();
         }
@@ -837,12 +866,12 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
     public void setIfClicked(String label) {
 
         for (AlarmLevel lvl: alarmParameter.getlQueue()){
-            if(lvl.getLabel().equals(label)) this.lvlID = lvl.getID();
+            if(lvl.getLabel().equals(label)) EditAlarmActivity.this.lvlID = lvl.getID();
         }
         AlarmLevel currLvl = alarmParameter.getlQueue().get(this.lvlID);
 
         adapter1.setAlarmParameter(currLvl.getmQueue()); //todo check if this updates the mQueue to the lvl's one
-
+        Log.d("currentAlarmParam", alarmParameter.getlQueue().toString() + " ,\nlvlID: " + lvlID);
         int snoozeAmount = -1;
         int snoozeTime = -1;
 

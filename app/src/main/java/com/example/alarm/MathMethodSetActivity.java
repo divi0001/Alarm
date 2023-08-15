@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -72,16 +73,21 @@ public class MathMethodSetActivity extends AppCompatActivity {
                 if ("Extremely easy".contentEquals(text)) {
                     kindOfMath = rgKindOfMath.getCheckedRadioButtonId();
                     txtExample.setText(generateExample("exEasy", kindOfMath));
+                    difficulty = Enums.Difficulties.ExEasy;
                 } else if ("Easy".contentEquals(text)) {
+                    difficulty = Enums.Difficulties.Easy;
                     kindOfMath = rgKindOfMath.getCheckedRadioButtonId();
                     txtExample.setText(generateExample("easy", kindOfMath));
                 } else if ("Middle".contentEquals(text)) {
+                    difficulty = Enums.Difficulties.Middle;
                     kindOfMath = rgKindOfMath.getCheckedRadioButtonId();
                     txtExample.setText(generateExample("middle", kindOfMath));
                 } else if ("Hard".contentEquals(text)) {
+                    difficulty = Enums.Difficulties.Hard;
                     kindOfMath = rgKindOfMath.getCheckedRadioButtonId();
                     txtExample.setText(generateExample("hard", kindOfMath));
                 } else if ("Extremely hard".contentEquals(text)) {
+                    difficulty = Enums.Difficulties.ExHard;
                     kindOfMath = rgKindOfMath.getCheckedRadioButtonId();
                     txtExample.setText(generateExample("exHard", kindOfMath));
                 }
@@ -98,45 +104,20 @@ public class MathMethodSetActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                Context context = MathMethodSetActivity.this;
-
-                                DBHelper db = new DBHelper(context, "Database.db");
-
-                                RadioButton rbMeth = findViewById(rgKindOfMath.getCheckedRadioButtonId());
-                                RadioButton rbDiff = findViewById(rgDifficulty.getCheckedRadioButtonId());
+                                SharedPreferences sp = MathMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
+                                int queueId = sp.getInt("queue_id",-1); //todo (threeDots in EditAlarm)
 
 
                                 if(edit){
 
-
-                                    db.editMethoddatabase(1,2,
-                                            db.findIdByMethod(rbMeth.getText().toString())-1, db.findIdByDifficulty(rbDiff.getText().toString())-1, "-1", spec_id, id);
+                                    Parcelable p = new AlarmMethod(queueId, difficulty, Enums.Method.Math, methodID);
+                                    getIntent().putExtra("MathMethod", p);
                                     finish();
 
                                 }else {
 
-
-
-                                    db.addMath(rbMeth.getText().toString(), rbDiff.getText().toString());
-
-                                    Cursor c = db.getData("Mathdatabase");
-                                    int lastId = 0;
-                                    if (c.getCount() > 0) {
-                                        while (c.moveToNext()) {
-                                            lastId = c.getInt(0);
-                                        }
-                                    }
-
-                                    db = new DBHelper(context, "Database.db");
-
-                                    SharedPreferences sp = MathMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
-                                    int queueId = sp.getInt("queue_id",-1);
-
-                                    int l = db.getMaxTableId("Methoddatabase")+1;
-
-                                    db.addMethod(l, queueId, db.findIdByMethodType("math"), db.findIdByMethod(rbMeth.getText().toString())-1, db.findIdByDifficulty(rbDiff.getText().toString())-1, null, lastId);
-                                    Log.d("math", String.valueOf(l));
-
+                                    Parcelable p = new AlarmMethod(difficulty, Enums.Method.Math, methodID);
+                                    getIntent().putExtra("MathMethod", p);
                                     finish();
                                 }
 
@@ -149,6 +130,20 @@ public class MathMethodSetActivity extends AppCompatActivity {
                             }
                         });
                         builder.create().show();
+            }
+        });
+
+        rgKindOfMath.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                RadioButton rb = new RadioButton(MathMethodSetActivity.this);
+                rb = findViewById(checkedId);
+                int i = 0;
+                for (String s: new String[]{"Add", "Sub", "Mult", "Division", "Fac", "Root", "Value", "extrema", "Multiple"}){
+                    if (rb.getText().toString().contains(s)) break;
+                    i++;
+                }
+                methodID = Enums.SubMethod.values()[i];
             }
         });
 
@@ -169,39 +164,28 @@ public class MathMethodSetActivity extends AppCompatActivity {
             id = getIntent().getIntExtra("id",-1);
 
 
-            DBHelper db = new DBHelper(MathMethodSetActivity.this, "Database.db");
-            alarm = db.getData("Methoddatabase");
-
-
-            if(alarm.getCount() >0){
-                while(alarm.moveToNext()){
-
-                    if(id == alarm.getInt(0)){
-                        spec_id = alarm.getInt(6);
-                        break;
-                    }
-
-                }
-            }
-
-
 
             RadioButton rbCurrDiff, rbCurrMeth;
 
             switch (diff){
                 case "extremely easy":
+                    difficulty = Enums.Difficulties.ExEasy;
                     rbCurrDiff = (RadioButton) findViewById(R.id.rbExEasy);
                     break;
                 case "easy":
+                    difficulty = Enums.Difficulties.Easy;
                     rbCurrDiff = (RadioButton) findViewById(R.id.rbEasy);
                     break;
                 case "hard":
+                    difficulty = Enums.Difficulties.Hard;
                     rbCurrDiff = (RadioButton) findViewById(R.id.rbHard);
                     break;
                 case "extremely hard":
+                    difficulty = Enums.Difficulties.ExHard;
                     rbCurrDiff = (RadioButton) findViewById(R.id.rbExHard);
                     break;
                 default:
+                    difficulty = Enums.Difficulties.Middle;
                     rbCurrDiff = (RadioButton) findViewById(R.id.rbMiddle);
                     break;
             }

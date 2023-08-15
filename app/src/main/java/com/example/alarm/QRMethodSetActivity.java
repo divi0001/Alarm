@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -89,8 +90,8 @@ public class QRMethodSetActivity extends AppCompatActivity {
                 if(getIntent().hasExtra("label") && getIntent().hasExtra("edit_add") && getIntent().hasExtra("id")){
                     int row_id = getIntent().getIntExtra("id",-1);
 
-
-                    db.editMethoddatabase(queueId, 2, -1, -1, editLabel.getText().toString(), -1, row_id);
+                    Parcelable p = new AlarmMethod(row_id, Enums.Method.QRBar, txtDecode.getText().toString(), editLabel.getText().toString());
+                    getIntent().putExtra("QRMethod", p);
                     finish();
                 }else {
 

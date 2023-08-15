@@ -1,5 +1,7 @@
 package com.example.alarm;
 
+import android.util.Log;
+
 import androidx.annotation.Nullable;
 
 import java.time.LocalDateTime;
@@ -199,7 +201,8 @@ public class Alarm implements java.io.Serializable {
      * @return
      */
     public void setmQueue(ArrayList<AlarmMethod> mQueue, int position) {
-        if(position > -1) this.lQueue.get(position).setmQueue(mQueue);
+        if(position > -1){ this.lQueue.get(position).setmQueue(mQueue);
+            Log.d("currentAlarmParamSetAlarmMQ", lQueue.toString()+position);}
         else this.mQueue = mQueue;
     }
 

@@ -1,18 +1,23 @@
 package com.example.alarm;
 
 import android.location.Address;
+import android.os.Parcel;
+import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
+import java.lang.invoke.MethodHandle;
 import java.util.Arrays;
 import java.util.Random;
 
-public class AlarmMethod {
+public class AlarmMethod implements Parcelable {
 
     private double locationRadius;
     private int id;
     private Enums.Difficulties difficulty;
     private Enums.Method method;
     private Enums.SubMethod subMethod;
-
+    private String qr_decoded, qrLabel;
     private Address adress;
 
     /*
@@ -26,6 +31,48 @@ public class AlarmMethod {
         this.method = method;
         this.subMethod = subMethod;
     }
+
+    public AlarmMethod(Enums.Difficulties diff, Enums.Method meth, Enums.SubMethod subMeth){
+        this.difficulty = diff;
+        this.method = meth;
+        this.subMethod = subMeth;
+        this.id = -1; //todo?
+    }
+
+    public AlarmMethod(int id, Enums.Method method, Enums.SubMethod subMethod, Address address, int radius){
+        this.id = id;
+        this.method = method;
+        this.subMethod = subMethod;
+        this.adress = address;
+        this.locationRadius = radius;
+
+    }
+
+    public AlarmMethod(int id, Enums.Method method, String QRBar, String QRLabel){
+        this.id = id;
+        this.method = method;
+        this.qr_decoded = QRBar;
+        this.qrLabel = QRLabel;
+    }
+
+    protected AlarmMethod(Parcel in) {
+        locationRadius = in.readDouble();
+        id = in.readInt();
+        adress = in.readParcelable(Address.class.getClassLoader());
+    }
+
+
+    public static final Creator<AlarmMethod> CREATOR = new Creator<AlarmMethod>() {
+        @Override
+        public AlarmMethod createFromParcel(Parcel in) {
+            return new AlarmMethod(in);
+        }
+
+        @Override
+        public AlarmMethod[] newArray(int size) {
+            return new AlarmMethod[size];
+        }
+    };
 
     public void calcExample(int type){
         if(!(type == 0) && !(type == 2) && !(type == 3) && !(type == 6) ){
@@ -118,13 +165,45 @@ public class AlarmMethod {
         this.adress = adress;
     }
 
+    public String getQr_decoded() {
+        return qr_decoded;
+    }
+
+    public void setQr_decoded(String qr_decoded) {
+        this.qr_decoded = qr_decoded;
+    }
+
+    public String getQrLabel() {
+        return qrLabel;
+    }
+
+    public void setQrLabel(String qrLabel) {
+        this.qrLabel = qrLabel;
+    }
+
     @Override
     public String toString() {
         return "AlarmMethod{" +
-                "id=" + id +
+                "locationRadius=" + locationRadius +
+                ", id=" + id +
                 ", difficulty=" + difficulty +
-                ", type=" + method +
-                ", subType=" + subMethod +
+                ", method=" + method +
+                ", subMethod=" + subMethod +
+                ", qr_decoded='" + qr_decoded + '\'' +
+                ", qrLabel='" + qrLabel + '\'' +
+                ", adress=" + adress +
                 '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeDouble(locationRadius);
+        dest.writeInt(id);
+        dest.writeParcelable(adress, flags);
     }
 }

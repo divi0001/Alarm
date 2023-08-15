@@ -17,6 +17,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -121,7 +122,7 @@ public class LocationMethodSetActivity extends AppCompatActivity {
         if(getIntent().hasExtra("edit_add") && getIntent().hasExtra("id")) {
 
             edit = getIntent().getStringExtra("edit_add").equals("edit");
-            id = getIntent().getIntExtra("id", -1);
+            id = getIntent().getIntExtra("id", -1); //todo update in editalarmactivity
 
             txtKm.setText(String.valueOf((int)(getIntent().getDoubleExtra("radius", 600.0))));
             if(getIntent().getStringExtra("enter_leave").equals("enter")){
@@ -272,7 +273,7 @@ public class LocationMethodSetActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 // km int usable yay
 
-
+                //todo ????
 
             }
         });
@@ -382,18 +383,19 @@ public class LocationMethodSetActivity extends AppCompatActivity {
 
                 if(edit){
                     int pos = getIntent().getIntExtra("pos",-1);
-                    if(pos == -1) finish();
+                    if(pos == -1) finish(); //??
 
-                    DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Database.db");
-                    Cursor c = db.getData("Locationdatabase");
+
                     if(addr != null) {
-                        db.editLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, addr.getThoroughfare(), radiusMode, pos);
+                        Parcelable p = new AlarmMethod(id, Enums.Method.Location, Enums.SubMethod.valueOf(radiusMode), addr, (int) radius);
+                        getIntent().putExtra("LocationMethod", p);
                         finish();
                     }else{
                         Geocoder g = new Geocoder(LocationMethodSetActivity.this);
                         try {
                             addr = g.getFromLocation(latitude, longitude, 1).get(0);
-                            db.editLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, addr.getThoroughfare(), radiusMode, pos);
+                            Parcelable p = new AlarmMethod(id, Enums.Method.Location, Enums.SubMethod.valueOf(radiusMode), addr, (int) radius);
+                            getIntent().putExtra("LocationMethod", p);
 
                             finish();
 
@@ -408,27 +410,18 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                         Geocoder g = new Geocoder(LocationMethodSetActivity.this);
                         try {
                             addr = g.getFromLocation(latitude, longitude, 1).get(0);
-                            DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Database.db");
-
-
-                            long specificId = db.addLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius, addr.getThoroughfare(), radiusMode);
-
-                            int l = db.getMaxTableId("Methoddatabase")+1;
-
-                            db.addMethod(l, queueId, 3, -1, -1, "-1", (int) specificId);
-                            //TODO: make sure radius is consistently updated
+                            Parcelable p = new AlarmMethod(id, Enums.Method.Location, Enums.SubMethod.valueOf(radiusMode), addr, (int) radius);
+                            getIntent().putExtra("LocationMethod", p);
                             finish();
+                            //todo id prolly needs updating the parcel from above
+
                         } catch (IOException e) {
                             Toast.makeText(LocationMethodSetActivity.this, "Couldn't find a valid location at your click", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        DBHelper db = new DBHelper(LocationMethodSetActivity.this, "Database.db");
-                        long specificId = db.addLocation((int) latitude, getDecFromDouble(latitude), (int) longitude, getDecFromDouble(longitude), (int) radius,
-                                addr.getThoroughfare(), radiusMode);
 
-                        int l = db.getMaxTableId("Methoddatabase")+1;
-
-                        db.addMethod(l, queueId, 3, -1, -1, "-1", (int) specificId);
+                        Parcelable p = new AlarmMethod(id, Enums.Method.Location, Enums.SubMethod.valueOf(radiusMode), addr, (int) radius);
+                        getIntent().putExtra("LocationMethod", p);
                         finish();
                     }
                 }

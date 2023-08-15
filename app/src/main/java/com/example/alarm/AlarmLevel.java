@@ -106,11 +106,15 @@ public class AlarmLevel {
     @Override
     public String toString() {
         return "AlarmLevel{" +
-                "mQueue=" + mQueue +
+                "ID=" + ID +
+                ", mQueue=" + mQueue +
                 ", label='" + label + '\'' +
                 ", soundPath='" + soundPath + '\'' +
                 ", snoozable=" + snoozable +
                 ", extraAwakeCheck=" + extraAwakeCheck +
+                ", snoozeAmount=" + snoozeAmount +
+                ", snoozeMinutes=" + snoozeMinutes +
+                ", minutesUntilTurnBackOn=" + minutesUntilTurnBackOn +
                 '}';
     }
 }
