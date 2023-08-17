@@ -3,6 +3,7 @@ package com.example.alarm;
 import android.location.Address;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -10,14 +11,14 @@ import java.lang.invoke.MethodHandle;
 import java.util.Arrays;
 import java.util.Random;
 
-public class AlarmMethod implements Parcelable {
+public class AlarmMethod {
 
     private double locationRadius;
     private int id;
     private Enums.Difficulties difficulty;
     private Enums.Method method;
     private Enums.SubMethod subMethod;
-    private String qr_decoded, qrLabel;
+    private String qrLabel;
     private Address adress;
 
     /*
@@ -43,36 +44,24 @@ public class AlarmMethod implements Parcelable {
         this.id = id;
         this.method = method;
         this.subMethod = subMethod;
+        this.difficulty = Enums.Difficulties.None;
         this.adress = address;
         this.locationRadius = radius;
 
     }
 
-    public AlarmMethod(int id, Enums.Method method, String QRBar, String QRLabel){
+    public AlarmMethod(int id, Enums.Method method, String QRLabel){
         this.id = id;
         this.method = method;
-        this.qr_decoded = QRBar;
         this.qrLabel = QRLabel;
-    }
-
-    protected AlarmMethod(Parcel in) {
-        locationRadius = in.readDouble();
-        id = in.readInt();
-        adress = in.readParcelable(Address.class.getClassLoader());
+        this.difficulty = Enums.Difficulties.None;
+        this.subMethod = Enums.SubMethod.None;
     }
 
 
-    public static final Creator<AlarmMethod> CREATOR = new Creator<AlarmMethod>() {
-        @Override
-        public AlarmMethod createFromParcel(Parcel in) {
-            return new AlarmMethod(in);
-        }
 
-        @Override
-        public AlarmMethod[] newArray(int size) {
-            return new AlarmMethod[size];
-        }
-    };
+
+
 
     public void calcExample(int type){
         if(!(type == 0) && !(type == 2) && !(type == 3) && !(type == 6) ){
@@ -153,8 +142,8 @@ public class AlarmMethod implements Parcelable {
         return adress;
     }
 
-    public double getLocationRadius() { //todo this is in no way implemented, just here, to keep away the errors so i can have a bootable app for once, so this will need further coding in locationsetactivity and editalarmactivity
-        return locationRadius;
+    public int getLocationRadius() { //todo this is in no way implemented, just here, to keep away the errors so i can have a bootable app for once, so this will need further coding in locationsetactivity and editalarmactivity
+        return (int) locationRadius;
     }
 
     public void setLocationRadius(double locationRadius) {
@@ -165,13 +154,7 @@ public class AlarmMethod implements Parcelable {
         this.adress = adress;
     }
 
-    public String getQr_decoded() {
-        return qr_decoded;
-    }
 
-    public void setQr_decoded(String qr_decoded) {
-        this.qr_decoded = qr_decoded;
-    }
 
     public String getQrLabel() {
         return qrLabel;
@@ -189,21 +172,10 @@ public class AlarmMethod implements Parcelable {
                 ", difficulty=" + difficulty +
                 ", method=" + method +
                 ", subMethod=" + subMethod +
-                ", qr_decoded='" + qr_decoded + '\'' +
                 ", qrLabel='" + qrLabel + '\'' +
                 ", adress=" + adress +
                 '}';
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
 
-    @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeDouble(locationRadius);
-        dest.writeInt(id);
-        dest.writeParcelable(adress, flags);
-    }
 }

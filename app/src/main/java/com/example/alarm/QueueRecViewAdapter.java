@@ -44,10 +44,19 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
 
         this.holder = holder;
 
+        if(alarmParameter.get(position).getType() == Enums.Method.QRBar){
+            holder.txtMethod.setText(alarmParameter.get(position).getType().toString() + ": " + alarmParameter.get(position).getQrLabel());
+        }else{
+            holder.txtMethod.setText(alarmParameter.get(position).getType().toString() + ": " + alarmParameter.get(position).getSubType().toString());
+        }
 
         holder.txtId.setText(String.valueOf(alarmParameter.get(position).getId()));
-        holder.txtMethod.setText(alarmParameter.get(position).getType().toString() + alarmParameter.get(position).getSubType().toString());
-        holder.txtDifficulty.setText(alarmParameter.get(position).getDifficulty().toString());
+
+        if(alarmParameter.get(position).getType() == Enums.Method.Location){
+            holder.txtDifficulty.setText("Radius: " + alarmParameter.get(position).getLocationRadius() + " " + alarmParameter.get(position).getAdress().getSubThoroughfare());
+        }else {
+            holder.txtDifficulty.setText(alarmParameter.get(position).getDifficulty().toString());
+        }
 
         holder.imgMinusDelete.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("NotifyDataSetChanged")

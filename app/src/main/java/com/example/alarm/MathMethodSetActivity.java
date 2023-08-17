@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
@@ -91,6 +92,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
                     kindOfMath = rgKindOfMath.getCheckedRadioButtonId();
                     txtExample.setText(generateExample("exHard", kindOfMath));
                 }
+                Log.d("method", "Selected Diff:"+ difficulty);
             }
         });
 
@@ -110,15 +112,32 @@ public class MathMethodSetActivity extends AppCompatActivity {
 
                                 if(edit){
 
-                                    Parcelable p = new AlarmMethod(queueId, difficulty, Enums.Method.Math, methodID);
-                                    getIntent().putExtra("MathMethod", p);
+                                    //Parcelable p = new AlarmMethod(queueId, difficulty, Enums.Method.Math, methodID);
+                                    //getIntent().putExtra("MathMethod", p);
+
+                                    Log.d("method",new AlarmMethod(difficulty, Enums.Method.Math, methodID).toString());
+                                    SharedPreferences sh = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE);
+                                    SharedPreferences.Editor se = sh.edit();
+                                    se.putString("Method", Enums.Method.Math.toString());
+                                    se.putString("Difficulty", difficulty.toString());
+                                    se.putString("SubMethod", methodID.toString());
+                                    se.putInt("queue_id", queueId);
+                                    se.apply();
+
                                     finish();
 
                                 }else {
 
-                                    Parcelable p = new AlarmMethod(difficulty, Enums.Method.Math, methodID);
-                                    getIntent().putExtra("MathMethod", p);
+
+                                    Log.d("method",new AlarmMethod(difficulty, Enums.Method.Math, methodID).toString());
+                                    SharedPreferences sh = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE);
+                                    SharedPreferences.Editor se = sh.edit();
+                                    se.putString("Method", Enums.Method.Math.toString());
+                                    se.putString("Difficulty", difficulty.toString());
+                                    se.putString("SubMethod", methodID.toString());
+                                    se.apply();
                                     finish();
+
                                 }
 
                             }
@@ -144,6 +163,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
                     i++;
                 }
                 methodID = Enums.SubMethod.values()[i];
+                Log.d("method","subMethod is " + methodID);
             }
         });
 

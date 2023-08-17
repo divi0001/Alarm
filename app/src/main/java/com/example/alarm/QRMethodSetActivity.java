@@ -87,11 +87,18 @@ public class QRMethodSetActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(getIntent().hasExtra("label") && getIntent().hasExtra("edit_add") && getIntent().hasExtra("id")){
+                if(getIntent().hasExtra("label")){
+
+                    //todo if this was based on editing an already set method, this needs another if to filter, if the label is unique, if a new qr was added, but it also shouldn't stop this from working if the label stays the same, because then it might be seen as ununique?
+
                     int row_id = getIntent().getIntExtra("id",-1);
 
-                    Parcelable p = new AlarmMethod(row_id, Enums.Method.QRBar, txtDecode.getText().toString(), editLabel.getText().toString());
-                    getIntent().putExtra("QRMethod", p);
+                    SharedPreferences sp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),MODE_PRIVATE);
+                    SharedPreferences.Editor se = sp.edit();
+                    se.putString("Method", Enums.Method.QRBar.name());
+                    se.putString("QRLabel", editLabel.getText().toString());
+                    //decoded value at the key of the label in the qr DB
+                    se.apply();
                     finish();
                 }else {
 
@@ -104,7 +111,12 @@ public class QRMethodSetActivity extends AppCompatActivity {
 
                         int l = db.getMaxTableId("Methoddatabase")+1;
 
-                        db.addMethod(l, queueId, 2, -1, -1, editLabel.getText().toString(), -1);
+                        SharedPreferences sp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),MODE_PRIVATE);
+                        SharedPreferences.Editor se = sp.edit();
+                        se.putString("Method", Enums.Method.QRBar.name());
+                        se.putString("QRLabel", editLabel.getText().toString());
+                        //decoded value at the key of the label in the qr DB
+                        se.apply();
                         finish();
                     }
 

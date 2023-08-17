@@ -55,6 +55,11 @@ import java.util.Objects;
 
 public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAdapter.EditAlarms {
 
+    private static final int SUDOKU_CODE = 2;
+    private static final int MATH_CODE = 3;
+    private static final int QR_CODE = 4;
+    private static final int LOC_CODE = 5;
+    private static final int MEMORY_CODE = 6;
     private Spinner spHours,spMins,spMethods;
     private CheckBox mo,di,mi,thu,fr,sa,so,checkWeekDays,checkWeekEnds,checkAllowSnooze,checkAwake,checkAlarmLvls,checkRevokePrivilege;
     private ImageView imgAddMethodPlus, imgBtnDownSnooze, imgBtnUpSnooze;
@@ -65,7 +70,6 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
     public final int CONTAINER_POS_CHECK_WEEK = 0;
     public final int CONTAINER_POS_CHECK_WEEKEND = 1;
     private RecyclerView alarmQueue,alarmLevels;
-    private final int REQ_CODE_MATH_METHOD = 1234;
 
     private final Context context = this;
     private QueueRecViewAdapter adapter1;
@@ -500,6 +504,13 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         alarmQueue.setLayoutManager(new LinearLayoutManager(context));
         adapter1.setAlarmParameter(alarmParameter.getmQueue(lvlID));
 
+
+
+
+
+
+
+
         imgAddMethodPlus.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -533,24 +544,8 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
                                     Intent iMath = new Intent(context, MathMethodSetActivity.class);
                                     iMath.putExtra("edit_add", "add");
-                                    ActivityResultLauncher<Intent> mathResLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                                            new ActivityResultCallback<ActivityResult>() {
-                                                @Override
-                                                public void onActivityResult(ActivityResult result) {
-                                                    if(result.getResultCode() == Activity.RESULT_OK){
-                                                        Bundle data = getIntent().getExtras();
-                                                        //todo what if return data is null?
-                                                        try {
-                                                            AlarmMethod met = (AlarmMethod) data.getParcelable("MathMethod");
-                                                            alarmParameter.getmQueue(-1).add(met); //todo check if this works?
+                                    iMath.putExtra("id",getMaxMQueueID(alarmParameter, -1));
 
-                                                        }catch (Exception ignored){
-
-                                                        }
-
-                                                    }
-                                                }
-                                            });
                                     startActivity(iMath);
 
                                     break;
@@ -558,6 +553,9 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                                 case QRBar:
 
                                     Intent iScan = new Intent(context, QRMethodSetActivity.class);
+                                    iScan.putExtra("edit_add", "add");
+                                    iScan.putExtra("id", getMaxMQueueID(alarmParameter,-1)); //todo not sure if really -1, though it should be?
+
                                     startActivity(iScan);
                                     break;
                                 case Location:
@@ -565,6 +563,9 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                                     if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                                         Mapbox.getInstance(EditAlarmActivity.this, getResources().getString(R.string.mapbox_access_token));
                                         Intent iLoc = new Intent(context, LocationMethodSetActivity.class);
+                                        iLoc.putExtra("id", getMaxMQueueID(alarmParameter,-1));
+                                        iLoc.putExtra("edit_add","add");
+
                                         startActivity(iLoc);
                                     } else {
                                         requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
@@ -574,11 +575,17 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
                                 case Sudoku:
                                     Intent iSudoku = new Intent(context, SudokuMethodSetActivity.class);
+                                    iSudoku.putExtra("id", getMaxMQueueID(alarmParameter,-1));
+                                    iSudoku.putExtra("edit_add","add");
+
                                     startActivity(iSudoku);
                                     break;
 
                                 case Memory:
                                     Intent iMemory = new Intent(context, MemoryMethodSetActivity.class);
+                                    iMemory.putExtra("id", getMaxMQueueID(alarmParameter,-1));
+                                    iMemory.putExtra("edit_add","add");
+
                                     startActivity(iMemory);
                                     break;
 
@@ -833,6 +840,8 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
     }
 
+
+
     private int getMaxLQueueID() {
         ArrayList<AlarmLevel> aL = alarmParameter.getlQueue();
         int maxID = -1;
@@ -914,17 +923,33 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
         super.onResume();
 
-
+        String labe = "";
         SharedPreferences shared = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE); //todo after the code is done, reset this shardedpref to default value, so if it fails, it wont put in the same val twice
+        SharedPreferences.Editor see = shared.edit();
+        int queue_id = -1;
+        if (shared.contains("queue_id")){
+            queue_id = shared.getInt("queue_id",-1);
+            see.remove("queue_id");
+        }
+
         if(shared.contains("Method")){ //todo this is the if that should be changed (see todo above)
             methodToSet = Enums.Method.valueOf(shared.getString("Method", (Enums.Method.None).toString()));
+            see.remove("Method");
         }
         if(shared.contains("Difficulty")){
             difficulty = Enums.Difficulties.valueOf(shared.getString("Difficulty", (Enums.Difficulties.None).toString()));
+            see.remove("Difficulty");
         }
         if(shared.contains("SubMethod")){
             subMethod = Enums.SubMethod.valueOf(shared.getString("SubMethod", Enums.SubMethod.None.toString()));
+            see.remove("SubMethod");
         }
+        if(shared.contains("QRLabel")){
+            labe = shared.getString("QRLabel", "");
+            see.remove("QRLabel");
+        }
+        see.apply();
+
         SharedPreferences se = getSharedPreferences(getString(R.string.uri_key),MODE_PRIVATE);
         if(se.contains("name")){
 
@@ -943,7 +968,12 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         }
 
 
+        Log.d("mett", "method is" + methodToSet);
 
+        if(methodToSet.equals(Enums.Method.QRBar)){
+            currMethod.add(new AlarmMethod(getMaxMQueueID(alarmParameter,lvlID),methodToSet, labe));
+            methodToSet = Enums.Method.None;
+        }
 
 
         if(!methodToSet.equals(Enums.Method.None)){ //set it to None now, so the same value wont get added twice todo add the same for the shared prefs
@@ -975,7 +1005,6 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         alarmQueue.setLayoutManager(new LinearLayoutManager(context));
 
 
-        imgAddMethodPlus = (ImageView) findViewById(R.id.btnMethodPlus);
 
 
 
@@ -1138,13 +1167,11 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (requestCode == 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){ //todo onActivityResult
             Intent iLoc = new Intent(context, LocationMethodSetActivity.class);
             startActivity(iLoc);
         }
     }
-
-
 
 
 

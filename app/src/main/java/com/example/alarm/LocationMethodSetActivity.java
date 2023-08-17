@@ -125,7 +125,7 @@ public class LocationMethodSetActivity extends AppCompatActivity {
             id = getIntent().getIntExtra("id", -1); //todo update in editalarmactivity
 
             txtKm.setText(String.valueOf((int)(getIntent().getDoubleExtra("radius", 600.0))));
-            if(getIntent().getStringExtra("enter_leave").equals("enter")){
+            if(getIntent().hasExtra("enter_leave") && getIntent().getStringExtra("enter_leave").equals("enter")){
                 rbEnter.setChecked(true);
             }else{
                 rbLeave.setChecked(true);
@@ -250,8 +250,12 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                 LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
                 @SuppressLint("MissingPermission")
                 Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                LocationMethodSetActivity.this.longitude = location.getLongitude();
-                LocationMethodSetActivity.this.latitude = location.getLatitude();
+                if (location != null) {
+                    LocationMethodSetActivity.this.longitude = location.getLongitude();
+                    LocationMethodSetActivity.this.latitude = location.getLatitude();
+                }else {
+                    Toast.makeText(LocationMethodSetActivity.this, "Couldn't fetch device location", Toast.LENGTH_SHORT).show();
+                }
                 try{
                     Geocoder g = new Geocoder(LocationMethodSetActivity.this);
                     addr = g.getFromLocation(latitude,longitude,1).get(0);
@@ -354,8 +358,12 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                 LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
                 @SuppressLint("MissingPermission")
                 Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                LocationMethodSetActivity.this.longitude = location.getLongitude();
-                LocationMethodSetActivity.this.latitude = location.getLatitude();
+                if (location == null){
+                    Toast.makeText(LocationMethodSetActivity.this, "Could not fetch current location", Toast.LENGTH_SHORT).show();   
+                }else {
+                    LocationMethodSetActivity.this.longitude = location.getLongitude();
+                    LocationMethodSetActivity.this.latitude = location.getLatitude();
+                }
                 Geocoder g = new Geocoder(LocationMethodSetActivity.this);
                 try {
                     addr = g.getFromLocation(latitude, longitude, 1).get(0);
@@ -384,19 +392,26 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                 if(edit){
                     int pos = getIntent().getIntExtra("pos",-1);
                     if(pos == -1) finish(); //??
-
+                    SharedPreferences ssp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE);
+                    SharedPreferences.Editor se = ssp.edit();
 
                     if(addr != null) {
-                        Parcelable p = new AlarmMethod(id, Enums.Method.Location, Enums.SubMethod.valueOf(radiusMode), addr, (int) radius);
-                        getIntent().putExtra("LocationMethod", p);
+
+                        se.putString("Method",Enums.Method.Location.name());
+                        se.putString("edit_add", "edit");
+                        se.apply();
                         finish();
                     }else{
                         Geocoder g = new Geocoder(LocationMethodSetActivity.this);
                         try {
                             addr = g.getFromLocation(latitude, longitude, 1).get(0);
-                            Parcelable p = new AlarmMethod(id, Enums.Method.Location, Enums.SubMethod.valueOf(radiusMode), addr, (int) radius);
-                            getIntent().putExtra("LocationMethod", p);
-
+                            se.putString("Method",Enums.Method.Location.name());
+                            se.putString("edit_add", "edit");
+                            se.putInt("long", (int)longitude);
+                            se.putInt("lat", (int) latitude);
+                            se.putInt("longitude", Integer.parseInt(String.valueOf(longitude).split("\\.")[1]));
+                            se.putInt("latitude", Integer.parseInt(String.valueOf(latitude).split("\\.")[1]));
+                            se.apply();
                             finish();
 
                         } catch (IOException e) {
@@ -405,25 +420,48 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                     }
 
                 }else {
-
+                    SharedPreferences ssp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE);
+                    SharedPreferences.Editor se = ssp.edit();
                     if (addr == null) {
                         Geocoder g = new Geocoder(LocationMethodSetActivity.this);
                         try {
                             addr = g.getFromLocation(latitude, longitude, 1).get(0);
-                            Parcelable p = new AlarmMethod(id, Enums.Method.Location, Enums.SubMethod.valueOf(radiusMode), addr, (int) radius);
-                            getIntent().putExtra("LocationMethod", p);
+                            se.putInt("queue_id", id);
+                            se.putString("Method", Enums.Method.Location.name());
+                            if (isLeaveMode){
+                                se.putString("SubMethod", Leave.name());
+                            }else{
+                                se.putString("SubMethod", Enter.name());
+                            }
+                            se.putInt("radius", (int) radius);
+                            se.putInt("long", (int)longitude);
+                            se.putInt("lat", (int) latitude);
+                            se.putInt("longitude", Integer.parseInt(String.valueOf(longitude).split("\\.")[1]));
+                            se.putInt("latitude", Integer.parseInt(String.valueOf(latitude).split("\\.")[1]));
+                            se.apply();
                             finish();
-                            //todo id prolly needs updating the parcel from above
 
                         } catch (IOException e) {
                             Toast.makeText(LocationMethodSetActivity.this, "Couldn't find a valid location at your click", Toast.LENGTH_SHORT).show();
                         }
                     } else {
 
-                        Parcelable p = new AlarmMethod(id, Enums.Method.Location, Enums.SubMethod.valueOf(radiusMode), addr, (int) radius);
-                        getIntent().putExtra("LocationMethod", p);
+                        se.putInt("queue_id", id);
+                        se.putString("Method", Enums.Method.Location.name());
+                        if (isLeaveMode){
+                            se.putString("SubMethod", Leave.name());
+                        }else{
+                            se.putString("SubMethod", Enter.name());
+                        }
+                        se.putInt("radius", (int) radius);
+                        se.putInt("long", (int)longitude);
+                        se.putInt("lat", (int) latitude);
+                        se.putInt("longitude", Integer.parseInt(String.valueOf(longitude).split("\\.")[1]));
+                        se.putInt("latitude", Integer.parseInt(String.valueOf(latitude).split("\\.")[1]));
+                        se.apply();
                         finish();
                     }
+
                 }
             }
         });
