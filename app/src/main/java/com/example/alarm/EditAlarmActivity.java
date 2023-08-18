@@ -18,6 +18,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ModuleInfo;
 import android.content.pm.PackageManager;
 import android.content.res.XmlResourceParser;
 import android.database.Cursor;
@@ -26,6 +27,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.text.Layout;
 import android.util.AttributeSet;
@@ -742,6 +744,12 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         btnPickSound.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedPreferences s = getSharedPreferences(getString(R.string.sound_key), MODE_PRIVATE);
+                SharedPreferences.Editor e = s.edit();
+                if(!txtCurrSoundName.getText().toString().equals("")){
+                    e.putString("sound_name", txtCurrSoundName.getText().toString());
+                }
+                e.apply();
                 Intent iMusic = new Intent(EditAlarmActivity.this, AlarmSoundSetActivity.class);
                 startActivity(iMusic);
             }
@@ -754,7 +762,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
             public void onClick(View v) {
 
                 //initializing current level w.r.t. alarmParameter
-                SharedPreferences se = getSharedPreferences(getString(R.string.uri_key), MODE_PRIVATE);
+                SharedPreferences se = getSharedPreferences(getString(R.string.sound_key), MODE_PRIVATE);
                 boolean skip = false;
                 for (AlarmLevel lv: alarmParameter.getlQueue()){
                     if(lv.getLabel().equals(editLabel.getText().toString())){
@@ -788,8 +796,8 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     }
 
 
-                    String uri = ""; //todo make this the standard sound uri & update it
-                    String name = "";
+                    String uri = se.getString("uri",Environment.getExternalStorageDirectory().getPath()+"/Music/fiverr/weak_2.mp3");
+                    String name = se.getString("sound_name",""); //not sure if this is needed
 
                     newLvl.setLvlSoundPath(uri);
 

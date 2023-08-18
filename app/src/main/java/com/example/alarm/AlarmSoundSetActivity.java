@@ -39,6 +39,7 @@ public class AlarmSoundSetActivity extends AppCompatActivity {
     CardView cvAddUrl;
     EditText editUrl;
     ArrayList<Song> songs = new ArrayList<>();
+    String currSoundName;
 
 
     @Override
@@ -48,6 +49,8 @@ public class AlarmSoundSetActivity extends AppCompatActivity {
 
         btnSetSound = (Button) findViewById(R.id.btnSetSound);
         btnAddSound = (Button) findViewById(R.id.btnAddSoundFile);
+        SharedPreferences s = getSharedPreferences(getString(R.string.sound_key),MODE_PRIVATE);
+        currSoundName = s.getString("sound_name", "");
 
         storagePermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), result -> {
             if(result){
@@ -70,11 +73,11 @@ public class AlarmSoundSetActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (adapter.getChosen() != null){
 
-                    SharedPreferences sp = AlarmSoundSetActivity.this.getSharedPreferences(getString(R.string.uri_key),MODE_PRIVATE);
+                    SharedPreferences sp = AlarmSoundSetActivity.this.getSharedPreferences(getString(R.string.sound_key),MODE_PRIVATE);
                     SharedPreferences.Editor se = sp.edit();
 
                     se.putString("uri", adapter.getChosen().toString());
-                    se.putString("name", adapter.getName());
+                    se.putString("sound_name", adapter.getName());
                     se.apply();
 
                     finish();
