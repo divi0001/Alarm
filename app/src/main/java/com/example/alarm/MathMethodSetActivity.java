@@ -71,7 +71,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
                 RadioButton radioButton = (RadioButton) findViewById(checkedId);
                 int kindOfMath;
                 CharSequence text = radioButton.getText();
-                if ("Extremely easy".contentEquals(text)) {
+                if ("ExEasy".contentEquals(text)) {
                     kindOfMath = rgKindOfMath.getCheckedRadioButtonId();
                     txtExample.setText(generateExample("exEasy", kindOfMath));
                     difficulty = Enums.Difficulties.ExEasy;
@@ -87,7 +87,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
                     difficulty = Enums.Difficulties.Hard;
                     kindOfMath = rgKindOfMath.getCheckedRadioButtonId();
                     txtExample.setText(generateExample("hard", kindOfMath));
-                } else if ("Extremely hard".contentEquals(text)) {
+                } else if ("ExHard".contentEquals(text)) {
                     difficulty = Enums.Difficulties.ExHard;
                     kindOfMath = rgKindOfMath.getCheckedRadioButtonId();
                     txtExample.setText(generateExample("exHard", kindOfMath));
@@ -118,6 +118,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
                                     Log.d("method",new AlarmMethod(difficulty, Enums.Method.Math, methodID).toString());
                                     SharedPreferences sh = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE);
                                     SharedPreferences.Editor se = sh.edit();
+                                    se.putString("edit_add", "edit");
                                     se.putString("Method", Enums.Method.Math.toString());
                                     se.putString("Difficulty", difficulty.toString());
                                     se.putString("SubMethod", methodID.toString());
@@ -132,6 +133,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
                                     Log.d("method",new AlarmMethod(difficulty, Enums.Method.Math, methodID).toString());
                                     SharedPreferences sh = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE);
                                     SharedPreferences.Editor se = sh.edit();
+                                    se.putString("edit_add", "add");
                                     se.putString("Method", Enums.Method.Math.toString());
                                     se.putString("Difficulty", difficulty.toString());
                                     se.putString("SubMethod", methodID.toString());

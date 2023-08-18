@@ -13,12 +13,12 @@ import java.util.Random;
 
 public class AlarmMethod {
 
-    private double locationRadius;
+    private double locationRadius, lon, lat;
     private int id;
     private Enums.Difficulties difficulty;
     private Enums.Method method;
     private Enums.SubMethod subMethod;
-    private String qrLabel;
+    private String qrLabel, addr;
     private Address adress;
 
     /*
@@ -40,13 +40,16 @@ public class AlarmMethod {
         this.id = -1; //todo?
     }
 
-    public AlarmMethod(int id, Enums.Method method, Enums.SubMethod subMethod, Address address, int radius){
+    public AlarmMethod(int id, Enums.Method method, Enums.SubMethod subMethod, Address address, int radius, double lon, double lat, String addr){
         this.id = id;
         this.method = method;
         this.subMethod = subMethod;
         this.difficulty = Enums.Difficulties.None;
         this.adress = address;
         this.locationRadius = radius;
+        this.lon = lon;
+        this.lat = lat;
+        this.addr = addr;
 
     }
 
@@ -164,18 +167,60 @@ public class AlarmMethod {
         this.qrLabel = qrLabel;
     }
 
+    public double getLon() {
+        return lon;
+    }
+
+    public void setLon(double lon) {
+        this.lon = lon;
+    }
+
+    public double getLat() {
+        return lat;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public Enums.Method getMethod() {
+        return method;
+    }
+
+    public void setMethod(Enums.Method method) {
+        this.method = method;
+    }
+
+    public Enums.SubMethod getSubMethod() {
+        return subMethod;
+    }
+
+    public void setSubMethod(Enums.SubMethod subMethod) {
+        this.subMethod = subMethod;
+    }
+
+    public String getAddr() {
+        return addr;
+    }
+
+    public void setAddr(String addr) {
+        this.addr = addr;
+    }
+
+
     @Override
     public String toString() {
         return "AlarmMethod{" +
                 "locationRadius=" + locationRadius +
+                ", lon=" + lon +
+                ", lat=" + lat +
                 ", id=" + id +
                 ", difficulty=" + difficulty +
                 ", method=" + method +
                 ", subMethod=" + subMethod +
                 ", qrLabel='" + qrLabel + '\'' +
+                ", addr='" + addr + '\'' +
                 ", adress=" + adress +
                 '}';
     }
-
-
 }

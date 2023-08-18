@@ -23,7 +23,7 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
     RadioGroup rgDiff;
     TextView txtExampleSudoku;
     Button btnAddSelected;
-    String difficulty;
+    Enums.Difficulties difficulty;
 
 
 
@@ -45,12 +45,12 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 RadioButton checkedRadioButton = findViewById(group.getCheckedRadioButtonId());
-                difficulty = checkedRadioButton.getText().toString();
+                difficulty = Enums.Difficulties.valueOf(checkedRadioButton.getText().toString());
 
-                int[][] gene = generateSudoku(difficulty);
+                int[][] gene = generateSudoku(difficulty.name());
 
                 txtExampleSudoku.setText(sudokuToString(gene));
-                txtExampleSudoku.setPaintFlags(txtExampleSudoku.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
+                //txtExampleSudoku.setPaintFlags(txtExampleSudoku.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
             }
         });
 
@@ -59,7 +59,7 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                DBHelper db = new DBHelper(SudokuMethodSetActivity.this, "Database.db");
+
 
                 SharedPreferences sp = SudokuMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
                 int queueId = sp.getInt("queue_id",-1);
@@ -68,13 +68,22 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
                     int row_id = getIntent().getIntExtra("id",-1);
 
                     RadioButton rbCurr = findViewById(rgDiff.getCheckedRadioButtonId());
-                    difficulty = rbCurr.getText().toString();
+                    difficulty = Enums.Difficulties.valueOf(rbCurr.getText().toString());
+                    SharedPreferences ssp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),MODE_PRIVATE);
+                    SharedPreferences.Editor se = ssp.edit();
+                    se.putString("Difficulty",difficulty.toString());
+                    se.putString("Method", Enums.Method.Sudoku.name());
+                    se.putInt("id", row_id);
+                    se.apply();
 
-                    db.editMethoddatabase(queueId, 5, -1, db.findIdByDifficulty(difficulty), "-1", -1, row_id);
                     finish();
                 }else {
-                    int l = db.getMaxTableId("Methoddatabase")+1;
-                    db.addMethod(l, queueId, 5, -1, db.findIdByDifficulty(difficulty), "-1", -1);
+
+                    SharedPreferences ssp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),MODE_PRIVATE);
+                    SharedPreferences.Editor se = ssp.edit();
+                    se.putString("Difficulty",difficulty.toString());
+                    se.putString("Method", Enums.Method.Sudoku.name());
+                    se.apply();
                     finish();
                 }
 
@@ -88,16 +97,31 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
     public String sudokuToString(int[][] gen) {
 
         StringBuilder ret = new StringBuilder();
+        String lineEnd, lineMiddle, rowBold, row;
+        row =     "--------------------------------------------";
+        rowBold = "~~~~~~~~~~~~~~~~~~~~~~~~~~";
 
         for(int i = 0; i < 9; i++){
             for (int j = 0; j < 9; j++){
-                if(gen[i][j] == 0){
-                    ret.append("   | ");
+                if(j == 2 || j == 5 || j == 8){
+                    lineEnd = "    I";
+                    lineMiddle = " I";
                 }else{
-                    ret.append(gen[i][j]).append(" | ");
+                    lineEnd = "    |";
+                    lineMiddle = " |";
+                }
+                if(j == 0){
+                    ret.append("I");
+                }
+
+                if(gen[i][j] == 0){
+                    ret.append(" ").append(lineEnd).append("  ");
+                }else{
+                    ret.append(" ").append(gen[i][j]).append(" ").append(lineMiddle).append(" ");
                 }
             }
-            ret.append("\n");
+            if(i != 2 && i != 5 && i != 8) ret.append("\n").append(row).append("\n");
+            else ret.append("\n").append(rowBold).append("\n");
         }
 
         return ret.toString();
@@ -171,12 +195,7 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
 
 
 
-    private int[][] swapAll(int[][] s1) {
 
-
-
-        return s1;
-    }
 
 
 
@@ -241,7 +260,7 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
 
         switch(difficulty){
 
-            case "Extremely easy":
+            case "ExEasy":
 
                 return mkNulls(preGen, 2);
 
@@ -257,7 +276,7 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
 
                 return mkNulls(preGen, 6);
 
-            case "Extremely hard":
+            case "ExHard":
 
                 return mkNulls(preGen, 8);
 

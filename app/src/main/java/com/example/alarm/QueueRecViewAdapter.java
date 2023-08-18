@@ -53,7 +53,7 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
         holder.txtId.setText(String.valueOf(alarmParameter.get(position).getId()));
 
         if(alarmParameter.get(position).getType() == Enums.Method.Location){
-            holder.txtDifficulty.setText("Radius: " + alarmParameter.get(position).getLocationRadius() + " " + alarmParameter.get(position).getAdress().getSubThoroughfare());
+            holder.txtDifficulty.setText("Radius: " + alarmParameter.get(position).getLocationRadius() + "m \n" + alarmParameter.get(position).getAddr());
         }else {
             holder.txtDifficulty.setText(alarmParameter.get(position).getDifficulty().toString());
         }
@@ -72,17 +72,7 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        DBHelper db = new DBHelper(context, "Database.db");
-
-                        int id = alarmParameter.get(position).getId();
-                        db.deleteRow("Methoddatabase", alarmParameter.get(position).getId());
-
-                        String table = typeToTable(alarmParameter.get(position).getType().toString());
-
-                        if(!table.equals("QRBarcodedatabase") && !table.equals("") && id != -1) db.deleteRow(table, id);
-
                         alarmParameter.remove(position);
-
                         notifyDataSetChanged();
                     }
                 });
@@ -130,27 +120,26 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
 
                 switch (type) {
                     case Math:
-                        iUpdate.putExtra("method", type.toString());
+                        iUpdate.putExtra("SubMethod", alarmParameter.get(position).getSubMethod());
                         iUpdate.putExtra("difficulty", alarmParameter.get(position).getDifficulty());
                         break;
                     case QRBar:
-                        iUpdate.putExtra("label", alarmParameter.get(position).getDifficulty());
+                        iUpdate.putExtra("label", alarmParameter.get(position).getQrLabel());
                     case Sudoku:
                         iUpdate.putExtra("difficulty", alarmParameter.get(position).getDifficulty());
                 }
                 if(type == Enums.Method.Location) {
                     double radius = alarmParameter.get(position).getLocationRadius(); //last arg in .substring is exclusive, so no -1 needed
                     String enter_leave = alarmParameter.get(position).getSubType().toString();
-                    String ent_lea = enter_leave.substring(0,enter_leave.indexOf(" "));
 
                     iUpdate.putExtra("street", alarmParameter.get(position).getAdress().getSubThoroughfare()); //todo dont you also want stuff like housenumber etc?
                     iUpdate.putExtra("radius",radius);
-                    iUpdate.putExtra("enter_leave", ent_lea);
+                    iUpdate.putExtra("enter_leave", enter_leave);
 
 
                 }
                 iUpdate.putExtra("id",alarmParameter.get(position).getId());
-
+                iUpdate.putExtra("queue_id",alarmParameter.get(position).getId());//just to be sure to get the id vars correctly hopefully
 
                 context.startActivity(iUpdate);
             }

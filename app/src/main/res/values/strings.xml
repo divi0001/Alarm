@@ -153,11 +153,11 @@
     <string name="wake_me_up">Wake me up at</string>
     <string name="method">Method:</string>
     <string name="method_math">Math Method Settings: </string>
-    <string name="ex_easy_difficulty">Extremely easy</string>
+    <string name="ex_easy_difficulty">ExEasy</string>
     <string name="easy_difficulty">Easy</string>
     <string name="middle_difficulty">Middle</string>
     <string name="hard_difficulty">Hard</string>
-    <string name="ex_hard_difficulty">Extremely hard</string>
+    <string name="ex_hard_difficulty">ExHard</string>
     <string name="difficulty">Difficulty: </string>
     <string name="example">Example for selected difficulty: </string>
     <string name="save">Save as set</string>

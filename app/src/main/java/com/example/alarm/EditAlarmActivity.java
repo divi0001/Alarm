@@ -23,6 +23,7 @@ import android.content.res.XmlResourceParser;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -49,8 +50,11 @@ import com.mapbox.mapboxsdk.Mapbox;
 
 import org.json.JSONArray;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAdapter.EditAlarms {
@@ -88,6 +92,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
     ArrayList<String> alarmLevel = new ArrayList<>();
     private int lvlID = -1;
+    private int methodToSetPos = -1;
 
 
     @Override
@@ -493,9 +498,11 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 methodToSet = Enums.Method.values()[position];
+                methodToSetPos = position;
             }
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {methodToSet= Enums.Method.TapOff;}
+            public void onNothingSelected(AdapterView<?> parent) {methodToSet= Enums.Method.TapOff;
+                methodToSetPos = -1;}
         });
 
         adapter1 = new QueueRecViewAdapter(context);
@@ -524,6 +531,8 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                 SharedPreferences.Editor edi = pref.edit();
                 edi.putString("method", "set_alarm");
                 edi.apply();
+                if(methodToSetPos != -1) methodToSet = Enums.Method.values()[methodToSetPos];
+
                 if(methodToSet.equals(Enums.Method.TapOff)) {
 
                     if(alarmParameter.getlQueue().size()>0){ //referential problems solved ^^
@@ -536,6 +545,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                         mQ.add(new AlarmMethod(getMaxMQueueID(alarmParameter,lvlID)+1, Enums.Difficulties.None, Enums.Method.TapOff, Enums.SubMethod.None));
                         alarmParameter.setmQueue(mQ,-1);
                     }
+                    adapter1.setAlarmParameter(alarmParameter.getmQueue(-1));
 
                 }else{
 
@@ -948,6 +958,30 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
             labe = shared.getString("QRLabel", "");
             see.remove("QRLabel");
         }
+        double longitude = 60;
+        double latitude = 60;
+        List<Address> addr = new ArrayList<>();
+        String adr = "";
+        if(shared.contains("long") && shared.contains("lat") && shared.contains("longitude") && shared.contains("latitude")){
+            if(shared.getInt("long",60) < 0) longitude = (shared.getInt("long",60)*(-1)+(Double.parseDouble("0."+shared.getInt("longitude",0)*(-1))))*(-1);
+            else longitude = shared.getInt("long", 60) + Double.parseDouble("0."+shared.getInt("longitude",0));
+            if(shared.getInt("lat",60) < 0) latitude = (shared.getInt("lat",60)*(-1)+(Double.parseDouble("0."+shared.getInt("latitude",0)*(-1))))*(-1);
+            else latitude = shared.getInt("lat", 60) + Double.parseDouble("0."+shared.getInt("latitude",0));
+
+            Log.d("mett", "Long: "+String.valueOf(longitude) + " , Lat: " + String.valueOf(latitude));
+            Geocoder geo = new Geocoder(this, Locale.getDefault());
+            try {
+                addr = geo.getFromLocation(latitude,longitude,1);
+                adr = addr.get(0).getAddressLine(0);
+                Log.d("mett", "Address: " + adr + " subthouroughfare: " + addr.get(0).getSubThoroughfare());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        int radius = 600;
+        if(shared.contains("radius")){
+            radius = shared.getInt("radius",600);
+        }
         see.apply();
 
         SharedPreferences se = getSharedPreferences(getString(R.string.uri_key),MODE_PRIVATE);
@@ -970,31 +1004,50 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
         Log.d("mett", "method is" + methodToSet);
 
-        if(methodToSet.equals(Enums.Method.QRBar)){
-            currMethod.add(new AlarmMethod(getMaxMQueueID(alarmParameter,lvlID),methodToSet, labe));
-            methodToSet = Enums.Method.None;
-        }
+        if(shared.contains("edit_add")){
+
+            if (shared.getString("edit_add","add").equals("add")) {
+                if (methodToSet.equals(Enums.Method.QRBar)) {
+                    currMethod.add(new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID), methodToSet, labe));
+                    methodToSet = Enums.Method.None;
+                } else if (methodToSet.equals(Enums.Method.Location)) {
+                    currMethod.add(new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID), methodToSet, subMethod, addr.get(0), radius, longitude, latitude, adr));
+                    methodToSet = Enums.Method.None;
+                    difficulty = Enums.Difficulties.None;
+                    subMethod = Enums.SubMethod.None;
+                }
 
 
-        if(!methodToSet.equals(Enums.Method.None)){ //set it to None now, so the same value wont get added twice todo add the same for the shared prefs
+                if (!methodToSet.equals(Enums.Method.None)) { //set it to None now, so the same value wont get added twice todo add the same for the shared prefs
+                    currMethod.add(new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID), difficulty, methodToSet, subMethod));
+                }
+            }else { //edit case TODO
 
-            currMethod.add(new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID), difficulty, methodToSet, subMethod));
+                if (methodToSet.equals(Enums.Method.QRBar)) {
+                    currMethod.set(queue_id,new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID), methodToSet, labe));
+                    methodToSet = Enums.Method.None;
+                } else if (methodToSet.equals(Enums.Method.Location)) {
+                    currMethod.set(queue_id, new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID), methodToSet, subMethod, addr.get(0), radius, longitude, latitude, adr));
+                    methodToSet = Enums.Method.None;
+                    difficulty = Enums.Difficulties.None;
+                    subMethod = Enums.SubMethod.None;
+                }
 
-            if(!subMethod.equals(Enums.SubMethod.None)){
+
+                if (!methodToSet.equals(Enums.Method.None)) { //set it to None now, so the same value wont get added twice todo add the same for the shared prefs
+                    currMethod.set(queue_id ,new AlarmMethod(queue_id, difficulty, methodToSet, subMethod));
+                }
+
+            }
                 subMethod = Enums.SubMethod.None;
-                //... (yes the above doesn't have to be in the if, but does the shared pref?)
-            }
-
-            if(!difficulty.equals(Enums.Difficulties.None)){
                 difficulty = Enums.Difficulties.None;
-            }
+                methodToSet = Enums.Method.None;
+            }else{
 
-            methodToSet = Enums.Method.None;
-            //...
-        } //todo check if the value differs, when setting this to none, since this is the same reference (is enum callbyreference?) --> tested in online compiler, no need to worry, if you change the var, the arraylists values dont change aswell
+            Toast.makeText(context, "You did not set the edit_add flag in the corresponding activity", Toast.LENGTH_SHORT).show();
 
-
-
+        }
+        see.remove("edit_add");
 
 
 
@@ -1003,10 +1056,6 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
         alarmQueue.setAdapter(adapter1);
         alarmQueue.setLayoutManager(new LinearLayoutManager(context));
-
-
-
-
 
 
         updateViews();

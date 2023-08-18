@@ -26,36 +26,36 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="96dp">
+        android:layout_marginTop="48dp">
 
 
         <RadioButton
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="24dp"
             android:id="@+id/rbExEasySudoku"
             android:text="@string/ex_easy_difficulty"/>
 
         <RadioButton
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/rbEasySudoku"
-            android:text="@string/easy_difficulty"/>
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:text="@string/easy_difficulty" />
 
         <RadioButton
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="24dp"
             android:id="@+id/rbMiddleSudoku"
             android:text="@string/middle_difficulty"/>
 
         <RadioButton
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="24dp"
             android:id="@+id/rbHardSudoku"
             android:text="@string/hard_difficulty"/>
 
         <RadioButton
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="24dp"
             android:id="@+id/rbExHardSudoku"
             android:text="@string/ex_hard_difficulty"/>
 
@@ -67,12 +67,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/example"
-        android:lines="9"
+        android:lines="18"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@+id/rgSudokuDifficulty"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="32dp" />
+        android:layout_marginTop="8dp"
+        android:textSize="16sp"/>
 
 
     <Button

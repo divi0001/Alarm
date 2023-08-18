@@ -250,12 +250,11 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                 LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
                 @SuppressLint("MissingPermission")
                 Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                if (location != null) {
+                if (addr == null) {
                     LocationMethodSetActivity.this.longitude = location.getLongitude();
                     LocationMethodSetActivity.this.latitude = location.getLatitude();
-                }else {
-                    Toast.makeText(LocationMethodSetActivity.this, "Couldn't fetch device location", Toast.LENGTH_SHORT).show();
                 }
+
                 try{
                     Geocoder g = new Geocoder(LocationMethodSetActivity.this);
                     addr = g.getFromLocation(latitude,longitude,1).get(0);
@@ -381,9 +380,9 @@ public class LocationMethodSetActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 if(isLeaveMode) {
-                    radiusMode = String.valueOf(Leave);
+                    radiusMode = Leave.name();
                 }else{
-                    radiusMode = String.valueOf(Enter);
+                    radiusMode = Enter.name();
                 }
 
                 SharedPreferences sp = LocationMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
@@ -399,18 +398,31 @@ public class LocationMethodSetActivity extends AppCompatActivity {
 
                         se.putString("Method",Enums.Method.Location.name());
                         se.putString("edit_add", "edit");
+                        se.putInt("long", (int)addr.getLongitude());
+                        se.putInt("lat", (int) addr.getLatitude());
+                        se.putInt("longitude",(int) ((addr.getLongitude()- (int) addr.getLongitude())*1000000));
+                        se.putInt("latitude",(int) ((addr.getLatitude()- (int) addr.getLatitude())*1000000));
+
+                        se.putInt("radius", (int) radius);
+                        se.putString("SubMethod", radiusMode);
                         se.apply();
+                        Log.d("mett", "Im here "+ latitude  + " " + longitude);
                         finish();
                     }else{
                         Geocoder g = new Geocoder(LocationMethodSetActivity.this);
                         try {
+                            Log.d("mett", "debug: long + lat ="+ longitude + " + " + latitude );
                             addr = g.getFromLocation(latitude, longitude, 1).get(0);
                             se.putString("Method",Enums.Method.Location.name());
                             se.putString("edit_add", "edit");
                             se.putInt("long", (int)longitude);
                             se.putInt("lat", (int) latitude);
-                            se.putInt("longitude", Integer.parseInt(String.valueOf(longitude).split("\\.")[1]));
-                            se.putInt("latitude", Integer.parseInt(String.valueOf(latitude).split("\\.")[1]));
+                            se.putInt("longitude",(int) ((addr.getLongitude()- (int) addr.getLongitude())*1000000));
+                            se.putInt("latitude",(int) ((addr.getLatitude()- (int) addr.getLatitude())*1000000));
+
+                            se.putInt("radius", (int) radius);
+                            se.putString("SubMethod", radiusMode);
+                            Log.d("mett", "Im queer "+ latitude  + " " + longitude);
                             se.apply();
                             finish();
 
@@ -425,19 +437,22 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                     if (addr == null) {
                         Geocoder g = new Geocoder(LocationMethodSetActivity.this);
                         try {
+                            Log.d("mett", "debug: long + lat ="+ longitude + " + " + latitude );
                             addr = g.getFromLocation(latitude, longitude, 1).get(0);
                             se.putInt("queue_id", id);
                             se.putString("Method", Enums.Method.Location.name());
-                            if (isLeaveMode){
-                                se.putString("SubMethod", Leave.name());
-                            }else{
-                                se.putString("SubMethod", Enter.name());
-                            }
+
                             se.putInt("radius", (int) radius);
                             se.putInt("long", (int)longitude);
                             se.putInt("lat", (int) latitude);
-                            se.putInt("longitude", Integer.parseInt(String.valueOf(longitude).split("\\.")[1]));
-                            se.putInt("latitude", Integer.parseInt(String.valueOf(latitude).split("\\.")[1]));
+                            se.putInt("longitude",(int) ((addr.getLongitude()- (int) addr.getLongitude())*1000000));
+                            se.putInt("latitude",(int) ((addr.getLatitude()- (int) addr.getLatitude())*1000000));
+
+                            //se.putInt("longitude", Integer.parseInt(String.valueOf(longitude).split("\\.")[1]));
+                            //se.putInt("latitude", Integer.parseInt(String.valueOf(latitude).split("\\.")[1]));
+                            se.putInt("radius", (int) radius);
+                            se.putString("SubMethod", radiusMode);
+                            Log.d("mett", "Hey "+ latitude  + " " + longitude);
                             se.apply();
                             finish();
 
@@ -454,10 +469,14 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                             se.putString("SubMethod", Enter.name());
                         }
                         se.putInt("radius", (int) radius);
-                        se.putInt("long", (int)longitude);
-                        se.putInt("lat", (int) latitude);
-                        se.putInt("longitude", Integer.parseInt(String.valueOf(longitude).split("\\.")[1]));
-                        se.putInt("latitude", Integer.parseInt(String.valueOf(latitude).split("\\.")[1]));
+                        se.putInt("long", (int)addr.getLongitude());
+                        se.putInt("lat", (int) addr.getLatitude());
+                        se.putInt("longitude",(int) ((addr.getLongitude()- (int) addr.getLongitude())*1000000));
+                        se.putInt("latitude",(int) ((addr.getLatitude()- (int) addr.getLatitude())*1000000));
+                        Log.d("mett", "newLong: " + (int) ((addr.getLongitude()- (int) addr.getLongitude())*1000000));
+                        se.putInt("radius", (int) radius);
+                        se.putString("SubMethod", radiusMode);
+                        Log.d("mett", "Im gay "+ latitude  + " " + longitude);
                         se.apply();
                         finish();
                     }
