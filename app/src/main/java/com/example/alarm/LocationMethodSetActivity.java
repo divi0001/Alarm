@@ -385,7 +385,7 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                     radiusMode = Enter.name();
                 }
 
-                SharedPreferences sp = LocationMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
+                SharedPreferences sp = LocationMethodSetActivity.this.getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE);
                 int queueId = sp.getInt("queue_id",-1);
 
                 if(edit){
@@ -405,6 +405,7 @@ public class LocationMethodSetActivity extends AppCompatActivity {
 
                         se.putInt("radius", (int) radius);
                         se.putString("SubMethod", radiusMode);
+                        se.putInt("queue_id",queueId);
                         se.apply();
                         Log.d("mett", "Im here "+ latitude  + " " + longitude);
                         finish();
@@ -419,7 +420,7 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                             se.putInt("lat", (int) latitude);
                             se.putInt("longitude",(int) ((addr.getLongitude()- (int) addr.getLongitude())*1000000));
                             se.putInt("latitude",(int) ((addr.getLatitude()- (int) addr.getLatitude())*1000000));
-
+                            se.putInt("queue_id",queueId);
                             se.putInt("radius", (int) radius);
                             se.putString("SubMethod", radiusMode);
                             Log.d("mett", "Im queer "+ latitude  + " " + longitude);
@@ -439,7 +440,7 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                         try {
                             Log.d("mett", "debug: long + lat ="+ longitude + " + " + latitude );
                             addr = g.getFromLocation(latitude, longitude, 1).get(0);
-                            se.putInt("queue_id", id);
+                            se.putInt("queue_id", ssp.getInt("queue_id", -1));
                             se.putString("Method", Enums.Method.Location.name());
 
                             se.putInt("radius", (int) radius);
@@ -461,7 +462,7 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                         }
                     } else {
 
-                        se.putInt("queue_id", id);
+                        se.putInt("queue_id", ssp.getInt("queue_id", -1));
                         se.putString("Method", Enums.Method.Location.name());
                         if (isLeaveMode){
                             se.putString("SubMethod", Leave.name());

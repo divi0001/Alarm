@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -81,26 +82,29 @@ public class QRMethodSetActivity extends AppCompatActivity {
             }
         }
 
-        SharedPreferences sp = QRMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
-        int queueId = sp.getInt("queue_id",-1);
+        SharedPreferences sp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE);
+        int queue_id = sp.getInt("queue_id",-1);
+        boolean edit = sp.getString("edit_add","add").equals("edit");
+        Log.d("mett", String.valueOf(edit));
         btnAddFromAbove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if(getIntent().hasExtra("label")){
+                if(edit){
 
                     //todo if this was based on editing an already set method, this needs another if to filter, if the label is unique, if a new qr was added, but it also shouldn't stop this from working if the label stays the same, because then it might be seen as ununique?
 
-                    int row_id = getIntent().getIntExtra("id",-1);
 
                     SharedPreferences sp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),MODE_PRIVATE);
                     SharedPreferences.Editor se = sp.edit();
                     se.putString("Method", Enums.Method.QRBar.name());
                     se.putString("QRLabel", editLabel.getText().toString());
+                    se.putInt("queue_id", queue_id);
+                    se.putString("edit_add", "edit");
                     //decoded value at the key of the label in the qr DB
                     se.apply();
                     finish();
-                }else {
+                } else {
 
 
                     if (labels.contains(editLabel.getText().toString())) {
@@ -115,6 +119,8 @@ public class QRMethodSetActivity extends AppCompatActivity {
                         SharedPreferences.Editor se = sp.edit();
                         se.putString("Method", Enums.Method.QRBar.name());
                         se.putString("QRLabel", editLabel.getText().toString());
+                        se.putInt("queue_id", queue_id);
+                        se.putString("edit_add", "add");
                         //decoded value at the key of the label in the qr DB
                         se.apply();
                         finish();
@@ -134,12 +140,28 @@ public class QRMethodSetActivity extends AppCompatActivity {
                     int row_id = getIntent().getIntExtra("id",-1);
 
 
-                    db.editMethoddatabase(queueId, 2, -1, -1, spSavedQRBars.getSelectedItem().toString(), -1, row_id);
+                    db.editMethoddatabase(queue_id, 2, -1, -1, spSavedQRBars.getSelectedItem().toString(), -1, row_id);
+                    SharedPreferences sp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),MODE_PRIVATE);
+                    SharedPreferences.Editor se = sp.edit();
+                    se.putString("Method", Enums.Method.QRBar.name());
+                    se.putString("QRLabel", spSavedQRBars.getSelectedItem().toString());
+                    se.putInt("queue_id", queue_id);
+                    se.putString("edit_add", sp.getString("edit_add","add"));
+                    //decoded value at the key of the label in the qr DB
+                    se.apply();
                     finish();
 
                 }else {
                     int l = db.getMaxTableId("Methoddatabase")+1;
-                    db.addMethod(l, queueId, 2, -1, -1, spSavedQRBars.getSelectedItem().toString(), -1);
+                    db.addMethod(l, queue_id, 2, -1, -1, spSavedQRBars.getSelectedItem().toString(), -1);
+                    SharedPreferences sp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),MODE_PRIVATE);
+                    SharedPreferences.Editor se = sp.edit();
+                    se.putString("Method", Enums.Method.QRBar.name());
+                    se.putString("QRLabel", spSavedQRBars.getSelectedItem().toString());
+                    se.putInt("queue_id", queue_id);
+                    se.putString("edit_add", sp.getString("edit_add","add"));
+                    //decoded value at the key of the label in the qr DB
+                    se.apply();
                     finish();
 
                 }

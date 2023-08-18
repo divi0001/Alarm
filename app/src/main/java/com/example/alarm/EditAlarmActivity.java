@@ -531,6 +531,8 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                 SharedPreferences.Editor edi = pref.edit();
                 edi.putString("method", "set_alarm");
                 edi.apply();
+                SharedPreferences.Editor ed = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE).edit();
+
                 if(methodToSetPos != -1) methodToSet = Enums.Method.values()[methodToSetPos];
 
                 if(methodToSet.equals(Enums.Method.TapOff)) {
@@ -553,8 +555,9 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                                 case Math:
 
                                     Intent iMath = new Intent(context, MathMethodSetActivity.class);
-                                    iMath.putExtra("edit_add", "add");
-                                    iMath.putExtra("id",getMaxMQueueID(alarmParameter, -1));
+                                    ed.putString("edit_add", "add");
+                                    ed.putInt("queue_id",getMaxMQueueID(alarmParameter, -1));
+                                    ed.apply();
 
                                     startActivity(iMath);
 
@@ -563,9 +566,9 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                                 case QRBar:
 
                                     Intent iScan = new Intent(context, QRMethodSetActivity.class);
-                                    iScan.putExtra("edit_add", "add");
-                                    iScan.putExtra("id", getMaxMQueueID(alarmParameter,-1)); //todo not sure if really -1, though it should be?
-
+                                    ed.putString("edit_add", "add");
+                                    ed.putInt("queue_id",getMaxMQueueID(alarmParameter, -1));
+                                    ed.apply();
                                     startActivity(iScan);
                                     break;
                                 case Location:
@@ -573,8 +576,9 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                                     if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                                         Mapbox.getInstance(EditAlarmActivity.this, getResources().getString(R.string.mapbox_access_token));
                                         Intent iLoc = new Intent(context, LocationMethodSetActivity.class);
-                                        iLoc.putExtra("id", getMaxMQueueID(alarmParameter,-1));
-                                        iLoc.putExtra("edit_add","add");
+                                        ed.putString("edit_add", "add");
+                                        ed.putInt("queue_id",getMaxMQueueID(alarmParameter, -1));
+                                        ed.apply();
 
                                         startActivity(iLoc);
                                     } else {
@@ -585,22 +589,25 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
                                 case Sudoku:
                                     Intent iSudoku = new Intent(context, SudokuMethodSetActivity.class);
-                                    iSudoku.putExtra("id", getMaxMQueueID(alarmParameter,-1));
-                                    iSudoku.putExtra("edit_add","add");
+                                    ed.putString("edit_add", "add");
+                                    ed.putInt("queue_id",getMaxMQueueID(alarmParameter, -1));
+                                    ed.apply();
 
                                     startActivity(iSudoku);
                                     break;
 
                                 case Memory:
                                     Intent iMemory = new Intent(context, MemoryMethodSetActivity.class);
-                                    iMemory.putExtra("id", getMaxMQueueID(alarmParameter,-1));
-                                    iMemory.putExtra("edit_add","add");
+                                    ed.putString("edit_add", "add");
+                                    ed.putInt("queue_id",getMaxMQueueID(alarmParameter, -1));
+                                    ed.apply();
 
                                     startActivity(iMemory);
                                     break;
 
                             }
                 }
+                ed.apply();
             }
         });
 
@@ -982,7 +989,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         if(shared.contains("radius")){
             radius = shared.getInt("radius",600);
         }
-        see.apply();
+
 
         SharedPreferences se = getSharedPreferences(getString(R.string.uri_key),MODE_PRIVATE);
         if(se.contains("name")){
@@ -1006,12 +1013,16 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
         if(shared.contains("edit_add")){
 
-            if (shared.getString("edit_add","add").equals("add")) {
+            String edit = shared.getString("edit_add", "add");
+            see.remove("edit_add");
+            Log.d("mett", edit);
+
+            if (edit.equals("add")) {
                 if (methodToSet.equals(Enums.Method.QRBar)) {
-                    currMethod.add(new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID), methodToSet, labe));
+                    currMethod.add(new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID)+1, methodToSet, labe));
                     methodToSet = Enums.Method.None;
                 } else if (methodToSet.equals(Enums.Method.Location)) {
-                    currMethod.add(new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID), methodToSet, subMethod, addr.get(0), radius, longitude, latitude, adr));
+                    currMethod.add(new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID)+1, methodToSet, subMethod, addr.get(0), radius, longitude, latitude, adr));
                     methodToSet = Enums.Method.None;
                     difficulty = Enums.Difficulties.None;
                     subMethod = Enums.SubMethod.None;
@@ -1019,15 +1030,20 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
 
                 if (!methodToSet.equals(Enums.Method.None)) { //set it to None now, so the same value wont get added twice todo add the same for the shared prefs
-                    currMethod.add(new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID), difficulty, methodToSet, subMethod));
+                    currMethod.add(new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID)+1, difficulty, methodToSet, subMethod));
                 }
             }else { //edit case TODO
 
+                int where = getTrueQueueID(queue_id);
+
                 if (methodToSet.equals(Enums.Method.QRBar)) {
-                    currMethod.set(queue_id,new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID), methodToSet, labe));
+
+                    Log.d("mett", String.valueOf(where));
+
+                    currMethod.set(where, new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID), methodToSet, labe));
                     methodToSet = Enums.Method.None;
                 } else if (methodToSet.equals(Enums.Method.Location)) {
-                    currMethod.set(queue_id, new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID), methodToSet, subMethod, addr.get(0), radius, longitude, latitude, adr));
+                    currMethod.set(where, new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID), methodToSet, subMethod, addr.get(0), radius, longitude, latitude, adr));
                     methodToSet = Enums.Method.None;
                     difficulty = Enums.Difficulties.None;
                     subMethod = Enums.SubMethod.None;
@@ -1035,21 +1051,19 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
 
                 if (!methodToSet.equals(Enums.Method.None)) { //set it to None now, so the same value wont get added twice todo add the same for the shared prefs
-                    currMethod.set(queue_id ,new AlarmMethod(queue_id, difficulty, methodToSet, subMethod));
+                    currMethod.set(where ,new AlarmMethod(queue_id, difficulty, methodToSet, subMethod));
                 }
 
             }
                 subMethod = Enums.SubMethod.None;
                 difficulty = Enums.Difficulties.None;
                 methodToSet = Enums.Method.None;
-            }else{
-
+        }else{
             Toast.makeText(context, "You did not set the edit_add flag in the corresponding activity", Toast.LENGTH_SHORT).show();
-
         }
         see.remove("edit_add");
 
-
+        see.apply();
 
         adapter1 = new QueueRecViewAdapter(context);
         adapter1.setAlarmParameter(alarmParameter.getmQueue(lvlID));
@@ -1059,6 +1073,15 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
 
         updateViews();
+    }
+
+    private int getTrueQueueID(int queueId) {
+
+        for(int i = 0; i < alarmParameter.getmQueue(-1).size(); i++){
+            if(alarmParameter.getmQueue(-1).get(i).getId() == queueId) return i;
+
+        }
+        return -1;
     }
 
     private void updateViews() {

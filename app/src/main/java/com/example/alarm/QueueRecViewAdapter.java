@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -90,6 +91,9 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
                 Enums.Method type = alarmParameter.get(position).getType();
                 Class classType = EditAlarmActivity.class;
 
+                SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.math_to_edit_alarm_pref_key), Context.MODE_PRIVATE);
+                SharedPreferences.Editor se = sp.edit();
+
                 switch (type){
                     case TapOff:
                         Toast.makeText(context, "What exactly do you want to edit here? :D", Toast.LENGTH_SHORT).show();
@@ -116,31 +120,31 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
                 }
 
                 Intent iUpdate = new Intent(context, classType);
-                iUpdate.putExtra("edit_add","edit");
+                se.putString("edit_add","edit");
 
                 switch (type) {
                     case Math:
-                        iUpdate.putExtra("SubMethod", alarmParameter.get(position).getSubMethod());
-                        iUpdate.putExtra("difficulty", alarmParameter.get(position).getDifficulty());
+                        se.putString("SubMethod", alarmParameter.get(position).getSubMethod().name());
+                        se.putString("difficulty", alarmParameter.get(position).getDifficulty().name());
                         break;
                     case QRBar:
-                        iUpdate.putExtra("label", alarmParameter.get(position).getQrLabel());
+                        se.putString("label", alarmParameter.get(position).getQrLabel());
                     case Sudoku:
-                        iUpdate.putExtra("difficulty", alarmParameter.get(position).getDifficulty());
+                        se.putString("difficulty", alarmParameter.get(position).getDifficulty().name());
                 }
                 if(type == Enums.Method.Location) {
                     double radius = alarmParameter.get(position).getLocationRadius(); //last arg in .substring is exclusive, so no -1 needed
                     String enter_leave = alarmParameter.get(position).getSubType().toString();
 
-                    iUpdate.putExtra("street", alarmParameter.get(position).getAdress().getSubThoroughfare()); //todo dont you also want stuff like housenumber etc?
-                    iUpdate.putExtra("radius",radius);
-                    iUpdate.putExtra("enter_leave", enter_leave);
+                    se.putString("street", alarmParameter.get(position).getAdress().getSubThoroughfare()); //todo dont you also want stuff like housenumber etc?
+                    se.putInt("radius",(int)radius);
+                    se.putString("enter_leave", enter_leave);
 
 
                 }
-                iUpdate.putExtra("id",alarmParameter.get(position).getId());
-                iUpdate.putExtra("queue_id",alarmParameter.get(position).getId());//just to be sure to get the id vars correctly hopefully
-
+                se.putInt("id",alarmParameter.get(position).getId());
+                se.putInt("queue_id",alarmParameter.get(position).getId());//just to be sure to get the id vars correctly hopefully
+                se.apply();
                 context.startActivity(iUpdate);
             }
         });

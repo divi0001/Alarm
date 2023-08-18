@@ -58,11 +58,15 @@ public class MathMethodSetActivity extends AppCompatActivity {
         getIntentData(); //gets the bool for edit which is used below here and more
         txtExample.setText("generating example, as soon \nas you select a different math task");
 
-        if(edit){
+        SharedPreferences s = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE);
+        String e = s.getString("edit_add","add");
+
+        if(e.equals("edit")){
             btnSave.setText(R.string.save);
+            edit = true;
         }else{
             btnSave.setText(R.string.add);
-
+            edit = false;
         }
 
         rgDifficulty.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -106,7 +110,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                SharedPreferences sp = MathMethodSetActivity.this.getSharedPreferences(getString(R.string.queue_key), MODE_PRIVATE);
+                                SharedPreferences sp = MathMethodSetActivity.this.getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE);
                                 int queueId = sp.getInt("queue_id",-1); //todo (threeDots in EditAlarm)
 
 
