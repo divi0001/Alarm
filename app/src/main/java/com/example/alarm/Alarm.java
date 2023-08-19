@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 public class Alarm implements java.io.Serializable  {
 
-    private CharSequence t;
+    private String t;
     int ID,selectedLvl, snoozeAmount, snoozeMinutes, minutesUntilTurnBackOn, turnus;
 
     //todo extendedPriveleges as a global setting, not per Alarm
@@ -24,7 +24,7 @@ public class Alarm implements java.io.Serializable  {
 
     public Alarm(CharSequence t, int id, String soundPath, boolean isActive, boolean[] weekDays, boolean snoozable, String label,
                  boolean extraAwakeCheck, boolean hasLevels, @Nullable ArrayList<AlarmMethod> mQueue, @Nullable ArrayList<AlarmLevel> lQueue, int turnus) {
-        this.t = t; //t = time
+        this.t = t.toString(); //t = time
         this.ID = id;
         this.isActive = isActive;
         this.weekDays = weekDays;
@@ -55,7 +55,7 @@ public class Alarm implements java.io.Serializable  {
         this.snoozable = false;
         this.extraAwakeCheck = false;
         this.hasLevels = false;
-        this.mQueue = new ArrayList<AlarmMethod>();
+        this.mQueue = new ArrayList<>();
         this.soundPath = "android.resource://com.example.alarm/"+ R.raw.weak_1; //should be the standard sound (R.raw.weak_1)
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -68,7 +68,7 @@ public class Alarm implements java.io.Serializable  {
     }
 
     public void setT(CharSequence t) {
-        this.t = t;
+        this.t = t.toString();
     }
 
     public int getID() {

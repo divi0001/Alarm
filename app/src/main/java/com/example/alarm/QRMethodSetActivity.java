@@ -150,7 +150,6 @@ public class QRMethodSetActivity extends AppCompatActivity {
 
                 }else {
                     int l = db.getMaxTableId("Methoddatabase")+1;
-                    db.addMethod(l, queue_id, 2, -1, -1, spSavedQRBars.getSelectedItem().toString(), -1);
                     SharedPreferences sp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),MODE_PRIVATE);
                     SharedPreferences.Editor se = sp.edit();
                     se.putString("Method", Enums.Method.QRBar.name());

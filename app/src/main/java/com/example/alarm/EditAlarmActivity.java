@@ -835,18 +835,19 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         @Override
         public void onClick(View v) {
             if(!editTurnus.getText().toString().equals("")) alarmParameter.setTurnus(Integer.parseInt(editTurnus.getText().toString()));
+            else alarmParameter.setTurnus(-1);
                     //first condition might be redundant
-            if((alarmParameter.getlQueue().size() > 0 || alarmParameter.getmQueue(-1).size() > 0)&& !Objects.equals(null, curr_uri)){
+            if((alarmParameter.getlQueue().size() > 0 || alarmParameter.getmQueue(-1).size() > 0)&& !Objects.equals(null, alarmParameter.getSoundPath(lvlID))){
 
                 DBHelper db = new DBHelper(context, "Database.db");
 
                 SharedPreferences sp = getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE);
-                alarmId = sp.getInt("id", 1);
-
-
-
-
-                db.syncFinalWithTempDB(alarmId);
+                boolean editAlarm = sp.getBoolean("edit_add", false);
+                alarmId = sp.getInt("id", 0);
+                alarmParameter.setID(alarmId);
+                //todo save lvls before mkAlarm
+                db.mkAlarm(alarmParameter, editAlarm);
+                Log.d("mett", alarmParameter.toString());
                 finish();
 
             }else{

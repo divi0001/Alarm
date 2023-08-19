@@ -504,6 +504,7 @@
                 android:layout_marginStart="4dp"
                 android:id="@+id/editTurnus"
                 android:hint="@string/explain_empty_turnus"
+                android:textSize="12sp"
                 android:layout_toEndOf="@id/txtTurnus"
                 android:autofillHints=""
                 android:inputType="number"/>

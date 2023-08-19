@@ -1,5 +1,6 @@
 package com.example.alarm;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,7 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class DBHelper extends SQLiteOpenHelper{
@@ -25,8 +30,7 @@ public class DBHelper extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        db.execSQL("create Table Alarmdatabase (id INTEGER primary key autoincrement, label TEXT, privilege_rights INTEGER," +
-                " time_wake_up_hours INTEGER, time_wake_up_minutes INTEGER, days_schedule_id INTEGER, weeks_schedule_amount INTEGER, check_awake INTEGER)");
+        db.execSQL("create Table Alarmtable (id INTEGER primary key , Alarm TEXT)");
 
         db.execSQL("create Table QRBarcodedatabase (label TEXT primary key, decoded TEXT)");
         //setupTablesForPreset(db);
@@ -36,7 +40,7 @@ public class DBHelper extends SQLiteOpenHelper{
     @Override
     public void onUpgrade(SQLiteDatabase db, int verOld, int verNew) {
 
-        db.execSQL("drop Table if exists Alarmdatabase");
+        db.execSQL("drop Table if exists Alarmtable");
         db.execSQL("drop Table if exists QRBarcodedatabase");
         onCreate(db);
     }
@@ -258,7 +262,7 @@ public class DBHelper extends SQLiteOpenHelper{
         }
     }
 
-
+/*
     public void addAlarm(int id, String label, int soundPathId, boolean privilegeRights, boolean snoozable, int wakeUpTimeHours, int wakeUpTimeMinutes, int daysScheduleId, int weeksScheduleAmount, boolean checkAwake){
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -310,7 +314,7 @@ public class DBHelper extends SQLiteOpenHelper{
             Toast.makeText(context, "Successfully added into Methoddatabase", Toast.LENGTH_SHORT).show();
         }
     }
-
+*/
 
 
     public String getMethodById(int id){
@@ -601,4 +605,89 @@ public class DBHelper extends SQLiteOpenHelper{
 
     }
 
+    public void mkAlarm(Alarm alarmParameter, boolean edit) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("id", alarmParameter.getID());
+        cv.put("Alarm", new Gson().toJson(alarmParameter));
+        if(edit){
+            db.update("Alarmtable", cv, "id=?", new String[]{Integer.toString(alarmParameter.getID())});
+        }else{
+            db.insert("Alarmtable", null, cv);
+        }
+    }
+            /*
+            cv.put("id", alarmParameter.getID());
+            cv.put("turnus", alarmParameter.getTurnus());
+            cv.put("t", alarmParameter.getT().toString());
+            cv.put("weekdays", weeksDaysToByte(alarmParameter.getWeekDays()));
+            cv.put("isActive", 1); //1 for true, 0 for false
+            if (alarmParameter.isHasLevels()) { //theoretically could also do cv.put("hasLevels", weeksDaysToByte(new boolean[]{alarmParameter.isHasLevels()})); but then i dont have the if
+                cv.put("hasLevels", 1);
+                cv.put("levels", alarmParameter.getlQueue().toString());
+            } else {
+                cv.put("hasLevels", 0);
+            }
+
+        */
+
+
+    public Alarm getAlarm(int id){
+        SQLiteDatabase db = this.getReadableDatabase();
+        @SuppressLint("Recycle") Cursor c = db.rawQuery("Select Alarm From Alarmtable where id=?", new String[]{Integer.toString(id)});
+
+        if(c.getCount()>0){
+            String json = c.getString(1);
+            return new Gson().fromJson(json, Alarm.class);
+        }else{
+            return new Alarm(-1);
+        }
+    }
+
+    public int getMaxAlarmID(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        @SuppressLint("Recycle") Cursor c = db.rawQuery("Select max(id) from Alarmtable", new String[]{});
+        if(c.getCount() > 0){
+            c.moveToFirst();
+            return c.getInt(0);
+        }else return -1;
+    }
+
+    /**
+     *
+     * @param weekDays the array containing booleans of weekdays on that the alarm should be on
+     * @return a byte representation of those bools, in reverse order, starting with the 2^0 bit, so {true,false,false,false,false,false,false} = 1 = 2^0 , {true,false,false,false,false,false,true} = 65 = 2^0+ 2^6
+     */
+    public byte weeksDaysToByte(boolean[] weekDays){
+        byte by = 0;
+        int i = 0;
+        for (boolean b: weekDays){
+            if(b) by+= power(2,i);
+            i++;
+        }
+
+        return by;
+    }
+
+    public int power(int x, int i){
+        int r = x;
+        if(i == 0) return 1;
+        for (int j = 1; j < i; j++){
+            r*=x;
+        }
+        return r;
+    }
+
+    public ArrayList<Alarm> getAlarms() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("select * from Alarmtable", new String[]{});
+        ArrayList<Alarm> alarms = new ArrayList<>();
+
+        if(c.getCount()>0){
+            while(c.moveToNext()) alarms.add(new Gson().fromJson(c.getString(1), Alarm.class));
+        }
+        return alarms;
+
+    }
 }

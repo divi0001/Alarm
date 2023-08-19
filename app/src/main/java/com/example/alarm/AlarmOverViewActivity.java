@@ -27,6 +27,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class AlarmOverViewActivity extends AppCompatActivity {
 
@@ -36,6 +37,7 @@ public class AlarmOverViewActivity extends AppCompatActivity {
 
     private ArrayList<Alarm> alarms = new ArrayList<>();
     private Context context = this;
+    AlarmRecViewAdapter adapter = new AlarmRecViewAdapter(this);
 
 
     @Override
@@ -52,31 +54,24 @@ public class AlarmOverViewActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 DBHelper db = new DBHelper(context, "Database.db");
-                Cursor alarmData = db.execQuery("SELECT MAX(id) FROM Alarmdatabase", null);
-                int latest_id = 1;
-
-
-                if(alarmData.getCount()>0){
-                    alarmData.moveToFirst();
-                    latest_id = alarmData.getInt(0);
-                }
-
-
-                SharedPreferences sp = getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE);
-                SharedPreferences.Editor se = sp.edit();
-                se.putInt("id", latest_id);
-                se.apply();
 
                 Intent i = new Intent(AlarmOverViewActivity.this, EditAlarmActivity.class);
                 i.putExtra("createAlarm","true");
+                getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().putBoolean("edit_add", false).apply();
+                getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().putInt("id", db.getMaxAlarmID()+1).apply();
                 startActivity(i);
             }
         });
 
 
+        DBHelper db = new DBHelper(context, "Database.db");
+        alarms = db.getAlarms();
 
 
+        adapter.setAlarms(alarms);
 
+        recView.setAdapter(adapter);
+        recView.setLayoutManager(new LinearLayoutManager(context));
 
 
 
@@ -93,16 +88,20 @@ public class AlarmOverViewActivity extends AppCompatActivity {
         addAlarm = (ImageView) findViewById(R.id.btnAddAlarm);
         recView = (RecyclerView) findViewById(R.id.alarmRecView);
 
+
+
         addAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                DBHelper db = new DBHelper(AlarmOverViewActivity.this, "Database.db");
                 Intent i = new Intent(AlarmOverViewActivity.this, EditAlarmActivity.class);
                 i.putExtra("createAlarm","true");
+                getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().putInt("id", db.getMaxAlarmID()+1).apply();
                 startActivity(i);
             }
         });
 
-
+        adapter.setAlarms(alarms);
 
 
     }
