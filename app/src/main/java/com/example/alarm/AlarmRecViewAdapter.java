@@ -42,8 +42,8 @@ public class AlarmRecViewAdapter extends RecyclerView.Adapter<AlarmRecViewAdapte
 
 
         holder.clock.setFormat24Hour(alarms.get(position).getT());
-        holder.method.setText(alarms.get(position).mainMethod(position));
-        holder.sound.setText(alarms.get(position).mainSoundPath(position));
+        holder.method.setText(alarms.get(position).mainMethod(-1));
+        holder.sound.setText(alarms.get(position).mainSoundPath(-1));
 
 
         holder.imgBtnDown.setOnClickListener(new View.OnClickListener() {
