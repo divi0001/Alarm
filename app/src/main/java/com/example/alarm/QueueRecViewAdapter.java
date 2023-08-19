@@ -111,7 +111,7 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
                         classType = MemoryMethodSetActivity.class;
                         break;
                     default:
-                        classType = EditAlarmActivity.class; //TODO: make sure, the names of the string that is switch cased is actually correctly muxed
+                        classType = EditAlarmActivity.class;
                         break;
                 }
 
@@ -136,7 +136,7 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
                     double radius = alarmParameter.get(position).getLocationRadius(); //last arg in .substring is exclusive, so no -1 needed
                     String enter_leave = alarmParameter.get(position).getSubType().toString();
 
-                    se.putString("street", alarmParameter.get(position).getAdress().getSubThoroughfare()); //todo dont you also want stuff like housenumber etc?
+                    se.putString("street", alarmParameter.get(position).getAdress().getSubThoroughfare());
                     se.putInt("radius",(int)radius);
                     se.putString("enter_leave", enter_leave);
 
@@ -155,21 +155,6 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
            //     Toast.makeText(context, "It fucking worked", Toast.LENGTH_SHORT).show();
             //}
         //});
-
-    }
-
-
-    private String typeToTable(String type) {
-
-        if(type.contains("Math")){
-            return "Mathdatabase";
-        } else if (type.contains("QR")) {
-            return "QRBarcodedatabase";
-        } else if (type.contains("Location")) {
-            return "Locationdatabase";
-        }else {
-            return ""; //todo
-        }
 
     }
 

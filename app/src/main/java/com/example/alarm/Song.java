@@ -1,30 +1,43 @@
 package com.example.alarm;
 
+import android.graphics.Bitmap;
 import android.net.Uri;
+
+import androidx.annotation.Nullable;
 
 public class Song {
 
-    private long id, albumId;
-    private Uri uri, albumArtUri;
-    private String name;
+    private long id;
+    private Uri uri;
+    private Bitmap albumArt;
+    private String name,album;
     private int duration, size;
 
 
     /**
      *
      * @param id the id of the song
-     * @param albumId the id of the album
+     * @param album the name of the album
      * @param uri the uri in internal storage to the song
-     * @param albumArtUri the uri to the album art
+     * @param albumArt the Bitmap of the album art
      * @param name the name of the song
      * @param duration the duration of the song
      * @param size the size (byte sized) of the song file
      */
-    public Song(long id, long albumId, Uri uri, Uri albumArtUri, String name, int duration, int size) {
+    public Song(long id, String album, Uri uri, Bitmap albumArt, String name, int duration, int size) {
         this.id = id;
-        this.albumId = albumId;
+        this.album = album;
         this.uri = uri;
-        this.albumArtUri = albumArtUri;
+        this.albumArt = albumArt;
+        this.name = name;
+        this.duration = duration;
+        this.size = size;
+    }
+
+    public Song(long id, String album, Uri uri, String name, int duration, int size) {
+        this.id = id;
+        this.album = album;
+        this.uri = uri;
         this.name = name;
         this.duration = duration;
         this.size = size;
@@ -34,16 +47,18 @@ public class Song {
         return id;
     }
 
+
+
     public void setId(long id) {
         this.id = id;
     }
 
-    public long getAlbumId() {
-        return albumId;
+    public String getAlbum() {
+        return album;
     }
 
-    public void setAlbumId(long albumId) {
-        this.albumId = albumId;
+    public void setAlbum(String albumId) {
+        this.album = albumId;
     }
 
     public Uri getUri() {
@@ -54,12 +69,12 @@ public class Song {
         this.uri = uri;
     }
 
-    public Uri getAlbumArtUri() {
-        return albumArtUri;
+    public Bitmap getAlbumArt() {
+        return albumArt;
     }
 
-    public void setAlbumArtUri(Uri albumArtUri) {
-        this.albumArtUri = albumArtUri;
+    public void setAlbumArt(Bitmap albumArt) {
+        this.albumArt = albumArt;
     }
 
     public String getName() {
@@ -90,9 +105,9 @@ public class Song {
     public String toString() {
         return "Song{" +
                 "id=" + id +
-                ", albumId=" + albumId +
+                ", albumId=" + album +
                 ", uri=" + uri +
-                ", albumArtUri=" + albumArtUri +
+                ", albumArtUri=" + albumArt +
                 ", name='" + name + '\'' +
                 ", duration=" + duration +
                 ", size=" + size +

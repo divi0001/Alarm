@@ -28,47 +28,8 @@ public class DBHelper extends SQLiteOpenHelper{
         db.execSQL("create Table Alarmdatabase (id INTEGER primary key autoincrement, label TEXT, privilege_rights INTEGER," +
                 " time_wake_up_hours INTEGER, time_wake_up_minutes INTEGER, days_schedule_id INTEGER, weeks_schedule_amount INTEGER, check_awake INTEGER)");
 
-        //need final tables for adding: Methoddatabase, Alarmlevel, QRBarcode, Location, dayschedule, i think i don't use the Mathdatabase for functional uses, todo check this, and delete if the data is never used
-
-        db.execSQL("create Table finalMethods(id integer primary key autoincrement, queue_id integer, method_type_id integer, method_id integer, difficulty_id integer," +
-                    " label text, method_database_specific_id integer)");
-        db.execSQL("create Table finalLevels(id integer primary key autoincrement, label text, snooze_count integer, snooze_time integer, sound_path text," +
-                "sound_name text, alarm_id integer)");
-        db.execSQL("create Table finalQRBar (label text primary key, decoded text)");
-        db.execSQL("create Table finalLocation (id integer primary key autoincrement, lat_int integer, point_lat integer, lon_int integer, point_lon integer, " +
-                "radius integer, street text, radius_mode text)");
-        db.execSQL("create Table inbetweenDayschedule (id integer primary key autoincrement, schedule_id integer, foreign key (schedule_id) references finalDayschedule(id))"); //todo implement syncing here
-        db.execSQL("create Table finalDayschedule (id integer primary key autoincrement, mon integer, tue integer, wed integer, thu integer, fri integer, sat integer, sun integer)");
-
-
-
-
-
-        db.execSQL("create Table Dayschedule (id INTEGER primary key autoincrement, mon INTEGER, tue INTEGER, wed INTEGER, thu INTEGER, fri INTEGER, sat INTEGER, sun INTEGER)");
-        //id, mon, tue, wed, thu, fri, sat, sun
-
-        db.execSQL("create Table Methoddatabase (id INTEGER primary key autoincrement, queue_id INTEGER, method_type_id INTEGER, method_id INTEGER, difficulty_id INTEGER," +
-                " label TEXT, method_database_specific_id INTEGER, foreign KEY(method_type_id) references Methodtype(id), foreign key (method_id) references Method(id)," +
-                " foreign key (difficulty_id) references Difficulty(id), foreign key(label) references QRBarcodedatabase(label)," +
-                " foreign KEY(queue_id) references Alarmlevel(id))");
-
-        db.execSQL("create Table Methodtype (id INTEGER primary key autoincrement, method_type TEXT)");
-        db.execSQL("create Table Method (id INTEGER primary key autoincrement, method TEXT)");
-        db.execSQL("create Table Difficulty (id INTEGER primary key autoincrement, difficulty TEXT)");
-
-        db.execSQL("create Table Alarmlevel (id INTEGER primary key autoincrement, label TEXT, snooze_count INTEGER, snooze_time INTEGER, sound_path TEXT, " +
-                "sound_name TEXT, alarm_id INTEGER, foreign key (alarm_id) references Alarmdatabase(id) )");
-        //multiple rows with the same level_id make up the different Alarmlevels
-
         db.execSQL("create Table QRBarcodedatabase (label TEXT primary key, decoded TEXT)");
-        db.execSQL("create Table Mathdatabase (id INTEGER primary key autoincrement, method TEXT, difficulty TEXT)");
-        db.execSQL("create Table Locationdatabase (id INTEGER primary key autoincrement, latitude_int INTEGER, zero_point_latitude INTEGER, longitude_int INTEGER," +
-                " zero_point_longitude INTEGER, radius_int INTEGER, street TEXT, radius_mode TEXT)");
-
-
-
-
-        setupTablesForPreset(db);
+        //setupTablesForPreset(db);
     }
 
 
@@ -76,69 +37,12 @@ public class DBHelper extends SQLiteOpenHelper{
     public void onUpgrade(SQLiteDatabase db, int verOld, int verNew) {
 
         db.execSQL("drop Table if exists Alarmdatabase");
-
-        db.execSQL("drop Table if exists finalLevels");
-
-        db.execSQL("drop Table if exists finalMethods");
-
-        db.execSQL("drop Table if exists finalQRBar");
-        db.execSQL("drop Table if exists finalLocation");
-        db.execSQL("drop Table if exists finalDayschedule");
-
-
-        db.execSQL("drop Table if exists Dayschedule");
-
-        db.execSQL("drop Table if exists Methoddatabase");
-        db.execSQL("drop Table if exists Methodtype");
-        db.execSQL("drop Table if exists Method");
-        db.execSQL("drop Table if exists Difficulty");
-
-        db.execSQL("drop Table if exists Alarmlevel");
-
         db.execSQL("drop Table if exists QRBarcodedatabase");
-        db.execSQL("drop Table if exists Mathdatabase");
-        db.execSQL("drop Table if exists Locationdatabase");
         onCreate(db);
     }
 
 
-    private void setupTablesForPreset(SQLiteDatabase db) {
 
-
-        ContentValues cv = new ContentValues();
-
-        long res;
-        for(String type : new String[]{"tap_off","math","qr_barcode","location","sudoku","memory","passphrase"}) {
-            cv.put("method_type", type);
-            res = db.insert("Methodtype", null, cv);
-            if(res == -1){
-                Toast.makeText(context, "Error setting up static Database \"Methodtype\"", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-
-        cv = new ContentValues();
-        for(String type : new String[]{"null","add","sub","mult","div","fac","root","value_fx","extrema_fx","multiple_choice","reach_radius","leave_radius"}) {
-            cv.put("method", type);
-            res = db.insert("Method", null, cv);
-            if(res == -1){
-                Toast.makeText(context, "Error setting up static Database \"Method\"", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-
-        cv = new ContentValues();
-        for(String type : new String[]{"ex_easy","easy","middle","hard","ex_hard"}) {
-            cv.put("difficulty", type);
-            res = db.insert("Difficulty", null, cv);
-            if(res == -1){
-                Toast.makeText(context, "Error setting up static Database \"Difficulty\"", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-
-
-    }
 
     /**
      * @param database: the string of the table in database.db

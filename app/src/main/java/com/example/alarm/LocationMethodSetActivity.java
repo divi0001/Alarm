@@ -59,6 +59,7 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class LocationMethodSetActivity extends AppCompatActivity {
@@ -121,11 +122,11 @@ public class LocationMethodSetActivity extends AppCompatActivity {
 
         if(getIntent().hasExtra("edit_add") && getIntent().hasExtra("id")) {
 
-            edit = getIntent().getStringExtra("edit_add").equals("edit");
-            id = getIntent().getIntExtra("id", -1); //todo update in editalarmactivity
+            edit = Objects.equals(getIntent().getStringExtra("edit_add"), "edit");
+            id = getIntent().getIntExtra("id", -1);
 
             txtKm.setText(String.valueOf((int)(getIntent().getDoubleExtra("radius", 600.0))));
-            if(getIntent().hasExtra("enter_leave") && getIntent().getStringExtra("enter_leave").equals("enter")){
+            if(getIntent().hasExtra("enter_leave") && Objects.equals(getIntent().getStringExtra("enter_leave"), "enter")){
                 rbEnter.setChecked(true);
             }else{
                 rbLeave.setChecked(true);
@@ -273,12 +274,7 @@ public class LocationMethodSetActivity extends AppCompatActivity {
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                // km int usable yay
-
-                //todo ????
-
-            }
+            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
 

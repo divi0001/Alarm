@@ -27,7 +27,7 @@ public class AlarmLevel {
         this.mQueue = new ArrayList<>();
         this.label = "Please set a unique label";
         this.snoozable = false;
-        this.soundPath = ""; //todo set standard soundpath here
+        this.soundPath = "android.resource://com.example.alarm/"+ R.raw.weak_1; //should be the standard sound (R.raw.weak_1);
         this.extraAwakeCheck = false;
     }
 

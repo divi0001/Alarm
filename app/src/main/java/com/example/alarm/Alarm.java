@@ -5,16 +5,14 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import java.time.LocalDateTime;
-import java.time.MonthDay;
-import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Alarm implements java.io.Serializable {
+public class Alarm implements java.io.Serializable  {
 
     private CharSequence t;
-    int ID,selectedLvl, snoozeAmount, snoozeMinutes, minutesUntilTurnBackOn;
+    int ID,selectedLvl, snoozeAmount, snoozeMinutes, minutesUntilTurnBackOn, turnus;
 
     //todo extendedPriveleges as a global setting, not per Alarm
     private boolean isActive, snoozable, extraAwakeCheck, hasLevels;
@@ -25,12 +23,12 @@ public class Alarm implements java.io.Serializable {
 
 
     public Alarm(CharSequence t, int id, String soundPath, boolean isActive, boolean[] weekDays, boolean snoozable, String label,
-                 boolean extraAwakeCheck, boolean hasLevels, @Nullable ArrayList<AlarmMethod> mQueue, @Nullable ArrayList<AlarmLevel> lQueue) {
+                 boolean extraAwakeCheck, boolean hasLevels, @Nullable ArrayList<AlarmMethod> mQueue, @Nullable ArrayList<AlarmLevel> lQueue, int turnus) {
         this.t = t; //t = time
         this.ID = id;
         this.isActive = isActive;
         this.weekDays = weekDays;
-
+        this.turnus = turnus;
 
         this.hasLevels = hasLevels;
         if (hasLevels) {
@@ -58,9 +56,9 @@ public class Alarm implements java.io.Serializable {
         this.extraAwakeCheck = false;
         this.hasLevels = false;
         this.mQueue = new ArrayList<AlarmMethod>();
-        this.soundPath = ""; //todo change this to the location of the standard alarm
+        this.soundPath = "android.resource://com.example.alarm/"+ R.raw.weak_1; //should be the standard sound (R.raw.weak_1)
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); //todo make sure, time is also shown as of now in the spinners
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
         this.t = dtf.format(now);
     }
@@ -258,7 +256,8 @@ public class Alarm implements java.io.Serializable {
 
     public int getMinutesUntilTurnBackOn(int pos) {
         if (pos == -1) return minutesUntilTurnBackOn;
-        return this.lQueue.get(pos).getMinutesUntilTurnBackOn(); //todo make sure, the .get does not return errorcodes when calling a submethod on it, but rather the desired return
+        AlarmLevel l = this.lQueue.get(pos);
+        return l.getMinutesUntilTurnBackOn();
     }
 
     public void setMinutesUntilTurnBackOn(int minutesUntilTurnBackOn, int pos) {
@@ -273,6 +272,14 @@ public class Alarm implements java.io.Serializable {
         return this.getSoundPath(pos);
     }
 
+    public int getTurnus() {
+        return turnus;
+    }
+
+    public void setTurnus(int turnus) {
+        this.turnus = turnus;
+    }
+
     @Override
     public String toString() {
         return "Alarm{" +
@@ -284,6 +291,7 @@ public class Alarm implements java.io.Serializable {
                 ", minutesUntilTurnBackOn=" + minutesUntilTurnBackOn +
                 ", isActive=" + isActive +
                 ", snoozable=" + snoozable +
+                ", turnus=" + turnus +
                 ", extraAwakeCheck=" + extraAwakeCheck +
                 ", hasLevels=" + hasLevels +
                 ", soundPath='" + soundPath + '\'' +

@@ -37,7 +37,7 @@ public class AlarmMethod {
         this.difficulty = diff;
         this.method = meth;
         this.subMethod = subMeth;
-        this.id = -1; //todo?
+        this.id = -1;
     }
 
     public AlarmMethod(int id, Enums.Method method, Enums.SubMethod subMethod, Address address, int radius, double lon, double lat, String addr){
@@ -71,7 +71,7 @@ public class AlarmMethod {
 
             if(type == 1) {
                 MathMethodSetActivity math = new MathMethodSetActivity();
-                math.generateExample(difficulty.toString(), subMethod.ordinal()); //todo check if snd arg is correct
+                math.generateExample(difficulty.toString(), subMethod.ordinal());
             } else if (type == 4) {
                 SudokuMethodSetActivity sudo = new SudokuMethodSetActivity();
                 sudo.sudokuToString(sudo.generateSudoku(difficulty.toString()));
@@ -145,7 +145,7 @@ public class AlarmMethod {
         return adress;
     }
 
-    public int getLocationRadius() { //todo this is in no way implemented, just here, to keep away the errors so i can have a bootable app for once, so this will need further coding in locationsetactivity and editalarmactivity
+    public int getLocationRadius() {
         return (int) locationRadius;
     }
 

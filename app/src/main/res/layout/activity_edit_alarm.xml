@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".EditAlarmActivity">
 
-<!-- TODO make checkboxes always appear on the left side of the option they are toggling-->
 
     <ScrollView
         android:layout_width="wrap_content"
@@ -275,21 +274,22 @@
             android:layout_marginTop="15dp"
             android:id="@+id/snoozeRelLay">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/txtSnoozeAllow"
-            android:textStyle="bold"
-            android:text="@string/allow_snooze"
-            android:textSize="15sp"/>
+            <TextView
+                android:id="@+id/txtSnoozeAllow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/checkSnooze"
+                android:text="@string/allow_snooze"
+                android:textSize="15sp"
+
+                android:textStyle="bold" />
 
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/checkSnooze"
                 android:layout_alignBaseline="@+id/txtSnoozeAllow"
-                android:layout_toEndOf="@+id/txtSnoozeAllow"
-                android:layout_marginStart="15dp"/>
+                />
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -395,6 +395,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/txtSetLabel"
                 android:layout_marginTop="25dp"
+                android:layout_toEndOf="@+id/checkAwake"
                 android:id="@+id/txtCheckWake"
                 android:text="@string/check_wake"
                 android:textStyle="bold"
@@ -404,7 +405,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@id/txtCheckWake"
-                android:layout_toEndOf="@id/txtCheckWake"
                 android:id="@+id/checkAwake"/>
 
             <EditText
@@ -428,15 +428,15 @@
                 android:text="@string/inc_intense"
                 android:textStyle="bold"
                 android:layout_below="@+id/checkAwake"
-                android:id="@+id/txtSetAlarmLvls"/>
+                android:id="@+id/txtSetAlarmLvls"
+                android:layout_toEndOf="@id/checkAlarmLvls"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/checkAlarmLvls"
                 android:layout_alignBaseline="@id/txtSetAlarmLvls"
-                android:layout_toEndOf="@id/txtSetAlarmLvls"
-                android:layout_marginStart="7dp"/>
+                />
 
             <RelativeLayout
                 android:layout_width="wrap_content"
@@ -486,6 +486,28 @@
 
             </RelativeLayout>
 
+            <TextView
+                android:layout_below="@+id/relLayAddLevels"
+                android:layout_marginTop="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtTurnus"
+                android:text="@string/turnusText"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/relLayAddLevels"
+                android:layout_alignBaseline="@id/txtTurnus"
+                android:layout_marginStart="4dp"
+                android:id="@+id/editTurnus"
+                android:hint="@string/explain_empty_turnus"
+                android:layout_toEndOf="@id/txtTurnus"
+                android:autofillHints=""
+                android:inputType="number"/>
+
 
         </RelativeLayout>
 
@@ -494,21 +516,6 @@
     </RelativeLayout>
 
 
-            <RelativeLayout
-                android:id="@+id/lowRelLay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="25dp">
-
-                <CheckBox
-                    android:id="@+id/checkRevokePrivileges"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:text="@string/revoke_priv" />
-
-
-            </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="match_parent"

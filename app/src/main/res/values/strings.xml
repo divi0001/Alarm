@@ -217,6 +217,25 @@
     <string name="memory_header">Settings for memory method: (WIP)</string>
     <string name="example_size_mem">6x6</string>
     <string name="alarm_id_key">com.example.alarm.ALARM_ID_KEY</string>
+    <string-array name="sound_files">
+        <item>weak_1</item>
+        <item>weak_2</item>
+        <item>weak_3</item>
+        <item>weak_4</item>
+        <item>weak_5</item>
+        <item>medium_1</item>
+        <item>medium_2</item>
+        <item>medium_3</item>
+        <item>medium_4</item>
+        <item>medium_5</item>
+        <item>strong_1</item>
+        <item>strong_2</item>
+        <item>strong_3</item>
+        <item>strong_4</item>
+        <item>strong_5</item>
+    </string-array>
+    <string name="turnusText">Set a turnus (in days):</string>
+    <string name="explain_empty_turnus">Leave empty for no turnus</string>
 
 
 </resources>

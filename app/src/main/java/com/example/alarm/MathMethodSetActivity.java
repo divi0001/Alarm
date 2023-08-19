@@ -111,7 +111,7 @@ public class MathMethodSetActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
 
                                 SharedPreferences sp = MathMethodSetActivity.this.getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE);
-                                int queueId = sp.getInt("queue_id",-1); //todo (threeDots in EditAlarm)
+                                int queueId = sp.getInt("queue_id",-1);
 
 
                                 if(edit){

@@ -77,7 +77,7 @@ public class QRMethodSetActivity extends AppCompatActivity {
         if(c.getCount()>0){
             c.moveToFirst();
             while(c.moveToNext()){
-                labels.add(c.getString(0)); //TODO: find out, why only 1 item is shown in the qr/barcode spinner when updating
+                labels.add(c.getString(0));
                 values.add(c.getString(1));
             }
         }
@@ -91,9 +91,6 @@ public class QRMethodSetActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 if(edit){
-
-                    //todo if this was based on editing an already set method, this needs another if to filter, if the label is unique, if a new qr was added, but it also shouldn't stop this from working if the label stays the same, because then it might be seen as ununique?
-
 
                     SharedPreferences sp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),MODE_PRIVATE);
                     SharedPreferences.Editor se = sp.edit();

@@ -2,6 +2,7 @@ package com.example.alarm;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -92,10 +93,10 @@ public class SoundRecViewAdapter extends RecyclerView.Adapter<SoundRecViewAdapte
         holder.txtSoundId.setText(String.valueOf(song.getId()));
 
 
-        Uri albumArtUri = song.getAlbumArtUri();
+        Bitmap albumArt = song.getAlbumArt();
 
-        if(albumArtUri != null){
-            holder.imgAlbumArt.setImageURI(albumArtUri);
+        if(albumArt != null){
+            holder.imgAlbumArt.setImageBitmap(albumArt);
 
             if (holder.imgAlbumArt.getDrawable() == null){
                 holder.imgAlbumArt.setImageResource(R.drawable.ic_map_overlay);

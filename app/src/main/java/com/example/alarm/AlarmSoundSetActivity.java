@@ -14,7 +14,9 @@ import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -30,8 +32,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +63,7 @@ public class AlarmSoundSetActivity extends AppCompatActivity {
 
         btnSetSound = (Button) findViewById(R.id.btnSetSound);
         btnAddSound = (Button) findViewById(R.id.btnAddSoundFile);
+        recViewSound = (RecyclerView) findViewById(R.id.recViewSounds);
         SharedPreferences sh = getSharedPreferences(getString(R.string.sound_key),MODE_PRIVATE);
         currSoundName = sh.getString("sound_name", "");
 
@@ -88,28 +93,64 @@ public class AlarmSoundSetActivity extends AppCompatActivity {
         Cursor cursor = this.managedQuery(
                 MediaStore.Audio.Media.INTERNAL_CONTENT_URI, projection, selection,null, null);
 
-        List<String> s = new ArrayList<String>();
 
-        while(cursor.moveToNext()){
-            s.add(cursor.getString(0) + "||" + cursor.getString(1) + "||" +
-                    cursor.getString(2) + "||" + cursor.getString(3) + "||" +
-                    cursor.getString(4) + "||" + cursor.getString(5));
+        ArrayList<Uri> ur = new ArrayList<>();
+        ArrayList<String> lines = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.sound_files)));
+        for(String s: lines){
+            ur.add(Uri.parse("android.resource://com.example.alarm/"+getResources().getIdentifier(s, "raw",this.getPackageName())));
         }
 
-//        Log.d("mett", s.toString());
-
-        Uri u = Uri.parse("android.resource://com.example.alarm/"+R.raw.weak_1);
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        mmr.setDataSource(this, u);
+        int k = 0;
+        for(Uri u: ur){
+            String album = "";
+            String name = "";
+            Bitmap albumArt = null;
+            int duration = -1;
+            int size = -1;
+            try {
+                AssetFileDescriptor fd = getContentResolver().openAssetFileDescriptor(u,"r");
+                size = (int) fd.getLength();
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
 
-        Log.d("mett", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)); //make sure metadata of that type is not null before retreiving it? wth how?!????!?!?!?!?!?!? ohhhh try catch might help :D
+            mmr.setDataSource(this, u);
+            try{
+                album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+            }catch (Exception ignored){}
+            boolean hasBitMap = false;
+            try{
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                    albumArt = mmr.getPrimaryImage();
+                    hasBitMap = true;
+                }
+            }catch (Exception ignored){}
+            try{
+                name = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+            }catch (Exception ignored){}
+            try {
+                duration = Integer.parseInt(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
+            }catch (Exception ignored){}
+
+            if(hasBitMap){
+                songs.add(new Song(k, album, u, albumArt, name, duration, size));
+            }else{
+                songs.add(new Song(k, album, u, name, duration, size));
+            }
+            k++;
+
+        }
+
         try {
             mmr.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        recViewSound = (RecyclerView) findViewById(R.id.recViewSounds);
+
+
+        showSongs(songs);
 
         btnSetSound.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,8 +160,8 @@ public class AlarmSoundSetActivity extends AppCompatActivity {
                     SharedPreferences sp = AlarmSoundSetActivity.this.getSharedPreferences(getString(R.string.sound_key),MODE_PRIVATE);
                     SharedPreferences.Editor se = sp.edit();
 
-                    se.putString("uri", adapter.getChosen().toString());
-                    se.putString("sound_name", adapter.getName());
+                    se.putString("uri", String.valueOf(adapter.curr_uri));
+                    se.putString("sound_name", adapter.curr_name);
                     se.apply();
 
                     finish();
@@ -174,6 +215,7 @@ public class AlarmSoundSetActivity extends AppCompatActivity {
 
 
 
+
     private void respondOnUserPermissionActs() {
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
@@ -203,28 +245,6 @@ public class AlarmSoundSetActivity extends AppCompatActivity {
 
 
         Uri songLibraryUri;
-
-        String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
-        String[] projection = { MediaStore.Audio.Media._ID,
-                MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.TITLE,
-                MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.DISPLAY_NAME,
-                MediaStore.Audio.Media.DURATION};
-
-        Cursor cursor = this.managedQuery(
-                MediaStore.Audio.Media.INTERNAL_CONTENT_URI, projection, selection,null, null);
-
-        List<String> s = new ArrayList<String>();
-
-        while(cursor.moveToNext()){
-            s.add(cursor.getString(0) + "||" + cursor.getString(1) + "||" +
-                    cursor.getString(2) + "||" + cursor.getString(3) + "||" +
-                    cursor.getString(4) + "||" + cursor.getString(5));
-        }
-        //Toast.makeText(this, s.toString(), Toast.LENGTH_SHORT).show();
-
-
-
-
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
             songLibraryUri = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
         }else{
@@ -257,16 +277,16 @@ public class AlarmSoundSetActivity extends AppCompatActivity {
                 String name = curso.getString(nameColumn);
                 int duration = curso.getInt(durationColumn);
                 int size = curso.getInt(sizeColumn);
-                long albumId = curso.getLong(albumColumn);
+                String albumId = curso.getString(albumColumn);
 
                 //song uri
                 Uri uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
 
                 //album art uri
-                Uri albumArtUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), albumId);
+                //Uri albumArtUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), albumId);
 
                 name = name.substring(0, name.lastIndexOf("."));
-                Song song = new Song(id, albumId, uri, albumArtUri, name, duration, size);
+                Song song = new Song(id, albumId, uri, name, duration, size);
                 songs.add(song);
 
             }
@@ -283,9 +303,9 @@ public class AlarmSoundSetActivity extends AppCompatActivity {
         adapter = new SoundRecViewAdapter(this);
         adapter.setSounds(songs);
 
-        recViewSound.setAdapter(adapter);
-        recViewSound.setLayoutManager(new LinearLayoutManager(this));
 
+        recViewSound.setLayoutManager(new LinearLayoutManager(this));
+        recViewSound.setAdapter(adapter);
 
 
     }

@@ -42,6 +42,7 @@ public class AlarmOverViewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm_over_view);
+        //todo add possibility to start/end alarm on specific dates
 
         addAlarm = (ImageView) findViewById(R.id.btnAddAlarm);
         recView = (RecyclerView) findViewById(R.id.alarmRecView);
