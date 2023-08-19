@@ -15,18 +15,27 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.FileDescriptor;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class AlarmSoundSetActivity extends AppCompatActivity {
 
@@ -42,6 +51,7 @@ public class AlarmSoundSetActivity extends AppCompatActivity {
     String currSoundName;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,8 +59,11 @@ public class AlarmSoundSetActivity extends AppCompatActivity {
 
         btnSetSound = (Button) findViewById(R.id.btnSetSound);
         btnAddSound = (Button) findViewById(R.id.btnAddSoundFile);
-        SharedPreferences s = getSharedPreferences(getString(R.string.sound_key),MODE_PRIVATE);
-        currSoundName = s.getString("sound_name", "");
+        SharedPreferences sh = getSharedPreferences(getString(R.string.sound_key),MODE_PRIVATE);
+        currSoundName = sh.getString("sound_name", "");
+
+
+        fetchSongs();
 
         storagePermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), result -> {
             if(result){
@@ -65,6 +78,36 @@ public class AlarmSoundSetActivity extends AppCompatActivity {
         //launch storage permission launcher
         storagePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
+
+        String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
+        String[] projection = { MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.DISPLAY_NAME,
+                MediaStore.Audio.Media.DURATION};
+
+        Cursor cursor = this.managedQuery(
+                MediaStore.Audio.Media.INTERNAL_CONTENT_URI, projection, selection,null, null);
+
+        List<String> s = new ArrayList<String>();
+
+        while(cursor.moveToNext()){
+            s.add(cursor.getString(0) + "||" + cursor.getString(1) + "||" +
+                    cursor.getString(2) + "||" + cursor.getString(3) + "||" +
+                    cursor.getString(4) + "||" + cursor.getString(5));
+        }
+
+//        Log.d("mett", s.toString());
+
+        Uri u = Uri.parse("android.resource://com.example.alarm/"+R.raw.weak_1);
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        mmr.setDataSource(this, u);
+
+        Log.d("mett", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)); //make sure metadata of that type is not null before retreiving it? wth how?!????!?!?!?!?!?!? ohhhh try catch might help :D
+        try {
+            mmr.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         recViewSound = (RecyclerView) findViewById(R.id.recViewSounds);
 
@@ -161,13 +204,34 @@ public class AlarmSoundSetActivity extends AppCompatActivity {
 
         Uri songLibraryUri;
 
+        String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
+        String[] projection = { MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.DISPLAY_NAME,
+                MediaStore.Audio.Media.DURATION};
+
+        Cursor cursor = this.managedQuery(
+                MediaStore.Audio.Media.INTERNAL_CONTENT_URI, projection, selection,null, null);
+
+        List<String> s = new ArrayList<String>();
+
+        while(cursor.moveToNext()){
+            s.add(cursor.getString(0) + "||" + cursor.getString(1) + "||" +
+                    cursor.getString(2) + "||" + cursor.getString(3) + "||" +
+                    cursor.getString(4) + "||" + cursor.getString(5));
+        }
+        //Toast.makeText(this, s.toString(), Toast.LENGTH_SHORT).show();
+
+
+
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
             songLibraryUri = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
         }else{
             songLibraryUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         }
 
-        String[] projection = new String[]{
+        String[] projection1 = new String[]{
                 MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.DISPLAY_NAME,
                 MediaStore.Audio.Media.DURATION,
@@ -177,23 +241,23 @@ public class AlarmSoundSetActivity extends AppCompatActivity {
 
         String sortOrder = MediaStore.Audio.Media.DATE_ADDED + " DESC";
 
-        try (Cursor cursor = getContentResolver().query(songLibraryUri, projection, null, null,sortOrder)){
+        try (Cursor curso = getContentResolver().query(songLibraryUri, projection1, null, null,sortOrder)){
 
             //cursor indices:
-            int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
-            int nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
-            int durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION);
-            int sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE);
-            int albumColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID);
+            int idColumn = curso.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
+            int nameColumn = curso.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
+            int durationColumn = curso.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION);
+            int sizeColumn = curso.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE);
+            int albumColumn = curso.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID);
 
             //get vals
-            while (cursor.moveToNext()){
+            while (curso.moveToNext()){
 
-                long id = cursor.getLong(idColumn);
-                String name = cursor.getString(nameColumn);
-                int duration = cursor.getInt(durationColumn);
-                int size = cursor.getInt(sizeColumn);
-                long albumId = cursor.getLong(albumColumn);
+                long id = curso.getLong(idColumn);
+                String name = curso.getString(nameColumn);
+                int duration = curso.getInt(durationColumn);
+                int size = curso.getInt(sizeColumn);
+                long albumId = curso.getLong(albumColumn);
 
                 //song uri
                 Uri uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
@@ -207,7 +271,7 @@ public class AlarmSoundSetActivity extends AppCompatActivity {
 
             }
 
-            showSongs(songs);
+            //showSongs(songs);
             Toast.makeText(this, "Number of songs: " + songs.size(), Toast.LENGTH_SHORT).show();
 
         }

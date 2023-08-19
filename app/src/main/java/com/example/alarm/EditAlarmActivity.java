@@ -796,7 +796,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     }
 
 
-                    String uri = se.getString("uri",Environment.getExternalStorageDirectory().getPath()+"/Music/fiverr/weak_2.mp3");
+                    String uri = se.getString("uri",Integer.toString(R.raw.weak_1));
                     String name = se.getString("sound_name",""); //not sure if this is needed
 
                     newLvl.setLvlSoundPath(uri);
