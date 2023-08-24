@@ -61,11 +61,7 @@ import java.util.Objects;
 
 public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAdapter.EditAlarms {
 
-    private static final int SUDOKU_CODE = 2;
-    private static final int MATH_CODE = 3;
-    private static final int QR_CODE = 4;
-    private static final int LOC_CODE = 5;
-    private static final int MEMORY_CODE = 6;
+
     private Spinner spHours,spMins,spMethods;
     private CheckBox mo,di,mi,thu,fr,sa,so,checkWeekDays,checkWeekEnds,checkAllowSnooze,checkAwake,checkAlarmLvls;
     private ImageView imgAddMethodPlus, imgBtnDownSnooze, imgBtnUpSnooze;
@@ -94,6 +90,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
     ArrayList<String> alarmLevel = new ArrayList<>();
     private int lvlID = -1;
     private int methodToSetPos = -1;
+    private boolean edit = false;
 
 
     @Override
@@ -151,6 +148,19 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
         c[CONTAINER_POS_CHECK_WEEK] = a;
         c[CONTAINER_POS_CHECK_WEEKEND] = b;
+
+        if (getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).contains("edit_add")){
+            edit = getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).getBoolean("edit_add", false);
+            if(edit){
+
+                alarmId = getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).getInt("id",0);
+                DBHelper db = new DBHelper(this, "Database.db");
+                alarmParameter = db.getAlarm(alarmId);
+                Log.d("mett", "editing: "+alarmParameter.toString());
+                getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().remove("edit_add").apply();
+                getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().remove("id").apply();
+            }
+        }
 
 
 
@@ -856,6 +866,43 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
         }
     });
+if(edit) {
+
+    int hhh = Integer.parseInt(alarmParameter.getT().subSequence(11, 13).toString());
+    int mmm = Integer.parseInt(alarmParameter.getT().subSequence(14, 16).toString());
+    spHours.setSelection(hhh);
+    spMins.setSelection(mmm);
+    int k = 0;
+    CheckBox[] che = new CheckBox[]{mo, di, mi, thu, fr, sa, so};
+
+    for (boolean bb : alarmParameter.getWeekDays()) {
+        if (che[k].isChecked() != bb) {
+            che[k].callOnClick();
+        }
+        k++;
+    }
+
+    txtCurrSoundName.setText(alarmParameter.getSoundPath(lvlID));
+    if (alarmParameter.isSnoozable(lvlID) != checkAllowSnooze.isChecked()) {
+        checkAllowSnooze.callOnClick();
+    }
+    if (alarmParameter.isSnoozable(lvlID)) {
+        editAmountSnoozes.setText(alarmParameter.getSnoozeAmount(lvlID));
+        editMinutesSnooze.setText(alarmParameter.getSnoozeMinutes(lvlID));
+    }
+    if (checkAwake.isChecked() != alarmParameter.isExtraAwakeCheck(lvlID)) {
+        checkAwake.callOnClick();
+    }
+    if (alarmParameter.isExtraAwakeCheck(lvlID)) {
+        editMinutesCheckAwake.setText(alarmParameter.getMinutesUntilTurnBackOn(lvlID));
+    }
+    if (alarmParameter.isHasLevels() != checkAlarmLvls.isChecked()) {
+        checkAlarmLvls.callOnClick();
+    }
+
+    editTurnus.setText(String.format(Integer.toString(alarmParameter.getTurnus())));
+    editLabel.setText(alarmParameter.getLabel(lvlID));
+}
 
 
 
@@ -1026,7 +1073,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         }
 
 
-        Log.d("mett", "method is" + methodToSet);
+        Log.d("mett", "method is " + methodToSet);
 
         if(shared.contains("edit_add")){
 

@@ -638,7 +638,8 @@ public class DBHelper extends SQLiteOpenHelper{
         @SuppressLint("Recycle") Cursor c = db.rawQuery("Select Alarm From Alarmtable where id=?", new String[]{Integer.toString(id)});
 
         if(c.getCount()>0){
-            String json = c.getString(1);
+            c.moveToFirst();
+            String json = c.getString(0);
             return new Gson().fromJson(json, Alarm.class);
         }else{
             return new Alarm(-1);

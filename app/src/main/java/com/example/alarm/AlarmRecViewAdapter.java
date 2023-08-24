@@ -3,7 +3,9 @@ package com.example.alarm;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +30,6 @@ public class AlarmRecViewAdapter extends RecyclerView.Adapter<AlarmRecViewAdapte
         this.context = context;
     }
 
-    //TODO: make the app persistent with data (data should survive a restart of the app or phone)
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -65,7 +66,11 @@ public class AlarmRecViewAdapter extends RecyclerView.Adapter<AlarmRecViewAdapte
             public void onClick(View v) {
                 Alarm curr = alarms.get(position);
                 Intent intent = new Intent(context, EditAlarmActivity.class);
-                intent.putExtra("position", position);
+                SharedPreferences.Editor se = context.getSharedPreferences(context.getString(R.string.alarm_id_key), Context.MODE_PRIVATE).edit();
+                se.putInt("id", curr.getID());
+                se.putBoolean("edit_add", true);
+                se.apply();
+                Log.d("mett", "started editAlarmActivity from threeDots with id " + curr.getID());
                 context.startActivity(intent);
                 notifyDataSetChanged();
             }
