@@ -79,6 +79,10 @@ public class AlarmRecViewAdapter extends RecyclerView.Adapter<AlarmRecViewAdapte
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                DBHelper db = new DBHelper(context, "Database.db");
+                db.deleteRow("Alarmtable", alarms.get(position).getID());
+
                 alarms.remove(position);
                 notifyDataSetChanged();
             }
@@ -102,7 +106,7 @@ public class AlarmRecViewAdapter extends RecyclerView.Adapter<AlarmRecViewAdapte
     
     public void setAlarms(ArrayList<Alarm> alarms){
         this.alarms = alarms;
-        notifyDataSetChanged(); //TODO: same as the one in delete
+        notifyDataSetChanged();
     }
 
 
