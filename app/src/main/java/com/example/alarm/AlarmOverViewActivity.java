@@ -36,6 +36,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 
 public class AlarmOverViewActivity extends AppCompatActivity {
 
@@ -44,11 +45,12 @@ public class AlarmOverViewActivity extends AppCompatActivity {
     private String path;
 
     private ArrayList<Alarm> alarms = new ArrayList<>();
-    private Context context = this;
+    private final Context context = this;
     AlarmRecViewAdapter adapter = new AlarmRecViewAdapter(this);
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
     private Calendar cal;
+    ArrayList<PendingAlarm> pendingAlarms = new ArrayList<>();
 
 
     @Override
@@ -86,84 +88,49 @@ public class AlarmOverViewActivity extends AppCompatActivity {
 
         recView.setAdapter(adapter);
         recView.setLayoutManager(new LinearLayoutManager(context));
-//        getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().putBoolean("edit_add", false).apply();
-//        getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().putInt("id", db.getMaxAlarmID()).apply();
 
 
-        cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, 20);
-        cal.set(Calendar.MINUTE, 24);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-
-        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-        Intent intent = new Intent(this, AlarmReceiver.class);
-        pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE); //immutable instead of 0 again todo
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-        Toast.makeText(context, "Alarm set Successfully", Toast.LENGTH_SHORT).show();
+        setAlarms();
 
 
-        setEditAlarm();
 
-
-        //cancelAlarm();
 
     }
 
-    private void cancelAlarm() {
 
-        Intent intent = new Intent(this, AlarmReceiver.class);
-        pendingIntent = PendingIntent.getBroadcast(this, 0 ,intent, PendingIntent.FLAG_IMMUTABLE); //todo
-        if(alarmManager == null){
-            alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+    @SuppressLint("ScheduleExactAlarm")
+    private void setAlarms() {
+
+        if(pendingAlarms.size() != 0){
+            for(PendingAlarm pA: pendingAlarms){
+                pA.getAlarmManager().cancel(pA.getPendingIntent());
+            }
         }
 
-        alarmManager.cancel(pendingIntent);
-        Toast.makeText(this, "Alarm Cancelled", Toast.LENGTH_SHORT).show();
+        for(Alarm alarm: alarms){
 
-    }
+            AlarmMgr mgr = new AlarmMgr(context);
+            Intent intent = new Intent(this, AlarmReceiver.class);
+            intent.putExtra("id", alarm.getID());
+            PendingIntent pI = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
-    private void setEditAlarm() {
-        SharedPreferences sp = getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE);
-        if(sp.contains("edit_add")){
-
-            int id = sp.getInt("id",-1);
-            int hh = -1;
-            int mm = -1;
-            Alarm al;
-            cal = null;
-
-            for(Alarm a: alarms){
-                if(id == a.getID()){
-                    al = a;
-                    hh = Integer.parseInt(al.getT().subSequence(11, 13).toString());
-                    mm = Integer.parseInt(al.getT().subSequence(14, 16).toString());
-                    cal = Calendar.getInstance();
-                    cal.set(Calendar.HOUR, hh);
-                    cal.set(Calendar.MINUTE, mm+1);
-                    cal.set(Calendar.SECOND, 0);
-                    cal.set(Calendar.MILLISECOND, 0);
-                }
-            }
-
-            if(sp.getBoolean("edit_add", false)){
-
-
-
-            }else {
+            if(alarm.isActive()){
+                long time = mgr.calculateNextAlarmTime(alarm, System.currentTimeMillis());
 
                 alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, pI);
 
-                Intent intent = new Intent(this, AlarmReceiver.class);
-                pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE); //immutable instead of 0 again todo
-                alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-                Toast.makeText(context, "Alarm set Successfully", Toast.LENGTH_SHORT).show();
+                PendingAlarm pA = new PendingAlarm(alarmManager, alarm.getID(), alarm);
+                pA.setPendingIntent(pI);
 
+                pendingAlarms.add(pA);
             }
-            sp.edit().remove("id").apply();
-            sp.edit().remove("edit_add").apply();
         }
+
+
+
+
     }
 
     private void createNotificationChannel() {
@@ -177,6 +144,18 @@ public class AlarmOverViewActivity extends AppCompatActivity {
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(channel);
 
+    }
+
+
+
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        setAlarms();
     }
 
     @Override

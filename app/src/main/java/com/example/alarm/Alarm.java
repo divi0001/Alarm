@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 
 public class Alarm implements java.io.Serializable  {
 
@@ -16,6 +17,9 @@ public class Alarm implements java.io.Serializable  {
 
     //todo extendedPriveleges as a global setting, not per Alarm
     private boolean isActive, snoozable, extraAwakeCheck, hasLevels;
+
+    boolean turnusToggle = false;
+    Calendar dateOfToggle = Calendar.getInstance();
     private String soundPath, label;
     private boolean[] weekDays;
     private ArrayList<AlarmMethod> mQueue = new ArrayList<>();
@@ -278,6 +282,14 @@ public class Alarm implements java.io.Serializable  {
 
     public void setTurnus(int turnus) {
         this.turnus = turnus;
+    }
+
+    public int getHour(){
+        return Integer.parseInt(this.t.subSequence(11, 13).toString());
+    }
+
+    public int getMinute(){
+        return Integer.parseInt(this.t.subSequence(14, 16).toString());
     }
 
     @Override
