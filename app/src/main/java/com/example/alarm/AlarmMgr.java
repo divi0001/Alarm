@@ -29,7 +29,7 @@ public class AlarmMgr {
         int turnusDays = alarm.getTurnus();
         int daysToNextAlarm = (turnusDays - (daysPassed % turnusDays)) % turnusDays;
 
-        if (!alarm.turnusToggle) {
+        if (!alarm.turnusToggle && turnusDays > -1) {
             daysToNextAlarm += turnusDays;
         }
 

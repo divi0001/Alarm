@@ -197,20 +197,9 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                Calendar c = Calendar.getInstance();
-                hour = c.get(Calendar.HOUR_OF_DAY);
-                String hh;
-                if(hour < 10){
-                    hh = "0"+ hour;
-                }else{
-                    hh = Integer.toString(hour);
-                }
+
                 CharSequence t = alarmParameter.getT();
-                CharSequence newT = "";
-                newT+=t.subSequence(0,11).toString();
-                newT+= hh;
-                newT+=t.subSequence(13,t.length()).toString();
-                alarmParameter.setT(newT);
+                alarmParameter.setT(t);
             }
         });
 
@@ -237,20 +226,9 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                Calendar c = Calendar.getInstance();
-                minute = c.get(Calendar.MINUTE);
-                String hh;
-                if(minute < 10){
-                    hh = "0"+ minute;
-                }else{
-                    hh = Integer.toString(minute);
-                }
+
                 CharSequence t = alarmParameter.getT();
-                CharSequence newT = "";
-                newT+=t.subSequence(0,14).toString();
-                newT+= hh;
-                newT+=t.subSequence(16,t.length()).toString();
-                alarmParameter.setT(newT);
+                alarmParameter.setT(t);
             }
         });
 
