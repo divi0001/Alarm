@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.alarm.databinding.ActivityMainBinding;
@@ -51,6 +52,7 @@ public class AlarmOverViewActivity extends AppCompatActivity {
     private PendingIntent pendingIntent;
     private Calendar cal;
     ArrayList<PendingAlarm> pendingAlarms = new ArrayList<>();
+    private TextView txtExplainAdd;
 
 
     @Override
@@ -85,6 +87,15 @@ public class AlarmOverViewActivity extends AppCompatActivity {
 
 
         adapter.setAlarms(alarms);
+
+
+        txtExplainAdd = (TextView) findViewById(R.id.txtExplain);
+
+        if(adapter.getItemCount()>0){
+            txtExplainAdd.setText("");
+        }else{
+            txtExplainAdd.setText(R.string.empty);
+        }
 
         recView.setAdapter(adapter);
         recView.setLayoutManager(new LinearLayoutManager(context));
@@ -159,6 +170,13 @@ public class AlarmOverViewActivity extends AppCompatActivity {
         alarms = db.getAlarms();
         adapter.setAlarms(alarms);
 
+        txtExplainAdd = findViewById(R.id.txtExplain);
+        if(adapter.getItemCount()>0){
+            txtExplainAdd.setText("");
+        }else{
+            txtExplainAdd.setText(R.string.empty);
+        }
+
         //setAlarms();
     }
 
@@ -173,6 +191,13 @@ public class AlarmOverViewActivity extends AppCompatActivity {
 
         addAlarm = (ImageView) findViewById(R.id.btnAddAlarm);
         recView = (RecyclerView) findViewById(R.id.alarmRecView);
+
+        txtExplainAdd = findViewById(R.id.txtExplain);
+        if(adapter.getItemCount()>0){
+            txtExplainAdd.setText("");
+        }else{
+            txtExplainAdd.setText(R.string.empty);
+        }
 
 
 
