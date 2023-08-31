@@ -133,35 +133,14 @@ public class QRMethodSetActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(getIntent().hasExtra("label") && getIntent().hasExtra("edit_add") && getIntent().hasExtra("id")) {
-                    int row_id = getIntent().getIntExtra("id",-1);
+                SharedPreferences sp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),MODE_PRIVATE);
+                SharedPreferences.Editor se = sp.edit();
+                se.putString("Method", Enums.Method.QRBar.name());
+                se.putString("QRLabel", spSavedQRBars.getSelectedItem().toString());
+                se.putInt("queue_id", queue_id);
 
-
-                    db.editMethoddatabase(queue_id, 2, -1, -1, spSavedQRBars.getSelectedItem().toString(), -1, row_id);
-                    SharedPreferences sp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),MODE_PRIVATE);
-                    SharedPreferences.Editor se = sp.edit();
-                    se.putString("Method", Enums.Method.QRBar.name());
-                    se.putString("QRLabel", spSavedQRBars.getSelectedItem().toString());
-                    se.putInt("queue_id", queue_id);
-                    se.putString("edit_add", sp.getString("edit_add","add"));
-                    //decoded value at the key of the label in the qr DB
-                    se.apply();
-                    finish();
-
-                }else {
-                    int l = db.getMaxTableId("Methoddatabase")+1;
-                    SharedPreferences sp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),MODE_PRIVATE);
-                    SharedPreferences.Editor se = sp.edit();
-                    se.putString("Method", Enums.Method.QRBar.name());
-                    se.putString("QRLabel", spSavedQRBars.getSelectedItem().toString());
-                    se.putInt("queue_id", queue_id);
-                    se.putString("edit_add", sp.getString("edit_add","add"));
-                    //decoded value at the key of the label in the qr DB
-                    se.apply();
-                    finish();
-
-                }
-
+                se.apply();
+                finish();
             }
         });
 

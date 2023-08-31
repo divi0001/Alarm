@@ -90,7 +90,7 @@ public class AlarmOverViewActivity extends AppCompatActivity {
         recView.setLayoutManager(new LinearLayoutManager(context));
 
 
-        setAlarms();
+        //setAlarms();
 
 
 
@@ -155,12 +155,20 @@ public class AlarmOverViewActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        setAlarms();
+        DBHelper db = new DBHelper(context, "Database.db");
+        alarms = db.getAlarms();
+        adapter.setAlarms(alarms);
+
+        //setAlarms();
     }
 
     @Override
     public void onActivityReenter(int resultCode, Intent data) {
         super.onActivityReenter(resultCode, data);
+
+        DBHelper db = new DBHelper(context, "Database.db");
+        alarms = db.getAlarms();
+        adapter.setAlarms(alarms);
 
 
         addAlarm = (ImageView) findViewById(R.id.btnAddAlarm);
@@ -173,8 +181,9 @@ public class AlarmOverViewActivity extends AppCompatActivity {
             public void onClick(View v) {
                 DBHelper db = new DBHelper(AlarmOverViewActivity.this, "Database.db");
                 Intent i = new Intent(AlarmOverViewActivity.this, EditAlarmActivity.class);
-                i.putExtra("createAlarm","true");
+
                 getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().putInt("id", db.getMaxAlarmID()+1).apply();
+                getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().putBoolean("edit_add", false).apply();
                 startActivity(i);
             }
         });

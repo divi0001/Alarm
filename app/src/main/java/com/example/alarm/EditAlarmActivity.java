@@ -833,8 +833,8 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                 boolean editAlarm = sp.getBoolean("edit_add", false);
                 alarmId = sp.getInt("id", 0);
                 alarmParameter.setID(alarmId);
-                //todo save lvls before mkAlarm
-                db.mkAlarm(alarmParameter, editAlarm);
+                //todo save lvls before saveAlarmToDB
+                db.saveAlarmToDB(alarmParameter, editAlarm);
                 Log.d("mett", alarmParameter.toString());
                 finish();
 
