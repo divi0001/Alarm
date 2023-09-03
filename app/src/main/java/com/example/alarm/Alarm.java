@@ -1,5 +1,6 @@
 package com.example.alarm;
 
+import android.app.AlarmManager;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -18,12 +19,13 @@ public class Alarm implements java.io.Serializable  {
     //todo extendedPriveleges as a global setting, not per Alarm
     private boolean isActive, snoozable, extraAwakeCheck, hasLevels;
 
-    boolean turnusToggle = false;
+    boolean turnusToggle = false; //this inits the turnusToggle to false, which means the alarm should go off, as we are not in the turnus, that the alarm should be skipped for (in this time, this is set to true)
     Calendar dateOfToggle = Calendar.getInstance();
     private String soundPath, label;
     private boolean[] weekDays;
     private ArrayList<AlarmMethod> mQueue = new ArrayList<>();
     private ArrayList<AlarmLevel> lQueue = new ArrayList<>();
+    AlarmManager alarmManager; //the alarmManager responsible for setting the turnusToggle and dateOfToggle
 
 
     public Alarm(CharSequence t, int id, String soundPath, boolean isActive, boolean[] weekDays, boolean snoozable, String label,
@@ -304,6 +306,7 @@ public class Alarm implements java.io.Serializable  {
                 ", isActive=" + isActive +
                 ", snoozable=" + snoozable +
                 ", turnus=" + turnus +
+                ", turnusToggle="+ turnusToggle +
                 ", extraAwakeCheck=" + extraAwakeCheck +
                 ", hasLevels=" + hasLevels +
                 ", soundPath='" + soundPath + '\'' +

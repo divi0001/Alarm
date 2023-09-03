@@ -116,31 +116,32 @@ public class AlarmOverViewActivity extends AppCompatActivity {
         if(pendingAlarms.size() != 0){
             for(PendingAlarm pA: pendingAlarms){
                 pA.getAlarmManager().cancel(pA.getPendingIntent());
+                pA.getAlarm().alarmManager.cancel(PendingIntent.getBroadcast(context, 0, new Intent("com.example.alarm.IntentAction.RECEIVE_TURNUS_UPDATE"), PendingIntent.FLAG_IMMUTABLE));
             }
         }
 
-        for(Alarm alarm: alarms){
+        if(alarms.size() > 0) {
 
-            AlarmMgr mgr = new AlarmMgr(context);
-            Intent intent = new Intent(this, AlarmReceiver.class);
-            intent.putExtra("id", alarm.getID());
-            PendingIntent pI = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+            for (Alarm alarm : alarms) {
 
-            if(alarm.isActive()){
-                long time = mgr.calculateNextAlarmTime(alarm, System.currentTimeMillis());
+                AlarmMgr mgr = new AlarmMgr(context);
+                Intent intent = new Intent(this, AlarmReceiver.class);
+                intent.putExtra("id", alarm.getID());
+                PendingIntent pI = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
-                alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, pI);
+                if (alarm.isActive()) {
+                    long time = mgr.calculateNextAlarmTime(alarm);
 
-                PendingAlarm pA = new PendingAlarm(alarmManager, alarm.getID(), alarm);
-                pA.setPendingIntent(pI);
+                    alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, pI);
 
-                pendingAlarms.add(pA);
+                    PendingAlarm pA = new PendingAlarm(alarmManager, alarm.getID(), alarm);
+                    pA.setPendingIntent(pI);
+
+                    pendingAlarms.add(pA);
+                }
             }
         }
-
-
-
 
     }
 
@@ -177,7 +178,7 @@ public class AlarmOverViewActivity extends AppCompatActivity {
             txtExplainAdd.setText(R.string.empty);
         }
 
-        //setAlarms();
+        setAlarms();
     }
 
     @Override

@@ -32,7 +32,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyApp:AlarmLock");
         wakeLock.acquire(30*60*1000L /*30 minutes*/);
 
-        playSound(context);
+
 
         Intent i = new Intent(context, ActiveAlarmActivity.class);
         id = intent.getIntExtra("id", -1);
@@ -51,6 +51,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
         notificationManagerCompat.notify(123, builder.build());
+        playSound(context);
 
         wakeLock.release();
 
