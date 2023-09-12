@@ -236,6 +236,12 @@
     </string-array>
     <string name="turnusText">Set a turnus (in days):</string>
     <string name="explain_empty_turnus">Leave empty for no turnus</string>
+    <string name="submit">Submit</string>
+    <string name="sleepProgressBarExplanation">Time until the sound goes back on:</string>
+    <string name="snooze">Snooze</string>
+    <string name="snooze_amount_left">"Amount of snoozes left: "</string>
+    <string name="active_alarm_progress_key">com.example.alarm.ACTIVE_ALARM_PROGRESS_KEY</string>
+    <string name="settings_key">com.example.alarm.MAIN_SETTINGS_KEY</string>
 
 
 </resources>

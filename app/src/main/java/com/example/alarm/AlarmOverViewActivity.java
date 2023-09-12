@@ -51,7 +51,6 @@ public class AlarmOverViewActivity extends AppCompatActivity {
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
     private Calendar cal;
-    ArrayList<PendingAlarm> pendingAlarms = new ArrayList<>();
     private TextView txtExplainAdd;
 
 
@@ -113,12 +112,7 @@ public class AlarmOverViewActivity extends AppCompatActivity {
     @SuppressLint("ScheduleExactAlarm")
     private void setAlarms() {
 
-        if(pendingAlarms.size() != 0){
-            for(PendingAlarm pA: pendingAlarms){
-                pA.getAlarmManager().cancel(pA.getPendingIntent());
-                pA.getAlarm().alarmManager.cancel(PendingIntent.getBroadcast(context, 0, new Intent("com.example.alarm.IntentAction.RECEIVE_TURNUS_UPDATE"), PendingIntent.FLAG_IMMUTABLE));
-            }
-        }
+
 
         if(alarms.size() > 0) {
 
@@ -135,10 +129,6 @@ public class AlarmOverViewActivity extends AppCompatActivity {
                     alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, pI);
 
-                    PendingAlarm pA = new PendingAlarm(alarmManager, alarm.getID(), alarm);
-                    pA.setPendingIntent(pI);
-
-                    pendingAlarms.add(pA);
                 }
             }
         }

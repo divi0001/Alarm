@@ -25,7 +25,6 @@ public class Alarm implements java.io.Serializable  {
     private boolean[] weekDays;
     private ArrayList<AlarmMethod> mQueue = new ArrayList<>();
     private ArrayList<AlarmLevel> lQueue = new ArrayList<>();
-    AlarmManager alarmManager; //the alarmManager responsible for setting the turnusToggle and dateOfToggle
 
 
     public Alarm(CharSequence t, int id, String soundPath, boolean isActive, boolean[] weekDays, boolean snoozable, String label,

@@ -23,6 +23,24 @@
         android:theme="@style/Theme.Alarm"
         tools:targetApi="31">
         <activity
+            android:name=".ActiveQRBarActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ActiveMemoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ActiveLocationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ActiveSudokuActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ActiveMathActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ActiveTapOffActivity"
+            android:exported="false" />
+        <activity
             android:name=".ActiveAlarmActivity"
             android:exported="false" />
         <activity
@@ -61,17 +79,13 @@
         </activity>
 
         <receiver android:name=".AlarmReceiver" />
-
-
         <receiver
-            android:name="com.example.alarm.TurnusBroadcastReceiver"
-            android:exported="false" >
+            android:name=".TurnusBroadcastReceiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.example.alarm.IntentAction.RECEIVE_TURNUS_UPDATE" />
             </intent-filter>
         </receiver>
-
-
 
         <meta-data
             android:name="preloaded_fonts"

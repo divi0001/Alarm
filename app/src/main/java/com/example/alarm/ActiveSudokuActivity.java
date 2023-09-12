@@ -4,11 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-public class ActiveAlarmActivity extends AppCompatActivity {
+public class ActiveSudokuActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_active_alarm);
+        setContentView(R.layout.activity_active_sudoku);
     }
 }

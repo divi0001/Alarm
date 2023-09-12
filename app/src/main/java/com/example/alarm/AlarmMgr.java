@@ -63,9 +63,7 @@ public class AlarmMgr {
 
         }
 
-        if(alarm.alarmManager != null){
-            alarm.alarmManager.cancel(PendingIntent.getBroadcast(context, 0 , new Intent("com.example.alarm.IntentAction.RECEIVE_TURNUS_UPDATE"), PendingIntent.FLAG_IMMUTABLE));
-        }
+
 
 
         Intent bI = new Intent("com.example.alarm.IntentAction.RECEIVE_TURNUS_UPDATE");
@@ -77,7 +75,6 @@ public class AlarmMgr {
 
 
 
-        alarm.alarmManager = am;
         DBHelper db = new DBHelper(context, "Database.db");
         db.saveAlarmToDB(alarm, true);
 

@@ -37,7 +37,6 @@ public class TurnusBroadcastReceiver extends BroadcastReceiver {
             //todo waaaay later, try to make this able to also work, when ScheduleExactAlarm Permission is revoked
 
             am.setExactAndAllowWhileIdle(AlarmManager.RTC, System.currentTimeMillis() + (alarm.getTurnus()* 24L*3600*1000), pi);
-            alarm.alarmManager = am;
 
             db.saveAlarmToDB(alarm, true);
 
