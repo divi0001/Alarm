@@ -78,7 +78,7 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
     private Enums.Difficulties difficulty = Enums.Difficulties.None;
     private int alarmId, hour, minute;
-    private int level_id = 0;
+    //private int level_id = 0;
     private RelativeLayout relLayoutHideable, relLayAddLvls;
     private Enums.Method methodToSet = Enums.Method.None;
     private Enums.SubMethod subMethod = Enums.SubMethod.None;
@@ -87,7 +87,6 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
 
     private Alarm alarmParameter;
 
-    ArrayList<String> alarmLevel = new ArrayList<>();
     private int lvlID = -1;
     private int methodToSetPos = -1;
     private boolean edit = false;
@@ -154,8 +153,9 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
             if(edit){
 
                 alarmId = getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).getInt("id",0);
-                DBHelper db = new DBHelper(this, "Database.db");
-                alarmParameter = db.getAlarm(alarmId);
+                try (DBHelper db = new DBHelper(this, "Database.db")) {
+                    alarmParameter = db.getAlarm(alarmId);
+                }
                 Log.d("mett", "editing: "+alarmParameter.toString());
                 getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().remove("edit_add").apply();
                 getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().remove("id").apply();
@@ -609,8 +609,8 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
         checkAllowSnooze.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                RelativeLayout.LayoutParams params= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
                 if (isChecked){
-                    RelativeLayout.LayoutParams params= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
                     params.addRule(RelativeLayout.BELOW, R.id.relLayoutHideable);
                     txtSetLabel.setLayoutParams(params);
                     if (imgBtnDownSnooze.getVisibility() == View.INVISIBLE && imgBtnUpSnooze.getVisibility() == View.INVISIBLE){
@@ -621,7 +621,6 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     relLayoutHideable.setVisibility(View.VISIBLE);
                 }else{
 
-                    RelativeLayout.LayoutParams params= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
                     params.addRule(RelativeLayout.BELOW, R.id.txtSnoozeAllow);
                     txtSetLabel.setLayoutParams(params);
                     imgBtnDownSnooze.setVisibility(View.INVISIBLE);
@@ -827,14 +826,15 @@ public class EditAlarmActivity extends AppCompatActivity implements AlarmLevelAd
                     //first condition might be redundant
             if((alarmParameter.getlQueue().size() > 0 || alarmParameter.getmQueue(-1).size() > 0)&& !Objects.equals(null, alarmParameter.getSoundPath(lvlID))){
 
-                DBHelper db = new DBHelper(context, "Database.db");
+                try (DBHelper db = new DBHelper(context, "Database.db")) {
 
-                SharedPreferences sp = getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE);
-                boolean editAlarm = sp.getBoolean("edit_add", false);
-                alarmId = sp.getInt("id", 0);
-                alarmParameter.setID(alarmId);
-                //todo save lvls before saveAlarmToDB
-                db.saveAlarmToDB(alarmParameter, editAlarm);
+                    SharedPreferences sp = getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE);
+                    boolean editAlarm = sp.getBoolean("edit_add", false);
+                    alarmId = sp.getInt("id", 0);
+                    alarmParameter.setID(alarmId);
+                    //todo save lvls before saveAlarmToDB
+                    db.saveAlarmToDB(alarmParameter, editAlarm);
+                }
                 Log.d("mett", alarmParameter.toString());
                 finish();
 
@@ -920,7 +920,7 @@ if(edit) {
 
     /**
      * @implNote Specifies what happens, if you click one of the alarm lvl texts
-     * @param label
+     * @param label the label of the level
      */
     @Override
     public void setIfClicked(String label) {
@@ -939,8 +939,8 @@ if(edit) {
             checkAllowSnooze.setChecked(true);
             snoozeAmount = currLvl.getSnoozeAmount();
             snoozeTime = currLvl.getSnoozeMinutes();
-            editAmountSnoozes.setText(Integer.toString(snoozeAmount));
-            editMinutesSnooze.setText(Integer.toString(snoozeTime));
+            editAmountSnoozes.setText(String.valueOf(snoozeAmount));
+            editMinutesSnooze.setText(String.valueOf(snoozeTime));
         }else{
             checkAllowSnooze.callOnClick();
         }
@@ -957,7 +957,7 @@ if(edit) {
         if(currLvl.isExtraAwakeCheck()){
             minsUntil = currLvl.getMinutesUntilTurnBackOn();
             checkAwake.setChecked(true);
-            editMinutesCheckAwake.setText(Integer.toString(minsUntil));
+            editMinutesCheckAwake.setText(String.valueOf(minsUntil));
         }else{
             checkAwake.callOnClick();
         }
@@ -1021,9 +1021,11 @@ if(edit) {
             Geocoder geo = new Geocoder(this, Locale.getDefault());
             try {
                 addr = geo.getFromLocation(latitude,longitude,1);
+                assert addr != null;
                 adr = addr.get(0).getAddressLine(0);
                 Log.d("mett", "Address: " + adr + " subthouroughfare: " + addr.get(0).getSubThoroughfare());
             } catch (IOException e) {
+                System.out.println("You fooooool, you havent even seen my last form!!!!");
                 throw new RuntimeException(e);
             }
         }

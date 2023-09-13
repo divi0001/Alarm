@@ -39,9 +39,13 @@ public class ActiveMathActivity extends AppCompatActivity {
 
         taskTime = getSharedPreferences(getString(R.string.settings_key),MODE_PRIVATE).getInt("time_per_task", 30)*1000L;
 
+        Alarm alarm = new Alarm(-1);
 
         int alarmId = getIntent().getIntExtra("id",-1); // defVal 0?
-        Alarm alarm = new DBHelper(this, "Database.db").getAlarm(alarmId);
+        try(DBHelper db = new DBHelper(this, "Database.db")){
+            alarm = db.getAlarm(alarmId);
+        }
+
 
         String difficulty = Enums.Difficulties.ExEasy.name();
         int mode = 0;

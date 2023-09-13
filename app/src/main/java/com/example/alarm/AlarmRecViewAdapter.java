@@ -72,7 +72,7 @@ public class AlarmRecViewAdapter extends RecyclerView.Adapter<AlarmRecViewAdapte
                 se.apply();
                 Log.d("mett", "started editAlarmActivity from threeDots with id " + curr.getID());
                 context.startActivity(intent);
-                notifyDataSetChanged();
+                notifyDataSetChanged(); //todo idk a specific change event, that fits here, take care of that
             }
         });
 

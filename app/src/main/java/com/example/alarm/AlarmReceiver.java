@@ -1,6 +1,5 @@
 package com.example.alarm;
 
-import static com.example.alarm.Enums.Method.None;
 import static com.example.alarm.Enums.Method.TapOff;
 
 import android.annotation.SuppressLint;
@@ -39,7 +38,11 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 
         id = intent.getIntExtra("id", -1);
-        Alarm ala = new DBHelper(context, "Database.db").getAlarm(id);
+        Alarm ala;
+
+        try(DBHelper db = new DBHelper(context, "Database.db")){
+            ala = db.getAlarm(id);
+        }
 
         AlarmMethod aM = new AlarmMethod(0, Enums.Difficulties.None, TapOff, Enums.SubMethod.None);
 
@@ -111,7 +114,13 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     private Ringtone playSound(Context context) {
 
-        Alarm alarm = new DBHelper(context, "Database.db").getAlarm(id);
+        Alarm alarm = new Alarm(-1);
+
+        try(DBHelper db = new DBHelper(context, "Database.db")){
+            alarm = db.getAlarm(id);
+        }
+
+
         Uri uri = Uri.parse(alarm.getSoundPath(-1));
 
 

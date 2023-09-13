@@ -1,9 +1,5 @@
 package com.example.alarm;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
@@ -11,46 +7,26 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.alarm.databinding.ActivityMainBinding;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import org.json.JSONArray;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 
 public class AlarmOverViewActivity extends AppCompatActivity {
 
     private RecyclerView recView;
     private ImageView addAlarm;
-    private String path;
 
     private ArrayList<Alarm> alarms = new ArrayList<>();
     private final Context context = this;
     AlarmRecViewAdapter adapter = new AlarmRecViewAdapter(this);
     private AlarmManager alarmManager;
-    private PendingIntent pendingIntent;
-    private Calendar cal;
     private TextView txtExplainAdd;
 
 
@@ -70,20 +46,21 @@ public class AlarmOverViewActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                DBHelper db = new DBHelper(context, "Database.db");
+                try(DBHelper db = new DBHelper(context, "Database.db")) {
 
-                Intent i = new Intent(AlarmOverViewActivity.this, EditAlarmActivity.class);
-                i.putExtra("createAlarm","true");
-                getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().putBoolean("edit_add", false).apply();
-                getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().putInt("id", db.getMaxAlarmID()+1).apply();
-                startActivity(i);
+                    Intent i = new Intent(AlarmOverViewActivity.this, EditAlarmActivity.class);
+                    i.putExtra("createAlarm", "true");
+                    getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().putBoolean("edit_add", false).apply();
+                    getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().putInt("id", db.getMaxAlarmID() + 1).apply();
+                    startActivity(i);
+                }
             }
         });
 
 
-        DBHelper db = new DBHelper(context, "Database.db");
-        alarms = db.getAlarms();
-
+        try(DBHelper db = new DBHelper(context, "Database.db")) {
+            alarms = db.getAlarms();
+        }
 
         adapter.setAlarms(alarms);
 
@@ -157,10 +134,10 @@ public class AlarmOverViewActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        DBHelper db = new DBHelper(context, "Database.db");
-        alarms = db.getAlarms();
-        adapter.setAlarms(alarms);
-
+        try(DBHelper db = new DBHelper(this, "Database.db")) {
+            alarms = db.getAlarms();
+            adapter.setAlarms(alarms);
+        }
         txtExplainAdd = findViewById(R.id.txtExplain);
         if(adapter.getItemCount()>0){
             txtExplainAdd.setText("");
@@ -175,8 +152,9 @@ public class AlarmOverViewActivity extends AppCompatActivity {
     public void onActivityReenter(int resultCode, Intent data) {
         super.onActivityReenter(resultCode, data);
 
-        DBHelper db = new DBHelper(context, "Database.db");
-        alarms = db.getAlarms();
+        try(DBHelper db = new DBHelper(context, "Database.db")) {
+            alarms = db.getAlarms();
+        }
         adapter.setAlarms(alarms);
 
 
@@ -195,10 +173,11 @@ public class AlarmOverViewActivity extends AppCompatActivity {
         addAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DBHelper db = new DBHelper(AlarmOverViewActivity.this, "Database.db");
-                Intent i = new Intent(AlarmOverViewActivity.this, EditAlarmActivity.class);
 
-                getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().putInt("id", db.getMaxAlarmID()+1).apply();
+                Intent i = new Intent(AlarmOverViewActivity.this, EditAlarmActivity.class);
+                try(DBHelper db = new DBHelper(context, "Database.db")) {
+                    getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().putInt("id", db.getMaxAlarmID() + 1).apply();
+                }
                 getSharedPreferences(getString(R.string.alarm_id_key), MODE_PRIVATE).edit().putBoolean("edit_add", false).apply();
                 startActivity(i);
             }

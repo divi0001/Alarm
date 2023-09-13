@@ -34,7 +34,6 @@ public class QRMethodSetActivity extends AppCompatActivity {
     private TextView txtDecode,txtFormat;
 
     private ArrayList<Bitmap> qrCodes,barCodes;
-    private DBHelper db;
 
 
     @Override
@@ -50,82 +49,79 @@ public class QRMethodSetActivity extends AppCompatActivity {
         editLabel = (EditText) findViewById(R.id.editLabelMe);
         spSavedQRBars = (Spinner) findViewById(R.id.spinnerQRBar);
 
-        db = new DBHelper(this, "Database.db");
+        ArrayList<String> labels;
+        int queue_id;
+        try (DBHelper db = new DBHelper(this, "Database.db")) {
 
 
+            btnAddNewQRBar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    IntentIntegrator intentIntegrator = new IntentIntegrator(QRMethodSetActivity.this);
+                    intentIntegrator.setPrompt("Scan a QR/Bar Code");
+                    intentIntegrator.setOrientationLocked(true);
+                    intentIntegrator.initiateScan(); //todo add to QRBarcodedatabase
+
+                }
+            });
+            Cursor c = db.getData("QRBarcodedatabase");
+
+            ArrayList<String> values = new ArrayList<>();
+            labels = new ArrayList<>();
 
 
-
-
-        btnAddNewQRBar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                IntentIntegrator intentIntegrator = new IntentIntegrator(QRMethodSetActivity.this);
-                intentIntegrator.setPrompt("Scan a QR/Bar Code");
-                intentIntegrator.setOrientationLocked(true);
-                intentIntegrator.initiateScan();
-
+            if (c.getCount() > 0) {
+                c.moveToFirst();
+                while (c.moveToNext()) {
+                    labels.add(c.getString(0));
+                    values.add(c.getString(1));
+                }
             }
-        });
-        Cursor c = db.getData("QRBarcodedatabase");
 
-        ArrayList<String> values = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
+            SharedPreferences sp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE);
+            queue_id = sp.getInt("queue_id", -1);
+            boolean edit = sp.getString("edit_add", "add").equals("edit");
+            Log.d("mett", String.valueOf(edit));
+            btnAddFromAbove.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
+                    if (edit) {
 
-        if(c.getCount()>0){
-            c.moveToFirst();
-            while(c.moveToNext()){
-                labels.add(c.getString(0));
-                values.add(c.getString(1));
-            }
-        }
-
-        SharedPreferences sp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE);
-        int queue_id = sp.getInt("queue_id",-1);
-        boolean edit = sp.getString("edit_add","add").equals("edit");
-        Log.d("mett", String.valueOf(edit));
-        btnAddFromAbove.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if(edit){
-
-                    SharedPreferences sp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),MODE_PRIVATE);
-                    SharedPreferences.Editor se = sp.edit();
-                    se.putString("Method", Enums.Method.QRBar.name());
-                    se.putString("QRLabel", editLabel.getText().toString());
-                    se.putInt("queue_id", queue_id);
-                    se.putString("edit_add", "edit");
-                    //decoded value at the key of the label in the qr DB
-                    se.apply();
-                    finish();
-                } else {
-
-
-                    if (labels.contains(editLabel.getText().toString())) {
-                        Toast.makeText(QRMethodSetActivity.this, "Label already used. Please use a unique label", Toast.LENGTH_SHORT).show();
-                    } else {
-
-                        db.addQRBar(editLabel.getText().toString(), txtDecode.getText().toString());
-
-                        int l = db.getMaxTableId("Methoddatabase")+1;
-
-                        SharedPreferences sp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key),MODE_PRIVATE);
+                        SharedPreferences sp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE);
                         SharedPreferences.Editor se = sp.edit();
                         se.putString("Method", Enums.Method.QRBar.name());
                         se.putString("QRLabel", editLabel.getText().toString());
                         se.putInt("queue_id", queue_id);
-                        se.putString("edit_add", "add");
+                        se.putString("edit_add", "edit");
                         //decoded value at the key of the label in the qr DB
                         se.apply();
                         finish();
-                    }
+                    } else {
 
+
+                        if (labels.contains(editLabel.getText().toString())) {
+                            Toast.makeText(QRMethodSetActivity.this, "Label already used. Please use a unique label", Toast.LENGTH_SHORT).show();
+                        } else {
+
+                            db.addQRBar(editLabel.getText().toString(), txtDecode.getText().toString());
+
+                            SharedPreferences sp = getSharedPreferences(getString(R.string.math_to_edit_alarm_pref_key), MODE_PRIVATE);
+                            SharedPreferences.Editor se = sp.edit();
+                            se.putString("Method", Enums.Method.QRBar.name());
+                            se.putString("QRLabel", editLabel.getText().toString());
+                            se.putInt("queue_id", queue_id);
+                            se.putString("edit_add", "add");
+                            //decoded value at the key of the label in the qr DB
+                            se.apply();
+                            finish();
+                        }
+
+                    }
                 }
-            }
-        });
+            });
+        }
 
         spSavedQRBars.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, labels));
 
@@ -151,7 +147,11 @@ public class QRMethodSetActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Cursor c = db.getData("QRBarcodedatabase");
+        Cursor c;
+        try (DBHelper db = new DBHelper(this, "Database.db")) {
+
+            c = db.getData("QRBarcodedatabase");
+        }
 
         ArrayList<String> values = new ArrayList<>();
         ArrayList<String> labels = new ArrayList<>();
@@ -164,7 +164,7 @@ public class QRMethodSetActivity extends AppCompatActivity {
                 values.add(c.getString(1));
             }
         }
-        spSavedQRBars.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, labels));
+        spSavedQRBars.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, labels));
     }
 
     @Override

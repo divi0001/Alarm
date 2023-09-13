@@ -75,9 +75,9 @@ public class AlarmMgr {
 
 
 
-        DBHelper db = new DBHelper(context, "Database.db");
-        db.saveAlarmToDB(alarm, true);
-
+        try(DBHelper db = new DBHelper(context, "Database.db")) {
+            db.saveAlarmToDB(alarm, true);
+        }
         return alarmTime.getTimeInMillis();
     }
 }
