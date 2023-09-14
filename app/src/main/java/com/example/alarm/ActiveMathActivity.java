@@ -1,5 +1,7 @@
 package com.example.alarm;
 
+import static java.lang.Math.abs;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.animation.ValueAnimator;
@@ -14,8 +16,11 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
+import java.util.function.LongPredicate;
 
 public class ActiveMathActivity extends AppCompatActivity {
 
@@ -26,6 +31,7 @@ public class ActiveMathActivity extends AppCompatActivity {
     private ValueAnimator anim;
     int tempProgress = 0;
     long taskTime = 30*1000;
+    int lvlID, queueID;
 
 
 
@@ -58,14 +64,14 @@ public class ActiveMathActivity extends AppCompatActivity {
         Enums.SubMethod mode = Enums.SubMethod.Add;
 
         if(alarm.isHasLevels()){
-            int lvlID = getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).getInt("curr_lvl_id",0);
-            int queueID = getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).getInt("curr_queue_id",0);
+            lvlID = getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).getInt("curr_lvl_id",0);
+            queueID = getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).getInt("curr_queue_id",0);
             difficulty = alarm.getlQueue().get(lvlID).getmQueue().get(queueID).getDifficulty();
             mode = alarm.getlQueue().get(lvlID).getmQueue().get(queueID).getSubMethod();
             txtSnoozesLeft.setText(alarm.getSnoozeAmount(lvlID));
 
         }else {
-            int queueID = getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).getInt("curr_queue_id",0);
+            queueID = getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).getInt("curr_queue_id",0);
             difficulty = alarm.getmQueue(-1).get(queueID).getDifficulty();
             mode = alarm.getmQueue(-1).get(queueID).getSubMethod();
             txtSnoozesLeft.setText(String.valueOf(alarm.getSnoozeAmount(-1)));
@@ -95,10 +101,18 @@ public class ActiveMathActivity extends AppCompatActivity {
             }
         });
 
+        Alarm finalAlarm = alarm;
+        Enums.SubMethod finalMode = mode;
+        Enums.Difficulties finalDifficulty = difficulty;
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if(isCorrect(task, editMathAnswer.getText().toString(), finalMode, finalDifficulty)){
+                    nextOrAlarmOff(finalAlarm);
+                }else{
+                    editMathAnswer.setText("");
+                    Toast.makeText(ActiveMathActivity.this, "Your answer didn't match the internally calculated one", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -145,6 +159,120 @@ public class ActiveMathActivity extends AppCompatActivity {
 
 
 
+    }
+
+    private void nextOrAlarmOff(Alarm alarm) {
+        //lvlID = getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).getInt("curr_lvl_id",0);
+        //queueID = getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).getInt("curr_queue_id",0);
+        if(alarm.isHasLevels()){
+            if(alarm.getlQueue().get(lvlID).getmQueue().size()-1 == queueID){
+                if(alarm.getlQueue().size()-1 == lvlID){
+                    getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).edit().putInt("curr_lvl_id", -1).apply();
+                    getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).edit().putInt("curr_queue_id", 0).apply();
+                }
+                lvlID++;
+                getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).edit().putInt("curr_lvl_id", lvlID).apply();
+                getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).edit().putInt("curr_queue_id", 0).apply();
+
+            }else if(lvlID != -1){
+                queueID++;
+                getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).edit().putInt("curr_queue_id", queueID).apply();
+            }else{
+                if(alarm.getmQueue(-1).size()-1 == queueID){
+                    //todo cleanup after alarm is done
+                    com.example.alarm.AlarmReceiver.r.stop();
+                    finish();
+                }else{
+                    queueID++;
+                    getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).edit().putInt("curr_queue_id", queueID).apply();
+                }
+            }
+        }else{
+            if (alarm.getmQueue(-1).size()-1 == queueID){
+                //todo cleanup after alarm is done
+                com.example.alarm.AlarmReceiver.r.stop();
+                finish();
+            }else{
+                queueID++;
+                getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).edit().putInt("curr_queue_id", queueID).apply();
+            }
+        }
+    }
+
+    private boolean isCorrect(long[] task, String answer, Enums.SubMethod sub, Enums.Difficulties diff) {
+        switch(sub){
+            case None:
+            case Mult:
+            case Sub:
+            case Div:
+            case Add:
+                return Long.parseLong(answer) == task[2];
+            case Root:
+            case Fac:
+                return Long.parseLong(answer) == task[1];
+            case Extrema:
+                long[] lAns = toLongArray(answer);
+                switch(diff){
+                    case None:
+                    case ExEasy:
+                    case Easy:
+                    case Middle:
+                        return containsLongs(lAns, new long[]{task[0], task[1]});
+                    case Hard:
+                        return containsLongs(lAns,new long[]{task[0], task[1],task[2], task[3]});
+                    case ExHard:
+                        return containsLongs(lAns,new long[]{task[0], task[1],task[2], task[3],task[4]});
+                    default:
+                        return false;
+                }
+            case FuncVal:
+                long[] lVals = toLongArray(answer);
+                return containsLongs(lVals, new long[]{task[task.length-1]});
+            default:
+                return false;
+        }
+    }
+
+    private boolean containsLongs(long[] toLongArray, long[] longs) {
+        if(toLongArray.length != longs.length){
+            return false;
+        }else{
+            for(long l: toLongArray){
+                if(!Arrays.asList(longs).contains(l)) return false; //todo make sure this actually looks, if l is contained in the longs array
+            }
+            return true;
+        }
+    }
+
+    private long[] toLongArray(String answer) {
+        long[] lArr;
+        ArrayList<Long> answers = new ArrayList<>();
+        StringBuilder buf = new StringBuilder();
+        int index=0;
+        for (char c: answer.toCharArray()) {
+
+            if(c == ',' && index != 0){
+                answers.add(Long.parseLong(buf.toString()));
+                buf = new StringBuilder();
+            }else if(Character.isDigit(c)){
+                buf.append(c);
+            }else if(c == '-' && buf.length() == 0){
+                buf.append("-");
+            }else{
+                Toast.makeText(this, "Wrong format of answer", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Give the answer as a comma seperated list like val1,val2,val3,... if there are double answers, naming 1 of them is enough", Toast.LENGTH_LONG).show();
+                break;
+            }
+            index++;
+        }
+        lArr = new long[answer.length()];
+        index = 0;
+        for(long l: answers){
+            lArr[index] = l;
+            index++;
+        }
+
+        return lArr;
     }
 
     private String toOperator(Enums.SubMethod sub) {
@@ -195,14 +323,37 @@ public class ActiveMathActivity extends AppCompatActivity {
                     break;
             }
         }else if (sub == Enums.SubMethod.Extrema){
+             switch (diff){
+                 case None:
+                 case ExEasy:
+                     stringedTask+= pws[3] + (taskArr[0] < 0 ? " - ": " + ") + abs(taskArr[3]) + "x + " + taskArr[4];
+                     break;
+                 case Easy:
+                     stringedTask+= pws[3] + (taskArr[3] < 0 ? " - ": " + ") + abs(taskArr[3]) + "x" + (taskArr[4] < 0 ? " - ": " + ") + abs(taskArr[4]);
+                     break;
+                 case Middle:
+                     stringedTask+= pws[1] + (taskArr[1] < 0 ? " - ": " + ") + abs(taskArr[1]) + pws[3];
+                     break;
+                 case Hard:
+                     stringedTask+= pws[1] + (taskArr[5] < 0 ? " - ": " + ") + abs(taskArr[5]) + pws[2] + (taskArr[6] < 0 ? " - ": " + ") + abs(taskArr[6]) + pws[3]
+                             + (taskArr[7] < 0 ? " - ": " + ") + abs(taskArr[7]) + pws[4] + (taskArr[8] < 0 ? " - ": " + ") + abs(taskArr[8]);
+                     break;
+                 case ExHard:
+                     stringedTask+= pws[0] + (taskArr[6] < 0 ? " - ": " + ") + abs(taskArr[6]) + pws[1] + (taskArr[7] < 0 ? " - ": " + ") + abs(taskArr[7]) + pws[2] +
+                             (taskArr[8] < 0 ? " - ": " + ") + abs(taskArr[8]) + pws[3] + (taskArr[9] < 0 ? " - ": " + ") + abs(taskArr[9]) + pws[4] +
+                             (taskArr[10] < 0 ? " - ": " + ") + abs(taskArr[10]);
+                     break;
+                 default:
+                     stringedTask+= "Something went wrong lol Knecht";
+                     break;
+
+             }
 
         }else if(sub == Enums.SubMethod.Root){
             stringedTask = toOperator(Enums.SubMethod.Root) + taskArr[0] + " = ?";
         }else{
             stringedTask = taskArr[0]+ toOperator(Enums.SubMethod.Fac) + " = ?";
         }
-
-
 
         return stringedTask;
     }
@@ -301,7 +452,7 @@ public class ActiveMathActivity extends AppCompatActivity {
                 case Easy:              // (x+s[0])*(x+s[1])            ,x^2, s[0]*x + s[1]*x               , s[0]*s[1] (remember, minus is included :D)
                     retArr = new long[]{smallRandArr[0], smallRandArr[1], 1, smallRandArr[0]+smallRandArr[1], smallRandArr[0]*smallRandArr[1]};
                     break;
-                case Middle://s[0]x^4 + s[1]x^2 type: clean biquadratics, will generate int extrema after root substituting
+                case Middle://x^4 + s[1]x^2 type: clean biquadratics, will generate int extrema after root substituting
                     retArr = new long[]{1, //must be 1 instead of smallRandArr[0] < 0 ? -(long) Math.pow(smallRandArr[0],2)*2: (long) Math.pow(smallRandArr[0],2)*2
                              smallRandArr[1] < 0 ? -(long) Math.pow(smallRandArr[1],2)*2:(long) Math.pow(smallRandArr[1],2)*2,
                             -(long) smallRandArr[1]*2, 0};
