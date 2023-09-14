@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Parcelable;
 import android.os.PowerManager;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 public class AlarmReceiver extends BroadcastReceiver {
 
     int id = -1;
+    static Ringtone r;
 
     @SuppressLint("MissingPermission")
     @Override
@@ -34,7 +36,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         wakeLock.acquire(30 * 60 * 1000L /*30 minutes*/);
 
 
-        Ringtone r = playSound(context);
+        r = playSound(context);
 
 
         id = intent.getIntExtra("id", -1);
@@ -42,9 +44,11 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         try(DBHelper db = new DBHelper(context, "Database.db")){
             ala = db.getAlarm(id);
+            Log.d("mett","alarm:\n" + ala.toString());
         }
 
-        AlarmMethod aM = new AlarmMethod(0, Enums.Difficulties.None, TapOff, Enums.SubMethod.None);
+        AlarmMethod aM;
+        Log.d("mett","alarm:\n" + ala.toString());
 
         if (ala.isHasLevels()) {
             ArrayList<AlarmLevel> alarmLevels = ala.getlQueue();
@@ -53,7 +57,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             aM = alarmMethods.get(0);
 
         } else {
-            ArrayList<AlarmMethod> alarmMethods = ala.getmQueue(0);
+            ArrayList<AlarmMethod> alarmMethods = ala.getmQueue(-1);
             aM = alarmMethods.get(0);
         }
 
@@ -89,7 +93,6 @@ public class AlarmReceiver extends BroadcastReceiver {
             Intent i = new Intent(context, act.getClass()); //todo each activeActivity needs to have a logic in the end, checking for further queued methods and potentially launching the intent to the next in queue
 
             i.putExtra("id", id);
-            i.putExtra("ringtone", (Parcelable) r);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_IMMUTABLE); //todo not sure, if flagImmutable is right here
 
@@ -97,7 +100,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                     .setSmallIcon(R.drawable.ic_launcher_background)
                     .setContentTitle("Alarm Manager")
                     .setContentText("Alarm")
-                    .setAutoCancel(true)
+                    .setAutoCancel(true) //this makes the notification go away after being clicked (if set to true)
                     .setDefaults(NotificationCompat.DEFAULT_ALL)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setContentIntent(pendingIntent);
@@ -105,11 +108,12 @@ public class AlarmReceiver extends BroadcastReceiver {
             NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
             notificationManagerCompat.notify(123, builder.build());
 
-
             wakeLock.release();
 
 
         }
+
+
 
 
     private Ringtone playSound(Context context) {
@@ -135,7 +139,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         );
 
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            Ringtone r = RingtoneManager.getRingtone(context, uri);
+            r = RingtoneManager.getRingtone(context, uri);
             r.play();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 r.setLooping(true);
