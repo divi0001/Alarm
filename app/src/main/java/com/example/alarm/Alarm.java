@@ -195,7 +195,7 @@ public class Alarm implements java.io.Serializable  {
      */
     public ArrayList<AlarmMethod> getmQueue(int position) {
         if(position > -1) return this.lQueue.get(position).getmQueue();
-        return mQueue;
+        return this.mQueue;
     }
 
     /**

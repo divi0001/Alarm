@@ -1,7 +1,5 @@
 package com.example.alarm;
 
-import static com.example.alarm.Enums.Method.TapOff;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -13,12 +11,13 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Parcelable;
 import android.os.PowerManager;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+
+import com.example.alarm.SudokuPkg.view.ActiveSudokuActivity;
 
 import java.util.ArrayList;
 
@@ -46,6 +45,14 @@ public class AlarmReceiver extends BroadcastReceiver {
             ala = db.getAlarm(id);
             Log.d("mett","alarm:\n" + ala.toString());
         }
+
+        if(ala.isHasLevels()){
+            context.getSharedPreferences(context.getString(R.string.active_alarm_progress_key),Context.MODE_PRIVATE).edit().putInt("curr_queue_id",0).apply();
+            context.getSharedPreferences(context.getString(R.string.active_alarm_progress_key),Context.MODE_PRIVATE).edit().putInt("curr_lvl_id",0).apply();
+        }else{
+            context.getSharedPreferences(context.getString(R.string.active_alarm_progress_key),Context.MODE_PRIVATE).edit().putInt("curr_queue_id",0).apply();
+        }
+
 
         AlarmMethod aM;
         Log.d("mett","alarm:\n" + ala.toString());

@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    //id 'kotlin-android-extensions'
 }
 android {
 
@@ -41,6 +42,9 @@ dependencies {
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'android.arch.lifecycle:extensions:1.1.1'
+    implementation 'android.arch.lifecycle:viewmodel:1.1.1'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     testImplementation 'junit:junit:4.13.2'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.7.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-sdk-geojson:6.9.0'

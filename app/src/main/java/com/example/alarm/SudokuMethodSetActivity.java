@@ -1,20 +1,18 @@
 package com.example.alarm;
 
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.alarm.SudokuPkg.game.Cell;
+
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Random;
 
 public class SudokuMethodSetActivity extends AppCompatActivity {
@@ -47,7 +45,8 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
                 RadioButton checkedRadioButton = findViewById(group.getCheckedRadioButtonId());
                 difficulty = Enums.Difficulties.valueOf(checkedRadioButton.getText().toString());
 
-                int[][] gene = generateSudoku(difficulty.name());
+                Cell[][] gene = generateSudoku();
+                gene = mkDifficulty(gene, difficulty.name());
 
                 txtExampleSudoku.setText(sudokuToString(gene));
                 //txtExampleSudoku.setPaintFlags(txtExampleSudoku.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
@@ -94,7 +93,7 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
     }
 
 
-    public String sudokuToString(int[][] gen) {
+    public String sudokuToString(Cell[][] gen) {
 
         StringBuilder ret = new StringBuilder();
         String lineEnd, lineMiddle, rowBold, row;
@@ -114,10 +113,10 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
                     ret.append("I");
                 }
 
-                if(gen[i][j] == 0){
+                if(gen[i][j].value == 0){
                     ret.append(" ").append(lineEnd).append("  ");
                 }else{
-                    ret.append(" ").append(gen[i][j]).append(" ").append(lineMiddle).append(" ");
+                    ret.append(" ").append(gen[i][j].value).append(" ").append(lineMiddle).append(" ");
                 }
             }
             if(i != 2 && i != 5 && i != 8) ret.append("\n").append(row).append("\n");
@@ -127,7 +126,7 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
         return ret.toString();
     }
 
-    public int[][] generateSudoku(String difficulty) {
+    public Cell[][] generateSudoku() {
 
         int[][] sudoku = initSudoku();
         int[] randSort1 = new int[9];
@@ -187,10 +186,20 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
 
         }
 
+        int index = 0;
+        Cell[][] finalSudoku = new Cell[9][9];
+        for (int[] su:sudoku) {
+            int index2 = 0;
+            for (int s:su) {
+                finalSudoku[index][index2] = new Cell(index,index2,s);
+                index2++;
+            }
+            index++;
+        }
 
 
 
-        return mkDifficulty(sudoku, difficulty);
+        return finalSudoku;
     }
 
 
@@ -253,7 +262,7 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
 
 
 
-    private int[][] mkDifficulty(int[][] preGen, String difficulty){
+    public Cell[][] mkDifficulty(Cell[][] preGen, String difficulty){ //yup ik i could make this way more compact
 
         Random rand = new Random();
 
@@ -290,7 +299,7 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
 
     }
 
-    private int[][] mkNulls(int[][] preGen, int i1) {
+    private Cell[][] mkNulls(Cell[][] preGen, int i1) {
 
         Random rand = new Random();
         int r1;
@@ -301,7 +310,8 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
 
                 r1 = rand.nextInt(9);
 
-                preGen[k][r1] = 0;
+                preGen[k][r1].value = 0;
+                preGen[k][r1].isStarting = false;
 
             }
         }

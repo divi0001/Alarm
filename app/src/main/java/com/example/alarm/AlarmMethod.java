@@ -1,14 +1,7 @@
 package com.example.alarm;
 
 import android.location.Address;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.util.Log;
 
-import androidx.annotation.NonNull;
-
-import java.lang.invoke.MethodHandle;
-import java.util.Arrays;
 import java.util.Random;
 
 public class AlarmMethod {
@@ -74,7 +67,7 @@ public class AlarmMethod {
                 math.generateExample(difficulty.toString(), subMethod.ordinal());
             } else if (type == 4) {
                 SudokuMethodSetActivity sudo = new SudokuMethodSetActivity();
-                sudo.sudokuToString(sudo.generateSudoku(difficulty.toString()));
+                sudo.sudokuToString(sudo.generateSudoku());
             } else if (type == 5) {
                 generatePointerMemory(difficulty.ordinal());
             }

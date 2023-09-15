@@ -5,10 +5,13 @@ import static java.lang.Math.abs;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,6 +42,7 @@ public class ActiveMathActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_active_math);
+        lvlID = -1;
 
         seekBarSoundTurnOn = (SeekBar) findViewById(R.id.seekProgressBarMath);
         anim = ValueAnimator.ofInt(0, seekBarSoundTurnOn.getMax());
@@ -88,13 +92,25 @@ public class ActiveMathActivity extends AppCompatActivity {
 
         txtMathTask.setText(displayedText);
 
+        Alarm finalAlarm1 = alarm;
         btnSnooze.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(Integer.parseInt(txtSnoozesLeft.getText().toString())>0){
-                    Ringtone r = (Ringtone) Objects.requireNonNull(getIntent().getExtras()).get("ringtone"); //todo not sure if Ringtone key (name:) was capitalized here
-                    assert r != null;
-                    r.stop(); //todo maybe dont use ringtone to play alarmsound, when turning off the alarm in app, rather mediaplayer or smth like that (for next time)
+                    com.example.alarm.AlarmReceiver.r.stop();
+                    getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).edit().putInt("snooze_amount", Integer.parseInt(txtSnoozesLeft.getText().toString())-1).apply();
+                    txtSnoozesLeft.setText(Integer.parseInt(txtSnoozesLeft.getText().toString())-1);
+
+                    final Handler handler = new Handler(Looper.getMainLooper());
+                    handler.postDelayed(() -> {
+                        AlarmReceiver.r.play();
+                        Intent i = new Intent(ActiveMathActivity.this, ActiveMathActivity.class);
+                        i.putExtra("id", alarmId);
+                        startActivity(i);
+                    }, finalAlarm1.getSnoozeMinutes(lvlID)*60*1000L);
+
+
+
                 }else{
                     Toast.makeText(ActiveMathActivity.this, "No snoozes left, get up!", Toast.LENGTH_SHORT).show();
                 }
