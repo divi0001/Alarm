@@ -1,4 +1,4 @@
-package com.example.alarm.SudokuPkg.view.custom;
+package com.example.alarm.SudokuPkgJava.view.custom;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -11,10 +11,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.example.alarm.SudokuPkg.game.Cell;
-
-import kotlin.Unit;
-import kotlin.jvm.internal.Intrinsics;
+import com.example.alarm.SudokuPkgJava.game.Cell;
 
 public final class SudokuBoardView extends View {
 
@@ -24,6 +21,7 @@ public final class SudokuBoardView extends View {
     private final Paint thinLinePaint;
     private final Paint selectedCellPaint;
     private final Paint conflictingCellPaint;
+
     private int selectedRow = -1;
     private int selectedCol = -1;
     private float cHeight=-1;
@@ -34,6 +32,9 @@ public final class SudokuBoardView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+        updateMeasurements(canvas.getWidth(), canvas.getHeight());
+
         for(int i = 0; i < 3; i++){
             for(int j = 0; j < 3; j++){
                 canvas.drawRect((i*(float)this.getWidth())/3, (j*(float)this.getHeight())/3, ((i+1)*(float)this.getWidth())/3, ((j+1)*(float)this.getHeight())/3,this.thickLinePaint);
@@ -57,30 +58,64 @@ public final class SudokuBoardView extends View {
         drawText(canvas);
     }
 
-    private void drawText(Canvas canvas) {
-        for (Cell[] ce: cells){
-            for (Cell c: ce) {
-                int row = c.row;
-                int col = c.col;
-                String valueString = String.valueOf(c.value);
-                Rect textBounds = new Rect();
 
-                Paint paintToUse = c.isStarting ? startingCellTextPaint() : textPaint();
-                paintToUse.getTextBounds(valueString,0,valueString.length(),textBounds);
-                float textWidth = paintToUse.measureText(valueString);
-                float textHeight = textBounds.height();
-                canvas.drawText(valueString,
-                        (col*(canvas.getWidth()/9F))+(canvas.getWidth()/9F)/2F - textWidth/2F,
-                        (row*(canvas.getHeight()/9F))+(canvas.getHeight()/9F)/2F - textHeight/2F,
-                        paintToUse);
+    private void updateMeasurements(float width, float height){
+        noteTextPaint().setTextSize(width/(9*3F));
+        textPaint().setTextSize(width/(9*1.5F));
+        startingCellTextPaint().setTextSize(width/(9*1.5F));
+    }
+
+    private void drawText(Canvas canvas) {
+        if(canvas == null) {
+            return;
+        }
+        for (Cell[] ce : cells) {
+            for (Cell c : ce) {
+
+                Rect textBounds = new Rect();
+                int value = c.value;
+                Paint noteTextPaint = noteTextPaint();
+
+                if (value == 0) {
+                    //draw notes
+                    c.notes.forEach(note -> {
+                        int rowInCell = (note - 1) / 3;
+                        int colInCell = (note - 1) % 3;
+                        String valueString = note.toString();
+                        noteTextPaint.getTextBounds(valueString, 0, valueString.length(), textBounds);
+                        float textWidth = noteTextPaint.measureText(valueString);
+                        float textHeight = textBounds.height();
+
+                        canvas.drawText(valueString,
+                                (c.col * (canvas.getWidth() / 9F)) + (canvas.getWidth() / 27F) * colInCell + ((canvas.getWidth() / 27F) / 2) - textWidth / 2F,
+                                (c.row * (canvas.getHeight() / 9F)) + (canvas.getHeight() / 27F) * rowInCell + ((canvas.getHeight() / 27F) / 2) + textHeight / 2F,
+                                noteTextPaint);
+
+                    });
+                } else {
+                    int row = c.row;
+                    int col = c.col;
+
+                    String valueString = String.valueOf(c.value);
+                    Paint paintToUse = c.isStarting ? startingCellTextPaint() : textPaint();
+                    paintToUse.getTextBounds(valueString, 0, valueString.length(), textBounds);
+                    float textWidth = paintToUse.measureText(valueString);
+                    float textHeight = textBounds.height();
+                    canvas.drawText(valueString,
+                            (col * (canvas.getWidth() / 3F)) + (canvas.getWidth() / 3F) / 2F - textWidth / 2F, //this used to be canvas.get...()/9F, trying 3F to see if it gets more readable that way
+                            (row * (canvas.getHeight() / 3F)) + (canvas.getHeight() / 3F) / 2F + textHeight / 2F,
+                            paintToUse);
+                }
+
+
             }
         }
     }
+
     private Paint textPaint(){
         Paint pain = new Paint();
         pain.setStyle(Style.FILL_AND_STROKE);
         pain.setColor(Color.BLACK);
-        pain.setTextSize(24F);
         return pain;
     }
 
@@ -88,7 +123,6 @@ public final class SudokuBoardView extends View {
         Paint pain1 = new Paint();
         pain1.setStyle(Style.FILL_AND_STROKE);
         pain1.setColor(Color.BLACK);
-        pain1.setTextSize(32F);
         pain1.setTypeface(Typeface.DEFAULT_BOLD);
         return pain1;
     }
@@ -99,6 +133,16 @@ public final class SudokuBoardView extends View {
         pain2.setColor(Color.argb(100,132,132,132));
         return pain2;
     }
+
+    private Paint noteTextPaint(){
+        Paint pain3 = new Paint();
+        pain3.setStyle(Style.FILL_AND_STROKE);
+        pain3.setColor(Color.BLACK);
+
+        return pain3;
+    }
+
+
 
     private void fillCells(Canvas canvas) {
 
@@ -126,6 +170,10 @@ public final class SudokuBoardView extends View {
     private void fillCell(Canvas canvas, int i, int j, Paint paint) {
         canvas.drawRect((float)(j*canvas.getWidth())/9F, (float)(i*canvas.getHeight())/9F, (float)((j+1)*canvas.getWidth())/9F, (float)((i+1)*canvas.getHeight())/9F,paint);
     }
+
+
+
+
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {

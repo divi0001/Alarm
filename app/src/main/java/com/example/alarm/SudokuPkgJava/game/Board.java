@@ -1,4 +1,4 @@
-package com.example.alarm.SudokuPkg.game;
+package com.example.alarm.SudokuPkgJava.game;
 
 public class Board {
     int size;

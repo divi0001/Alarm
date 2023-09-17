@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.alarm.SudokuPkg.game.Cell;
+import com.example.alarm.SudokuPkgJava.game.Cell;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -186,6 +186,15 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
 
         }
 
+
+        Cell[][] finalSudoku = intToCellSudoku(sudoku);
+
+
+
+        return finalSudoku;
+    }
+
+    public Cell[][] intToCellSudoku(int[][] sudoku) {
         int index = 0;
         Cell[][] finalSudoku = new Cell[9][9];
         for (int[] su:sudoku) {
@@ -196,16 +205,8 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
             }
             index++;
         }
-
-
-
         return finalSudoku;
     }
-
-
-
-
-
 
 
     private int[] shiftByX(int[] randSort, int index) {

@@ -17,7 +17,7 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import com.example.alarm.SudokuPkg.view.ActiveSudokuActivity;
+import com.example.alarm.SudokuPkgJava.view.ActiveSudokuActivity;
 
 import java.util.ArrayList;
 
