@@ -32,7 +32,7 @@
             android:name=".ActiveLocationActivity"
             android:exported="false" />
         <activity
-            android:name=".SudokuPkgJava.view.ActiveSudokuActivity"
+            android:name=".sudokuPkgJava.view.ActiveSudokuActivity"
             android:exported="false" />
         <activity
             android:name=".ActiveMathActivity"

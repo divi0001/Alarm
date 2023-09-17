@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.alarm.SudokuPkgJava.game.Cell;
+import com.example.alarm.sudokuPkgJava.game.Cell;
 
 import java.util.Arrays;
 import java.util.Random;

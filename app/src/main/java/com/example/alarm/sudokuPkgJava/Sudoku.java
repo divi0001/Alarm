@@ -1,4 +1,4 @@
-package com.example.alarm.SudokuPkgJava;
+package com.example.alarm.sudokuPkgJava;
 import java.lang.*;
 
 //stole this from geeks for greeks

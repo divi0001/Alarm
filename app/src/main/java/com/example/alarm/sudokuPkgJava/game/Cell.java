@@ -1,4 +1,4 @@
-package com.example.alarm.SudokuPkgJava.game;
+package com.example.alarm.sudokuPkgJava.game;
 
 import java.util.HashSet;
 import java.util.Set;

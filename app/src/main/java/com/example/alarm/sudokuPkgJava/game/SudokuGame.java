@@ -1,11 +1,11 @@
-package com.example.alarm.SudokuPkgJava.game;
+package com.example.alarm.sudokuPkgJava.game;
 
 import android.util.Pair;
 
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.alarm.SudokuMethodSetActivity;
-import com.example.alarm.SudokuPkgJava.Sudoku;
+import com.example.alarm.sudokuPkgJava.Sudoku;
 
 import java.util.Arrays;
 import java.util.HashSet;

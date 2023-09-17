@@ -1,4 +1,4 @@
-package com.example.alarm.SudokuPkgJava.view;
+package com.example.alarm.sudokuPkgJava.view;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -18,10 +18,10 @@ import com.example.alarm.DBHelper;
 import com.example.alarm.Enums;
 import com.example.alarm.R;
 import com.example.alarm.SudokuMethodSetActivity;
-import com.example.alarm.SudokuPkgJava.Sudoku;
-import com.example.alarm.SudokuPkgJava.game.Cell;
-import com.example.alarm.SudokuPkgJava.view.custom.SudokuBoardView;
-import com.example.alarm.SudokuPkgJava.viewmodel.PlaySudokuViewModel;
+import com.example.alarm.sudokuPkgJava.Sudoku;
+import com.example.alarm.sudokuPkgJava.game.Cell;
+import com.example.alarm.sudokuPkgJava.view.custom.SudokuBoardView;
+import com.example.alarm.sudokuPkgJava.viewmodel.PlaySudokuViewModel;
 
 import java.util.Objects;
 import java.util.Set;

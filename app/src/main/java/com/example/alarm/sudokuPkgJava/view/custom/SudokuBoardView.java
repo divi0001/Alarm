@@ -1,4 +1,4 @@
-package com.example.alarm.SudokuPkgJava.view.custom;
+package com.example.alarm.sudokuPkgJava.view.custom;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -11,7 +11,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.example.alarm.SudokuPkgJava.game.Cell;
+import com.example.alarm.sudokuPkgJava.game.Cell;
 
 public final class SudokuBoardView extends View {
 
