@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.PlaySudokuActivity">
+    tools:context="sudokuPkgJava.view.ActiveSudokuActivity">
 
-    <com.example.alarm.sudokupkgkotlin.view.custom.SudokuBoardView
+    <com.example.alarm.sudokuPkgJava.view.custom.SudokuBoardView
         android:id="@+id/sudokuBoardView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

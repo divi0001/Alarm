@@ -41,9 +41,6 @@
             android:name=".ActiveTapOffActivity"
             android:exported="false" />
         <activity
-            android:name=".ActiveAlarmActivity"
-            android:exported="false" />
-        <activity
             android:name=".MemoryMethodSetActivity"
             android:exported="false" />
         <activity

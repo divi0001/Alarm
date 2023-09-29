@@ -17,9 +17,9 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import java.util.ArrayList;
+import com.example.alarm.sudokuPkgJava.view.ActiveSudokuActivity;
 
-import com.example.alarm.sudokupkgkotlin.view.PlaySudokuActivity;
+import java.util.ArrayList;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -72,6 +72,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         Activity act;
         switch (aM.getType()) {
             case TapOff:
+            case Passphrase:
                 act = new ActiveTapOffActivity();
                 break;
             case Math:
@@ -84,13 +85,10 @@ public class AlarmReceiver extends BroadcastReceiver {
                 act = new ActiveMemoryActivity();
                 break;
             case Sudoku:
-                act = new PlaySudokuActivity(); //ActiveSudokuActivity
+                act = new ActiveSudokuActivity(); //ActiveSudokuActivity
                 break;
             case Location:
                 act = new ActiveLocationActivity();
-                break;
-            case Passphrase:
-                act = new ActiveTapOffActivity(); //todo build this into ActiveTapOffActivity
                 break;
             default:
                 act = new ActiveTapOffActivity();
