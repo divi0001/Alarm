@@ -242,6 +242,7 @@
     <string name="snooze_amount_left">"Amount of snoozes left: "</string>
     <string name="active_alarm_progress_key">com.example.alarm.ACTIVE_ALARM_PROGRESS_KEY</string>
     <string name="settings_key">com.example.alarm.MAIN_SETTINGS_KEY</string>
+    <string name="zero">0</string>
 
 
 </resources>

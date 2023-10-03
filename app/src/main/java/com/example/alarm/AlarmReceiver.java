@@ -17,7 +17,8 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import com.example.alarm.sudokuPkgJava.view.ActiveSudokuActivity;
+
+import com.example.alarm.sudoku.SudokuAlarmActivity;
 
 import java.util.ArrayList;
 
@@ -85,7 +86,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 act = new ActiveMemoryActivity();
                 break;
             case Sudoku:
-                act = new ActiveSudokuActivity(); //ActiveSudokuActivity
+                act = new SudokuAlarmActivity(); //ActiveSudokuActivity
                 break;
             case Location:
                 act = new ActiveLocationActivity();
