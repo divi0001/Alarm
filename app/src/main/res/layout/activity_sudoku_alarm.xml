@@ -6,7 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".sudoku.SudokuAlarmActivity">
 
-
+    <!--TODO bitte nicht view für view ändern, habe das hier mit hilfe eines haskellprogramms, als txt erstellen lassen (
+            falls du mal Änderungen vorhast, dann musst du nicht unnötig viel boilerplate selbst machen ;D
+            ) todo damits grün leuchtet lol -->
     <GridLayout
         android:id="@+id/gridSudoku"
         android:layout_width="0dp"
@@ -18,6 +20,9 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline10"
         app:layout_constraintStart_toStartOf="@+id/guideline9"
         app:layout_constraintTop_toTopOf="parent">
+
+
+
 
         <TextView
             android:id="@+id/txtSudokuR9C9"
