@@ -11,9 +11,10 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 
-import com.example.alarm.sudoku.Cell;
+import com.example.alarm.sudoku.subtry.game.Cell;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Random;
 
 public class SudokuMethodSetActivity extends AppCompatActivity {
@@ -114,10 +115,10 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
                     ret.append("I");
                 }
 
-                if(gen[i][j].value == 0){
+                if(gen[i][j].getValue() == 0){
                     ret.append(" ").append(lineEnd).append("  ");
                 }else{
-                    ret.append(" ").append(gen[i][j].value).append(" ").append(lineMiddle).append(" ");
+                    ret.append(" ").append(gen[i][j].getValue()).append(" ").append(lineMiddle).append(" ");
                 }
             }
             if(i != 2 && i != 5 && i != 8) ret.append("\n").append(row).append("\n");
@@ -201,7 +202,7 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
         for (int[] su:sudoku) {
             int index2 = 0;
             for (int s:su) {
-                finalSudoku[index][index2] = new Cell(index,index2,s);
+                finalSudoku[index][index2] = new Cell(index,index2,s,false,new HashSet<>());
                 index2++;
             }
             index++;
@@ -312,7 +313,7 @@ public class SudokuMethodSetActivity extends AppCompatActivity {
 
                 r1 = rand.nextInt(9);
 
-                preGen[k][r1].value = 0;
+                preGen[k][r1].setValue(0);
                 preGen[k][r1].isStarting = false;
 
             }

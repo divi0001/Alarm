@@ -18,7 +18,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 
-import com.example.alarm.sudoku.SudokuAlarmActivity;
+import com.example.alarm.sudoku.subtry.view.PlaySudokuActivity;
 
 import java.util.ArrayList;
 
@@ -69,8 +69,9 @@ public class AlarmReceiver extends BroadcastReceiver {
             aM = alarmMethods.get(0);
         }
 
-
-        Activity act;
+        Intent i = null;
+        Activity act = null;
+        boolean sk = false;
         switch (aM.getType()) {
             case TapOff:
             case Passphrase:
@@ -86,7 +87,13 @@ public class AlarmReceiver extends BroadcastReceiver {
                 act = new ActiveMemoryActivity();
                 break;
             case Sudoku:
-                act = new SudokuAlarmActivity(); //ActiveSudokuActivity
+                //i = new Intent();
+                //i.addCategory(Intent.CATEGORY_LAUNCHER);
+                //i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                //i.setComponent(new ComponentName("com.example.alarm.sudoku.subtry.view","com.example.alarm.sudoku.subtry.view.PlaySudokuActivity"));
+                //sk= true; //.subtry.view
+
+                act = new PlaySudokuActivity(); //ActiveSudokuActivity
                 break;
             case Location:
                 act = new ActiveLocationActivity();
@@ -95,8 +102,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 act = new ActiveTapOffActivity();
                 break;
         }
-
-            Intent i = new Intent(context, act.getClass()); //todo each activeActivity needs to have a logic in the end, checking for further queued methods and potentially launching the intent to the next in queue
+            if(!sk) i = new Intent(context, act.getClass()); //todo each activeActivity needs to have a logic in the end, checking for further queued methods and potentially launching the intent to the next in queue
 
             i.putExtra("id", id);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

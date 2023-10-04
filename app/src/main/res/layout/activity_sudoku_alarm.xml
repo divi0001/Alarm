@@ -9,613 +9,136 @@
     <!--TODO bitte nicht view für view ändern, habe das hier mit hilfe eines haskellprogramms, als txt erstellen lassen (
             falls du mal Änderungen vorhast, dann musst du nicht unnötig viel boilerplate selbst machen ;D
             ) todo damits grün leuchtet lol -->
-    <GridLayout
+    <!--<GridLayout
         android:id="@+id/gridSudoku"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#8888"
         android:columnCount="9"
         android:rowCount="9"
-        app:layout_constraintBottom_toTopOf="@+id/guideline8"
-        app:layout_constraintEnd_toStartOf="@+id/guideline10"
-        app:layout_constraintStart_toStartOf="@+id/guideline9"
         app:layout_constraintTop_toTopOf="parent">
 
 
 
 
-        <TextView
-            android:id="@+id/txtSudokuR9C9"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="8"  android:layout_column="8"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR8C9"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="7"  android:layout_column="8"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR7C9"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="6"  android:layout_column="8"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR6C9"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="5"  android:layout_column="8"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR5C9"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="4"  android:layout_column="8"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR4C9"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="3"  android:layout_column="8"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR3C9"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="2"  android:layout_column="8"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR2C9"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="1"  android:layout_column="8"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR1C9"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="0"  android:layout_column="8"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR9C8"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="8"  android:layout_column="7"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR8C8"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="7"  android:layout_column="7"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR7C8"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="6"  android:layout_column="7"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR6C8"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="5"  android:layout_column="7"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR5C8"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="4"  android:layout_column="7"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR4C8"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="3"  android:layout_column="7"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR3C8"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="2"  android:layout_column="7"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR2C8"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="1"  android:layout_column="7"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR1C8"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="0"  android:layout_column="7"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR9C7"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="8"  android:layout_column="6"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR8C7"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="7"  android:layout_column="6"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR7C7"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="6"  android:layout_column="6"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR6C7"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="5"  android:layout_column="6"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR5C7"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="4"  android:layout_column="6"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR4C7"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="3"  android:layout_column="6"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR3C7"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="2"  android:layout_column="6"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR2C7"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="1"  android:layout_column="6"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR1C7"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="0"  android:layout_column="6"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR9C6"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="8"  android:layout_column="5"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR8C6"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="7"  android:layout_column="5"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR7C6"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="6"  android:layout_column="5"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR6C6"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="5"  android:layout_column="5"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR5C6"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="4"  android:layout_column="5"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR4C6"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="3"  android:layout_column="5"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR3C6"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="2"  android:layout_column="5"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR2C6"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="1"  android:layout_column="5"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR1C6"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="0"  android:layout_column="5"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR9C5"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="8"  android:layout_column="4"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR8C5"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="7"  android:layout_column="4"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR7C5"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="6"  android:layout_column="4"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR6C5"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="5"  android:layout_column="4"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR5C5"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="4"  android:layout_column="4"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR4C5"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="3"  android:layout_column="4"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR3C5"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="2"  android:layout_column="4"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR2C5"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="1"  android:layout_column="4"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR1C5"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="0"  android:layout_column="4"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR9C4"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="8"  android:layout_column="3"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR8C4"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="7"  android:layout_column="3"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR7C4"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="6"  android:layout_column="3"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR6C4"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="5"  android:layout_column="3"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR5C4"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="4"  android:layout_column="3"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR4C4"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="3"  android:layout_column="3"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR3C4"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="2"  android:layout_column="3"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR2C4"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="1"  android:layout_column="3"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR1C4"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="0"  android:layout_column="3"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR9C3"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="8"  android:layout_column="2"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR8C3"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="7"  android:layout_column="2"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR7C3"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="6"  android:layout_column="2"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR6C3"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="5"  android:layout_column="2"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR5C3"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="4"  android:layout_column="2"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR4C3"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="3"  android:layout_column="2"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR3C3"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="2"  android:layout_column="2"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR2C3"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="1"  android:layout_column="2"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR1C3"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="0"  android:layout_column="2"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR9C2"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="8"  android:layout_column="1"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR8C2"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="7"  android:layout_column="1"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR7C2"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="6"  android:layout_column="1"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR6C2"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="5"  android:layout_column="1"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR5C2"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="4"  android:layout_column="1"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR4C2"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="3"  android:layout_column="1"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR3C2"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="2"  android:layout_column="1"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR2C2"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="1"  android:layout_column="1"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR1C2"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="0"  android:layout_column="1"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR9C1"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="8"  android:layout_column="0"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR8C1"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="7"  android:layout_column="0"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR7C1"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="6"  android:layout_column="0"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR6C1"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="5"  android:layout_column="0"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR5C1"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="4"  android:layout_column="0"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR4C1"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="3"  android:layout_column="0"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR3C1"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="2"  android:layout_column="0"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR2C1"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="1"  android:layout_column="0"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
-        <TextView
-            android:id="@+id/txtSudokuR1C1"
-            android:layout_width="wrap_content"  android:layout_height="wrap_content"
-            android:layout_row="0"  android:layout_column="0"
-            android:background="#8888"
-            android:text="@string/zero"
-            android:layout_gravity="center"  android:textSize="32sp"/>
 
 
 
     </GridLayout>
+    -->
+
+
+
+
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline8"
+        android:id="@+id/guideR1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.6" />
-
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.05" />
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline9"
+        android:id="@+id/guideR2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.15" />
-
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline10"
+        android:id="@+id/guideR3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.25" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideR4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.35" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideR5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.45" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideR6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.55" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideR7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.65" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideR8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.75" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideR9"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.85" />
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideC1"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.05"/>
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideC2"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.10"/>
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideC3"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.15"/>
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideC4"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.20"/>
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideC5"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.25"/>
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideC6"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.30"/>
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideC7"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.35"/>
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideC8"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.40"/>
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideC9"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.45"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

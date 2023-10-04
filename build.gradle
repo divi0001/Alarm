@@ -1,7 +1,22 @@
+buildscript {
+    ext.kotlin_version = '1.2.61'
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
 
 plugins {
     id 'com.android.application' version '8.1.0' apply false
     id 'com.android.library' version '8.1.0' apply false
     id 'org.jetbrains.kotlin.android' version '1.8.0' apply false
-    //minSDK Changed, look in the laptop, to see to which version
+    id("org.jetbrains.kotlin.kapt") version "1.9.20-Beta2"
 }
+
+
+

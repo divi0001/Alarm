@@ -25,6 +25,7 @@
         <activity
             android:name=".sudoku.SudokuAlarmActivity"
             android:exported="true" />
+        <activity android:name=".sudoku.subtry.view.PlaySudokuActivity" android:exported="true"/>
         <activity
             android:name=".ActiveQRBarActivity"
             android:exported="false" />

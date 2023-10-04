@@ -13,4 +13,5 @@
     <color name="green">#286E2A</color>
     <color name="purple">#673AB7</color>
     <color name="gray">#B6B6B6</color>
+    <color name="color_primary">#FF03DAC5</color>
 </resources>

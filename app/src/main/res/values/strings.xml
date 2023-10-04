@@ -243,6 +243,9 @@
     <string name="active_alarm_progress_key">com.example.alarm.ACTIVE_ALARM_PROGRESS_KEY</string>
     <string name="settings_key">com.example.alarm.MAIN_SETTINGS_KEY</string>
     <string name="zero">0</string>
+    <string name="sudokucell">sudokuCell</string>
+    <string name="time_until_sound">The alarm sound will turn on, when the bar reaches it\'s end</string>
+    <string name="done">Done</string>
 
 
 </resources>
