@@ -42,7 +42,7 @@ public class ActiveMathActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_active_math);
-        lvlID = -1;
+
 
         seekBarSoundTurnOn = (SeekBar) findViewById(R.id.seekProgressBarMath);
         anim = ValueAnimator.ofInt(0, seekBarSoundTurnOn.getMax());
@@ -54,6 +54,9 @@ public class ActiveMathActivity extends AppCompatActivity {
 
         taskTime = getSharedPreferences(getString(R.string.settings_key),MODE_PRIVATE).getInt("time_per_task", 30)*1000L;
 
+
+        lvlID = -1;
+        queueID = -1;
         Alarm alarm = new Alarm(-1);
 
         int alarmId = getIntent().getIntExtra("id",-1); // defVal 0?
@@ -93,53 +96,44 @@ public class ActiveMathActivity extends AppCompatActivity {
         txtMathTask.setText(displayedText);
 
         Alarm finalAlarm1 = alarm;
-        btnSnooze.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(Integer.parseInt(txtSnoozesLeft.getText().toString())>0){
-                    com.example.alarm.AlarmReceiver.r.stop();
-                    getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).edit().putInt("snooze_amount", Integer.parseInt(txtSnoozesLeft.getText().toString())-1).apply();
-                    txtSnoozesLeft.setText(Integer.parseInt(txtSnoozesLeft.getText().toString())-1);
+        btnSnooze.setOnClickListener(v -> {
+            if(Integer.parseInt(txtSnoozesLeft.getText().toString())>0){
+                AlarmReceiver.r.stop();
+                getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).edit().putInt("snooze_amount", Integer.parseInt(txtSnoozesLeft.getText().toString())-1).apply();
+                txtSnoozesLeft.setText(Integer.parseInt(txtSnoozesLeft.getText().toString())-1);
 
-                    final Handler handler = new Handler(Looper.getMainLooper());
-                    handler.postDelayed(() -> {
-                        AlarmReceiver.r.play();
-                        Intent i = new Intent(ActiveMathActivity.this, ActiveMathActivity.class);
-                        i.putExtra("id", alarmId);
-                        startActivity(i);
-                    }, finalAlarm1.getSnoozeMinutes(lvlID)*60*1000L);
+                final Handler handler = new Handler(Looper.getMainLooper());
+                handler.postDelayed(() -> {
+                    AlarmReceiver.r.play();
+                    Intent i = new Intent(ActiveMathActivity.this, ActiveMathActivity.class);
+                    i.putExtra("id", alarmId);
+                    startActivity(i);
+                }, finalAlarm1.getSnoozeMinutes(lvlID)*60*1000L);
 
 
 
-                }else{
-                    Toast.makeText(ActiveMathActivity.this, "No snoozes left, get up!", Toast.LENGTH_SHORT).show();
-                }
+            }else{
+                Toast.makeText(ActiveMathActivity.this, "No snoozes left, get up!", Toast.LENGTH_SHORT).show();
             }
         });
 
         Alarm finalAlarm = alarm;
         Enums.SubMethod finalMode = mode;
         Enums.Difficulties finalDifficulty = difficulty;
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(isCorrect(task, editMathAnswer.getText().toString(), finalMode, finalDifficulty)){
-                    nextOrAlarmOff(finalAlarm);
-                }else{
-                    editMathAnswer.setText("");
-                    Toast.makeText(ActiveMathActivity.this, "Your answer didn't match the internally calculated one", Toast.LENGTH_LONG).show();
-                }
+        btnSubmit.setOnClickListener(v -> {
+            if(isCorrect(task, editMathAnswer.getText().toString(), finalMode, finalDifficulty)){
+                nextOrAlarmOff(finalAlarm);
+            }else{
+                editMathAnswer.setText("");
+                Toast.makeText(ActiveMathActivity.this, "Your answer didn't match the internally calculated one", Toast.LENGTH_LONG).show();
             }
         });
 
 
         anim.setDuration(taskTime);
-        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                int animProgress = (Integer) animation.getAnimatedValue();
-                seekBarSoundTurnOn.setProgress(animProgress);
-            }
+        anim.addUpdateListener(animation -> {
+            int animProgress = (Integer) animation.getAnimatedValue();
+            seekBarSoundTurnOn.setProgress(animProgress);
         });
         anim.start();
 
@@ -511,12 +505,9 @@ public class ActiveMathActivity extends AppCompatActivity {
         anim = ValueAnimator.ofInt(progress, seekBarSoundTurnOn.getMax());
 
         anim.setDuration((long) (taskTime-(progress/seekBarSoundTurnOn.getMax()*1F)));
-        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                int animProgress = (Integer) animation.getAnimatedValue();
-                seekBarSoundTurnOn.setProgress(animProgress);
-            }
+        anim.addUpdateListener(animation -> {
+            int animProgress = (Integer) animation.getAnimatedValue();
+            seekBarSoundTurnOn.setProgress(animProgress);
         });
         anim.start();
     }

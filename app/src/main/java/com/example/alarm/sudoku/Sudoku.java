@@ -32,7 +32,7 @@ public class Sudoku {
         fillRemaining(0, SRN);
 
         // Remove Randomly K digits to make game
-        //removeKDigits();
+        removeKDigits();
     }
 
     // Fill the diagonal SRN number of SRN x SRN matrices
@@ -181,14 +181,16 @@ public class Sudoku {
     }
 
     // Print sudoku
-    public void printSudoku()
-    {
-        for (int i = 0; i<N; i++)
-        {
+    public String printSudoku(int[][] cells) {
+
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i<N; i++) {
             for (int j = 0; j<N; j++)
-                System.out.print(mat[i][j] + " ");
-            System.out.println();
+                res.append(cells[i][j]).append(" ");
+            res.append("\n");
         }
-        System.out.println();
+
+        return res.toString();
     }
+
 }

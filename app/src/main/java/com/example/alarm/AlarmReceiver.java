@@ -25,7 +25,7 @@ import java.util.ArrayList;
 public class AlarmReceiver extends BroadcastReceiver {
 
     int id = -1;
-    static Ringtone r;
+    public static Ringtone r;
 
     @SuppressLint("MissingPermission")
     @Override

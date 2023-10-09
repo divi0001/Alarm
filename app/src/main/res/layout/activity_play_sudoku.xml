@@ -137,13 +137,31 @@
         android:layout_marginEnd="32dp"
         android:layout_marginTop="24dp"/>
 
+    <TextView
+        android:id="@+id/txtSudokuSnoozesLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/snooze_amount_left"
+        android:layout_marginTop="8dp"/>
 
     <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnSudokuSnooze"
+        android:text="@string/snooze"
+        android:textAllCaps="false"
+        />
+
+
+    <Button
+        android:id="@+id/btnSubmitSudoku"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="@string/done"
         android:textAllCaps="false"/>
+
+
 
         </LinearLayout>
 
