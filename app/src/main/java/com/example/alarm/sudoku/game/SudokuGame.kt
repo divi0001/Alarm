@@ -1,4 +1,4 @@
-package com.example.alarm.sudoku.subtry.game
+package com.example.alarm.sudoku.game
 
 import androidx.lifecycle.MutableLiveData
 

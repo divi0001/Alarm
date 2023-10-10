@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="sudoku.subtry.view.PlaySudokuActivity">
+    tools:context=".sudoku.view.PlaySudokuActivity">
 
     <ScrollView
         android:layout_width="wrap_content"
@@ -18,7 +18,7 @@
             android:gravity="center">
 
 
-    <com.example.alarm.sudoku.subtry.view.custom.SudokuBoardView
+    <com.example.alarm.sudoku.view.custom.SudokuBoardView
         android:id="@+id/sudokuBoardView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -1,4 +1,4 @@
-package com.example.alarm.sudoku.subtry.view
+package com.example.alarm.sudoku.view
 
 import android.animation.ValueAnimator
 import android.graphics.Color
@@ -18,11 +18,11 @@ import com.example.alarm.AlarmReceiver
 import com.example.alarm.DBHelper
 import com.example.alarm.Enums.Difficulties
 import com.example.alarm.R
+import com.example.alarm.sudoku.viewmodel.PlaySudokuViewModel
 import com.example.alarm.sudoku.Sudoku
-import com.example.alarm.sudoku.subtry.game.Board
-import com.example.alarm.sudoku.subtry.game.Cell
-import com.example.alarm.sudoku.subtry.view.custom.SudokuBoardView
-import com.example.alarm.sudoku.subtry.viewmodel.PlaySudokuViewModel
+import com.example.alarm.sudoku.view.custom.SudokuBoardView
+import com.example.alarm.sudoku.game.Board
+import com.example.alarm.sudoku.game.Cell
 
 
 class PlaySudokuActivity : AppCompatActivity(), SudokuBoardView.OnTouchListener {

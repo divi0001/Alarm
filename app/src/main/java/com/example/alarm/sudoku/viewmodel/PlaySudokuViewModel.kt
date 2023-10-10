@@ -1,8 +1,8 @@
-package com.example.alarm.sudoku.subtry.viewmodel
+package com.example.alarm.sudoku.viewmodel
 
 
 import androidx.lifecycle.ViewModel
-import com.example.alarm.sudoku.subtry.game.SudokuGame
+import com.example.alarm.sudoku.game.SudokuGame
 
 class PlaySudokuViewModel : ViewModel() {
     val sudokuGame = SudokuGame()

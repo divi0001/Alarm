@@ -11,7 +11,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 
-import com.example.alarm.sudoku.subtry.game.Cell;
+import com.example.alarm.sudoku.game.Cell;
 
 import java.util.Arrays;
 import java.util.HashSet;

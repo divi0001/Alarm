@@ -18,7 +18,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 
-import com.example.alarm.sudoku.subtry.view.PlaySudokuActivity;
+import com.example.alarm.sudoku.view.PlaySudokuActivity;
 
 import java.util.ArrayList;
 

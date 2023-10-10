@@ -1,11 +1,11 @@
-package com.example.alarm.sudoku.subtry.view.custom
+package com.example.alarm.sudoku.view.custom
 
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import com.example.alarm.sudoku.subtry.game.Cell
+import com.example.alarm.sudoku.game.Cell
 import kotlin.math.min
 
 class SudokuBoardView(context: Context, attributeSet: AttributeSet) : View(context, attributeSet) {
