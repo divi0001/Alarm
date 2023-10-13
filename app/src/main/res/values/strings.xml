@@ -246,6 +246,9 @@
     <string name="sudokucell">sudokuCell</string>
     <string name="time_until_sound">The alarm sound will turn on, when the bar reaches it\'s end</string>
     <string name="done">Done</string>
+    <string name="enable_gps">Please enable gps services, or the alarm wont work, so it wont go off</string>
+    <string name="gps_is_enabled">I enabled it</string>
+    <string name="i_did_not_enable">Don\'t click this</string>
 
 
 </resources>

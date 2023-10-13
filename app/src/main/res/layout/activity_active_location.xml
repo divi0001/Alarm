@@ -6,4 +6,107 @@
     android:layout_height="match_parent"
     tools:context=".ActiveLocationActivity">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="@id/mapGuideLineTop"
+        app:layout_constraintStart_toStartOf="@id/mapGuideLineLeft"
+        app:layout_constraintEnd_toEndOf="@id/mapGuideLineRight"
+        app:layout_constraintBottom_toBottomOf="@id/mapGuideLineBottom"
+        >
+
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/mapActiveMap"
+        />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/mapGuideLineBottom"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/locationSnoozeAmount"
+        android:text="@string/snooze_amount_left"/>
+
+    <Button
+        android:id="@+id/btnLocationSnooze"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/snooze"
+        android:textAllCaps="false"
+        app:layout_constraintTop_toBottomOf="@id/locationSnoozeAmount"
+        android:layout_marginTop="8dp"
+        />
+
+    <Button
+        android:id="@+id/btnFakeUpdateLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/btnLocationSnooze"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="Update location"
+        android:textAllCaps="false"
+        app:layout_constraintTop_toBottomOf="@id/locationSnoozeAmount"
+        android:layout_marginTop="8dp"
+        />
+
+    <TextView
+        android:id="@+id/txtLocationSoundBackOn"
+        app:layout_constraintTop_toBottomOf="@id/btnLocationSnooze"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        android:text="@string/time_until_sound"/>
+
+    <SeekBar
+        android:id="@+id/seekBarLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtLocationSoundBackOn"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="12dp"/>
+
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/mapGuideLineLeft"
+        app:layout_constraintGuide_percent="0.10"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/mapGuideLineRight"
+        app:layout_constraintGuide_percent="0.90"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/mapGuideLineTop"
+        app:layout_constraintGuide_percent="0.15"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/mapGuideLineBottom"
+        app:layout_constraintGuide_percent="0.65"/>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

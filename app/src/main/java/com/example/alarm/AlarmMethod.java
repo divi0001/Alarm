@@ -11,8 +11,7 @@ public class AlarmMethod {
     private Enums.Difficulties difficulty;
     private Enums.Method method;
     private Enums.SubMethod subMethod;
-    private String qrLabel, addr;
-    private Address adress;
+    private String qrLabel;
 
     /*
     private final String[] translationTypeList = new String[]{"TapOff", "Math", "QRCode", "Location", "Sudoku", "Memory", "Passphrase"};
@@ -33,16 +32,14 @@ public class AlarmMethod {
         this.id = -1;
     }
 
-    public AlarmMethod(int id, Enums.Method method, Enums.SubMethod subMethod, Address address, int radius, double lon, double lat, String addr){
+    public AlarmMethod(int id, Enums.Method method, Enums.SubMethod subMethod, int radius, double lon, double lat){
         this.id = id;
         this.method = method;
         this.subMethod = subMethod;
         this.difficulty = Enums.Difficulties.None;
-        this.adress = address;
         this.locationRadius = radius;
         this.lon = lon;
         this.lat = lat;
-        this.addr = addr;
 
     }
 
@@ -134,20 +131,12 @@ public class AlarmMethod {
         this.subMethod = subType;
     }
 
-    public Address getAdress() {
-        return adress;
-    }
-
     public int getLocationRadius() {
         return (int) locationRadius;
     }
 
     public void setLocationRadius(double locationRadius) {
         this.locationRadius = locationRadius;
-    }
-
-    public void setAdress(Address adress) {
-        this.adress = adress;
     }
 
 
@@ -192,14 +181,6 @@ public class AlarmMethod {
         this.subMethod = subMethod;
     }
 
-    public String getAddr() {
-        return addr;
-    }
-
-    public void setAddr(String addr) {
-        this.addr = addr;
-    }
-
 
     @Override
     public String toString() {
@@ -212,8 +193,6 @@ public class AlarmMethod {
                 ", method=" + method +
                 ", subMethod=" + subMethod +
                 ", qrLabel='" + qrLabel + '\'' +
-                ", addr='" + addr + '\'' +
-                ", adress=" + adress +
                 '}';
     }
 }

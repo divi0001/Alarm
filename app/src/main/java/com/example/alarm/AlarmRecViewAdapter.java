@@ -39,7 +39,7 @@ public class AlarmRecViewAdapter extends RecyclerView.Adapter<AlarmRecViewAdapte
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
 
 
         holder.clock.setFormat24Hour(alarms.get(position).getT());
@@ -97,7 +97,7 @@ public class AlarmRecViewAdapter extends RecyclerView.Adapter<AlarmRecViewAdapte
                     //TODO: Schedule actual alarm with all the set options
                 }else{
                     alarms.get(position).setActive(true);
-                    //TODO: Switch off the scheduled alarm
+                    //TODO: unschedule the alarm
                 }
             }
         });

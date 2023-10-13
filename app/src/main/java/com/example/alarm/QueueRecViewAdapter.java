@@ -53,7 +53,7 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
         holder.txtId.setText(String.valueOf(alarmParameter.get(position).getId()));
 
         if(alarmParameter.get(position).getType() == Enums.Method.Location){
-            holder.txtDifficulty.setText("Radius: " + alarmParameter.get(position).getLocationRadius() + "m \n" + alarmParameter.get(position).getAddr());
+            holder.txtDifficulty.setText("Radius: " + alarmParameter.get(position).getLocationRadius() + "m \n Longitude: " + alarmParameter.get(position).getLon() +" , Latitude: " + alarmParameter.get(position).getLat());
         }else {
             holder.txtDifficulty.setText(alarmParameter.get(position).getDifficulty().toString());
         }
@@ -134,10 +134,8 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
                     double radius = alarmParameter.get(position).getLocationRadius(); //last arg in .substring is exclusive, so no -1 needed
                     String enter_leave = alarmParameter.get(position).getSubType().toString();
 
-                    se.putString("street", alarmParameter.get(position).getAdress().getSubThoroughfare());
                     se.putInt("radius",(int)radius);
                     se.putString("enter_leave", enter_leave);
-
 
                 }
                 se.putInt("id",alarmParameter.get(position).getId());
@@ -146,13 +144,6 @@ public class QueueRecViewAdapter extends RecyclerView.Adapter<QueueRecViewAdapte
                 context.startActivity(iUpdate);
             }
         });
-
-        //holder.parent.setOnClickListener(new View.OnClickListener() {
-         //   @Override
-          //  public void onClick(View v) {
-           //     Toast.makeText(context, "It fucking worked", Toast.LENGTH_SHORT).show();
-            //}
-        //});
 
     }
 

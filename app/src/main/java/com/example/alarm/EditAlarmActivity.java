@@ -989,8 +989,11 @@ if(edit) {
         }
         double longitude = 60;
         double latitude = 60;
-        List<Address> addr = new ArrayList<>();
-        String adr = "";
+        //List<Address> addr = new ArrayList<>();
+
+
+        //todo dont use the address in order to save the location, rather use long/lat
+
         if(shared.contains("long") && shared.contains("lat") && shared.contains("longitude") && shared.contains("latitude")){
             if(shared.getInt("long",60) < 0) longitude = (shared.getInt("long",60)*(-1)+(Double.parseDouble("0."+shared.getInt("longitude",0)*(-1))))*(-1);
             else longitude = shared.getInt("long", 60) + Double.parseDouble("0."+shared.getInt("longitude",0));
@@ -998,16 +1001,19 @@ if(edit) {
             else latitude = shared.getInt("lat", 60) + Double.parseDouble("0."+shared.getInt("latitude",0));
 
             Log.d("mett", "Long: "+String.valueOf(longitude) + " , Lat: " + String.valueOf(latitude));
+            /*
             Geocoder geo = new Geocoder(this, Locale.getDefault());
+
             try {
                 addr = geo.getFromLocation(latitude,longitude,1);
                 assert addr != null;
                 adr = addr.get(0).getAddressLine(0);
                 Log.d("mett", "Address: " + adr + " subthouroughfare: " + addr.get(0).getSubThoroughfare());
             } catch (IOException e) {
-                System.out.println("You fooooool, you havent even seen my last form!!!!");
                 throw new RuntimeException(e);
             }
+             */
+            //code kept here for now just in case
         }
         int radius = 600;
         if(shared.contains("radius")){
@@ -1046,7 +1052,7 @@ if(edit) {
                     currMethod.add(new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID)+1, methodToSet, labe));
                     methodToSet = Enums.Method.None;
                 } else if (methodToSet.equals(Enums.Method.Location)) {
-                    currMethod.add(new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID)+1, methodToSet, subMethod, addr.get(0), radius, longitude, latitude, adr));
+                    currMethod.add(new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID)+1, methodToSet, subMethod, radius, longitude, latitude));
                     methodToSet = Enums.Method.None;
                     difficulty = Enums.Difficulties.None;
                     subMethod = Enums.SubMethod.None;
@@ -1067,7 +1073,7 @@ if(edit) {
                     currMethod.set(where, new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID), methodToSet, labe));
                     methodToSet = Enums.Method.None;
                 } else if (methodToSet.equals(Enums.Method.Location)) {
-                    currMethod.set(where, new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID), methodToSet, subMethod, addr.get(0), radius, longitude, latitude, adr));
+                    currMethod.set(where, new AlarmMethod(getMaxMQueueID(alarmParameter, lvlID), methodToSet, subMethod, radius, longitude, latitude));
                     methodToSet = Enums.Method.None;
                     difficulty = Enums.Difficulties.None;
                     subMethod = Enums.SubMethod.None;

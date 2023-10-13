@@ -35,6 +35,7 @@ public class ActiveMathActivity extends AppCompatActivity {
     int tempProgress = 0;
     long taskTime = 30*1000;
     int lvlID, queueID;
+    AlarmMgr alarmMgr = new AlarmMgr(this);
 
 
 
@@ -45,18 +46,18 @@ public class ActiveMathActivity extends AppCompatActivity {
 
 
         seekBarSoundTurnOn = (SeekBar) findViewById(R.id.seekProgressBarMath);
-        anim = ValueAnimator.ofInt(0, seekBarSoundTurnOn.getMax());
         txtMathTask = (TextView) findViewById(R.id.txtMathTask);
         txtSnoozesLeft = (TextView) findViewById(R.id.txtMathSnoozesLeft);
         btnSubmit = (Button) findViewById(R.id.btnSubmitMathAnswer);
         btnSnooze = (Button) findViewById(R.id.btnMathSnooze);
         editMathAnswer = (EditText) findViewById(R.id.editMathAnswer);
 
-        taskTime = getSharedPreferences(getString(R.string.settings_key),MODE_PRIVATE).getInt("time_per_task", 30)*1000L;
+        taskTime = alarmMgr.getTaskTime();
+        anim = alarmMgr.makeAnim(seekBarSoundTurnOn.getMax(), seekBarSoundTurnOn);
 
 
-        lvlID = -1;
-        queueID = -1;
+        lvlID = alarmMgr.getLvlID();
+        queueID = alarmMgr.getQueueID();
         Alarm alarm = new Alarm(-1);
 
         int alarmId = getIntent().getIntExtra("id",-1); // defVal 0?
@@ -67,23 +68,14 @@ public class ActiveMathActivity extends AppCompatActivity {
         //com.example.alarm.AlarmReceiver.r.play(); repeating alarm sound from start
         //todo code to check if its a new level, therefore if a new sound uri should be set, if that's a thing, but i want to have that implemented
 
-        Enums.Difficulties difficulty = Enums.Difficulties.ExEasy;
-        Enums.SubMethod mode = Enums.SubMethod.Add;
+        Enums.Difficulties difficulty;
+        Enums.SubMethod mode;
 
-        if(alarm.isHasLevels()){
-            lvlID = getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).getInt("curr_lvl_id",0);
-            queueID = getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).getInt("curr_queue_id",0);
-            difficulty = alarm.getlQueue().get(lvlID).getmQueue().get(queueID).getDifficulty();
-            mode = alarm.getlQueue().get(lvlID).getmQueue().get(queueID).getSubMethod();
-            txtSnoozesLeft.setText(alarm.getSnoozeAmount(lvlID));
+        if(alarm.isHasLevels())txtSnoozesLeft.setText(alarm.getSnoozeAmount(lvlID));
+        else txtSnoozesLeft.setText(String.valueOf(alarm.getSnoozeAmount(-1)));
 
-        }else {
-            queueID = getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).getInt("curr_queue_id",0);
-            difficulty = alarm.getmQueue(-1).get(queueID).getDifficulty();
-            mode = alarm.getmQueue(-1).get(queueID).getSubMethod();
-            txtSnoozesLeft.setText(String.valueOf(alarm.getSnoozeAmount(-1)));
-
-        }
+        difficulty = alarmMgr.getAlarmDifficulty(alarm);
+        mode = alarmMgr.getAlarmMode(alarm);
 
 
 
@@ -122,7 +114,13 @@ public class ActiveMathActivity extends AppCompatActivity {
         Enums.Difficulties finalDifficulty = difficulty;
         btnSubmit.setOnClickListener(v -> {
             if(isCorrect(task, editMathAnswer.getText().toString(), finalMode, finalDifficulty)){
-                nextOrAlarmOff(finalAlarm);
+                if(alarmMgr.nextOrAlarmOff(finalAlarm)){
+                    //call the next alarm method via intent
+                }else{
+                    //todo clean up the sharedprefs if not done in alarmMgr
+                    finish();
+                }
+
             }else{
                 editMathAnswer.setText("");
                 Toast.makeText(ActiveMathActivity.this, "Your answer didn't match the internally calculated one", Toast.LENGTH_LONG).show();
@@ -130,84 +128,31 @@ public class ActiveMathActivity extends AppCompatActivity {
         });
 
 
-        anim.setDuration(taskTime);
-        anim.addUpdateListener(animation -> {
-            int animProgress = (Integer) animation.getAnimatedValue();
-            seekBarSoundTurnOn.setProgress(animProgress);
-        });
-        anim.start();
-
         seekBarSoundTurnOn.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser){
 
-                    resetToUserProgress(seekBar, progress);
+                    alarmMgr.resetToUserProgress(seekBar, progress, anim, taskTime);
                     tempProgress = progress;
-
                 }
             }
-
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                     anim.cancel();
                     tempProgress = seekBar.getProgress();
             }
-
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                resetToUserProgress(seekBar, seekBar.getProgress());
+                alarmMgr.resetToUserProgress(seekBar, seekBar.getProgress(), anim, taskTime);
             }
         });
 
 
 
-
-
-
-
-
-
-
     }
 
-    private void nextOrAlarmOff(Alarm alarm) {
-        //lvlID = getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).getInt("curr_lvl_id",0);
-        //queueID = getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).getInt("curr_queue_id",0);
-        if(alarm.isHasLevels()){
-            if(alarm.getlQueue().get(lvlID).getmQueue().size()-1 == queueID){
-                if(alarm.getlQueue().size()-1 == lvlID){
-                    getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).edit().putInt("curr_lvl_id", -1).apply();
-                    getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).edit().putInt("curr_queue_id", 0).apply();
-                }
-                lvlID++;
-                getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).edit().putInt("curr_lvl_id", lvlID).apply();
-                getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).edit().putInt("curr_queue_id", 0).apply();
 
-            }else if(lvlID != -1){
-                queueID++;
-                getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).edit().putInt("curr_queue_id", queueID).apply();
-            }else{
-                if(alarm.getmQueue(-1).size()-1 == queueID){
-                    //todo cleanup after alarm is done
-                    com.example.alarm.AlarmReceiver.r.stop();
-                    finish();
-                }else{
-                    queueID++;
-                    getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).edit().putInt("curr_queue_id", queueID).apply();
-                }
-            }
-        }else{
-            if (alarm.getmQueue(-1).size()-1 == queueID){
-                //todo cleanup after alarm is done
-                com.example.alarm.AlarmReceiver.r.stop();
-                finish();
-            }else{
-                queueID++;
-                getSharedPreferences(getString(R.string.active_alarm_progress_key), MODE_PRIVATE).edit().putInt("curr_queue_id", queueID).apply();
-            }
-        }
-    }
 
     private boolean isCorrect(long[] task, String answer, Enums.SubMethod sub, Enums.Difficulties diff) {
         switch(sub){
@@ -498,19 +443,7 @@ public class ActiveMathActivity extends AppCompatActivity {
         return retArr;
     }
 
-    private void resetToUserProgress(SeekBar seekBar, int progress) {
-        seekBar.setProgress(progress);
-        anim.cancel();
 
-        anim = ValueAnimator.ofInt(progress, seekBarSoundTurnOn.getMax());
-
-        anim.setDuration((long) (taskTime-(progress/seekBarSoundTurnOn.getMax()*1F)));
-        anim.addUpdateListener(animation -> {
-            int animProgress = (Integer) animation.getAnimatedValue();
-            seekBarSoundTurnOn.setProgress(animProgress);
-        });
-        anim.start();
-    }
 
 
 

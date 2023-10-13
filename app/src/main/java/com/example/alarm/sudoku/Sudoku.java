@@ -157,7 +157,7 @@ public class Sudoku {
 
     // Remove the K no. of digits to
     // complete game
-    public void removeKDigits()
+    public void removeKDigits() //todo make this method only remove digits, that can be logically deduced, e.g. make sure the sudoku is after removal still uniquely solvable
     {
         int count = K;
         while (count != 0)

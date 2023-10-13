@@ -65,7 +65,6 @@ import java.util.Objects;
 public class LocationMethodSetActivity extends AppCompatActivity {
 
     private MapView mapView;
-    private MapboxMap mapboxMap;
     private SeekBar seekBar;
     private ImageView imgGetLocation, imgBtnUp, imgSatellite, imgStreetSatellite, imgStreet, imgSatelliteExpanded, imgSatelliteMap;
     private Button btnGo;
@@ -132,7 +131,6 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                 rbLeave.setChecked(true);
             }
 
-            autoCompleteTextView.setText(getIntent().getStringExtra("street"));
 
 
         }
@@ -144,6 +142,7 @@ public class LocationMethodSetActivity extends AppCompatActivity {
         ValContainer<Address> vC = new ValContainer<>();
         adapt.setvC(vC);
 
+        //this method might cause trouble...to be seen in testing if it does
         autoCompleteTextView.setOnKeyListener(new View.OnKeyListener() {
             @SuppressLint("SetTextI18n")
             @Override
@@ -449,7 +448,6 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                             //se.putInt("latitude", Integer.parseInt(String.valueOf(latitude).split("\\.")[1]));
                             se.putInt("radius", (int) radius);
                             se.putString("SubMethod", radiusMode);
-                            Log.d("mett", "Hey "+ latitude  + " " + longitude);
                             se.apply();
                             finish();
 
@@ -473,7 +471,6 @@ public class LocationMethodSetActivity extends AppCompatActivity {
                         Log.d("mett", "newLong: " + (int) ((addr.getLongitude()- (int) addr.getLongitude())*1000000));
                         se.putInt("radius", (int) radius);
                         se.putString("SubMethod", radiusMode);
-                        Log.d("mett", "Im gay "+ latitude  + " " + longitude);
                         se.apply();
                         finish();
                     }
@@ -623,7 +620,7 @@ public class LocationMethodSetActivity extends AppCompatActivity {
 
             if((double)width*meterPerPixel[i] <= radius){
 
-                if(i>3)return i-4;
+                if(i>3) return i-4;
                 return 0;
             }
 
