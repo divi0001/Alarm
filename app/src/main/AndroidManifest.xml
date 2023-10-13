@@ -22,9 +22,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Alarm"
         tools:targetApi="31">
-        <activity
-            android:name=".sudoku.SudokuAlarmActivity"
-            android:exported="true" />
         <activity android:name=".sudoku.view.PlaySudokuActivity" android:exported="true"/>
         <activity
             android:name=".ActiveQRBarActivity"
