@@ -250,6 +250,7 @@
     <string name="gps_is_enabled">I enabled it</string>
     <string name="i_did_not_enable">Don\'t click this</string>
     <string name="passphrase_hint">Type your Passphrase here…</string>
+    <string name="scan_qr_bar">I\'m ready to scam</string>
 
 
 </resources>
