@@ -172,6 +172,20 @@ public class AlarmMgr {
         return mode;
     }
 
+    public Enums.Method getAlarmMethod(Alarm alarm){
+        Enums.Method mode;
+        int lvlID = getLvlID();
+        int queueID = getQueueID();
+        if(alarm.isHasLevels()){
+            mode = alarm.getlQueue().get(lvlID).getmQueue().get(queueID).getMethod();
+        }else {
+            mode = alarm.getmQueue(-1).get(queueID).getMethod();
+        }
+        return mode;
+    }
+
+
+
     public int getLvlID(){
         return context.getSharedPreferences(context.getString(R.string.active_alarm_progress_key), MODE_PRIVATE).getInt("curr_lvl_id",-1);
     }
