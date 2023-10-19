@@ -17,6 +17,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Button;
@@ -40,8 +41,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.mapbox.android.gestures.StandardScaleGestureDetector;
 import com.mapbox.geojson.Feature;
@@ -74,9 +77,12 @@ public class ActiveLocationActivity extends AppCompatActivity implements Locatio
     MapView mapview;
     PolygonOptions currPoly;
     private FusedLocationProviderClient client;
-    LocationRequest request;
     public double longitude, latitude, radius, zoom, userLong, userLat;
+    boolean winCondition = false;
+    Enums.SubMethod mode;
+    Alarm alarm;
 
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -143,7 +149,7 @@ public class ActiveLocationActivity extends AppCompatActivity implements Locatio
         lvlID = alarmMgr.getLvlID();
         queueID = alarmMgr.getQueueID();
 
-        Alarm alarm = new Alarm(-1);
+        alarm = new Alarm(-1);
 
         int alarmId = getIntent().getIntExtra("id", -1); // defVal 0?
         try (DBHelper db = new DBHelper(this, "Database.db")) {
@@ -157,7 +163,7 @@ public class ActiveLocationActivity extends AppCompatActivity implements Locatio
             txtSnoozesLeft.setText(String.valueOf(alarm.getSnoozeAmount(-1)));
 
         Enums.Difficulties difficulty = alarmMgr.getAlarmDifficulty(alarm);
-        Enums.SubMethod mode = alarmMgr.getAlarmMode(alarm);
+        mode = alarmMgr.getAlarmMode(alarm);
 
         if (alarm.isHasLevels()) {
             longitude = alarm.getmQueue(lvlID).get(queueID).getLon();
@@ -204,13 +210,39 @@ public class ActiveLocationActivity extends AppCompatActivity implements Locatio
             updateMap();
         });
 
+        scheduleLocation();
+
 
     }
 
-    @SuppressLint("MissingPermissions")
+
+    @SuppressLint("MissingPermission")
+    void scheduleLocation(){
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(ActiveLocationActivity.this);
+        new Handler(Looper.getMainLooper()).postDelayed(() -> fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener(locati -> {
+            if(locati != null){
+                userLat = locati.getLatitude();
+                userLong = locati.getLongitude();
+                updateMap();
+            }
+            Log.d("matt", "new Location update\n" + userLat + " " + userLong);
+        }),1000);
+
+        float[] result = new float[1];
+        Location.distanceBetween(latitude,longitude, userLat, userLong, result);
+        if(result[0] > radius && mode == Enums.SubMethod.Leave){
+            winCondition = true;
+        }else if(result[0] < radius && mode == Enums.SubMethod.Enter){
+            winCondition = true;
+        }
+
+        alarmMgr.nextOrAlarmOff(alarm);
+
+        if(!winCondition) new Handler(Looper.getMainLooper()).postDelayed(this::scheduleLocation, 2000);
+    }
+
     private void setupLocationUpdates() {
-        //todo make sure the method uses another location service if using earlier version of android
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+        //if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
 
             LocationCallback locationCallback = new LocationCallback() {
                 @Override
@@ -249,13 +281,13 @@ public class ActiveLocationActivity extends AppCompatActivity implements Locatio
                                 e.printStackTrace();
                             }
                         }else{
-
+                            task.getResult();
                         }
                     }
                 }
             });
 
-        }
+        //}
 
 
 
@@ -283,8 +315,6 @@ public class ActiveLocationActivity extends AppCompatActivity implements Locatio
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
             });
-
-
         }
     }
 
@@ -324,8 +354,7 @@ public class ActiveLocationActivity extends AppCompatActivity implements Locatio
                                 iconAllowOverlap(true),
                                 iconOffset(new Float[]{0f, -9f})
                         ));
-                    }
-                    else{
+                    }else{
                         style.addImage("user-icon", Objects.requireNonNull(BitmapUtils.getBitmapFromDrawable(getResources().getDrawable(R.drawable.ic_user_location_icon2))),false);
                         style.addLayer(new SymbolLayer("icon-layer-id","icon-source-id").withProperties(
                                 iconImage("user-icon"),
@@ -339,12 +368,13 @@ public class ActiveLocationActivity extends AppCompatActivity implements Locatio
                     if(userLat != -1000) {
                         GeoJsonSource iconGeoJsonSource = new GeoJsonSource("icon-source-id", Feature.fromGeometry(Point.fromLngLat(userLong, userLat)));
                         style.addSource(iconGeoJsonSource);
+                        zoom = alarmMgr.radiusToZoom(radius, userLat);
                     }else{
                         GeoJsonSource iconGeoJsonSource = new GeoJsonSource("icon-source-id", Feature.fromGeometry(Point.fromLngLat(longitude, latitude)));
                         style.addSource(iconGeoJsonSource);
+                        zoom = alarmMgr.radiusToZoom(radius, latitude);
                     }
 
-                    zoom = alarmMgr.radiusToZoom(radius, latitude);
                 }
             });
         });
